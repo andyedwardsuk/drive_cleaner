@@ -77,12 +77,27 @@ function getCachedFolderId() {
 
 /**
  * Modified version of getFileandFolders that returns data instead of writing to sheet
+ * Now includes caching for improved performance on repeated scans
+ *
  * @param {String} rootId - The main root id.
  * @param {String} corpora - either 'drive' or 'user'
- * @returns {Array<Array>} 2D array of file/folder data
+ * @returns {Array<Array>} 2D array of file/folder data with enhanced metadata
  */
 function getFileandFoldersData(rootId, corpora) {
   console.time("getFilesAndFoldersData")
+
+  // Generate cache key
+  const cacheKey = generateCacheKey(rootId, corpora)
+
+  // Attempt to get cached data
+  const cachedData = getCachedScanData(cacheKey)
+  if (cachedData) {
+    Logger.log(`Returning cached data for ${rootId} (${cachedData.length} files)`)
+    console.timeEnd("getFilesAndFoldersData")
+    return cachedData
+  }
+
+  Logger.log(`Cache miss - performing fresh scan for ${rootId}`)
 
   const maxNumOfFoldersPerQuery = "250"
   let pageToken = null
@@ -136,6 +151,12 @@ function getFileandFoldersData(rootId, corpora) {
     const itemArrays = createFileArrays_(items, folders)
     folders = [...foldersRemaining, ...itemArrays.childFolderIds]
     directoryArray = directoryArray.concat(itemArrays.spreadsheetFormatted)
+  }
+
+  // Cache the results (6 hour TTL)
+  const cacheSuccess = setCachedScanData(cacheKey, directoryArray)
+  if (cacheSuccess) {
+    Logger.log(`Scan results cached for ${rootId} (${directoryArray.length} files)`)
   }
 
   console.timeEnd("getFilesAndFoldersData")

@@ -43,12 +43,42 @@ const copyToClipboard = (text) => {
 
 // Helper to export data as CSV
 const exportToCSV = (data) => {
-  const headers = ['Icon', 'File Name', 'File ID', 'Parent Name', 'Parent ID', 'MIME Type']
+  const headers = [
+    'Icon',
+    'File Name',
+    'File Size',
+    'Category',
+    'Last Modified',
+    'Created Date',
+    'Last Viewed',
+    'Owner',
+    'Sharing Status',
+    'Starred',
+    'Parent Folder',
+    'File ID',
+    'Drive Link',
+    'MIME Type',
+  ]
   const csvContent = [
     headers.join(','),
     ...data.map(row =>
-      [row.icon, row.fileName, row.fileId, row.parentName, row.parentId, row.mimeType]
-        .map(cell => `"${cell}"`)
+      [
+        row.icon,
+        row.fileName,
+        row.fileSize,
+        row.fileCategory,
+        row.modifiedDate,
+        row.createdDate,
+        row.lastViewedDate,
+        row.ownerNames,
+        row.sharingStatus,
+        row.starred,
+        row.parentName,
+        row.fileId,
+        row.driveLink,
+        row.mimeType,
+      ]
+        .map(cell => `"${cell || ''}"`)
         .join(',')
     )
   ].join('\n')
@@ -128,22 +158,107 @@ export default function FileTable({ data = [] }) {
             </Button>
           )
         },
-        cell: ({ row }) => <div className="font-medium">{row.getValue('fileName')}</div>,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-2">
+            <span className="font-medium">{row.getValue('fileName')}</span>
+            {row.original.starred && <span className="text-yellow-500">{row.original.starred}</span>}
+          </div>
+        ),
       },
       {
-        accessorKey: 'fileId',
+        accessorKey: 'fileSize',
         header: ({ column }) => {
           return (
             <Button
               variant="ghost"
               onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
-              File ID
+              Size
               <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
           )
         },
-        cell: ({ row }) => <div className="font-mono text-xs">{row.getValue('fileId')}</div>,
+        cell: ({ row }) => <div className="text-sm">{row.getValue('fileSize')}</div>,
+        sortingFn: (rowA, rowB) => {
+          const a = rowA.original.fileSizeBytes || 0
+          const b = rowB.original.fileSizeBytes || 0
+          return a - b
+        },
+      },
+      {
+        accessorKey: 'fileCategory',
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+              Category
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          )
+        },
+        cell: ({ row }) => {
+          const category = row.getValue('fileCategory')
+          return (
+            <Badge variant="secondary" className="text-xs">
+              {category}
+            </Badge>
+          )
+        },
+      },
+      {
+        accessorKey: 'modifiedDate',
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+              Last Modified
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          )
+        },
+        cell: ({ row }) => <div className="text-sm">{row.getValue('modifiedDate')}</div>,
+      },
+      {
+        accessorKey: 'ownerNames',
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+              Owner
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          )
+        },
+        cell: ({ row }) => <div className="text-sm">{row.getValue('ownerNames')}</div>,
+      },
+      {
+        accessorKey: 'sharingStatus',
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            >
+              Sharing
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          )
+        },
+        cell: ({ row }) => {
+          const status = row.getValue('sharingStatus')
+          const variant = status === 'Private' ? 'outline' : status === 'Public' ? 'destructive' : 'default'
+          return (
+            <Badge variant={variant} className="text-xs">
+              {status}
+            </Badge>
+          )
+        },
       },
       {
         accessorKey: 'parentName',
@@ -153,36 +268,9 @@ export default function FileTable({ data = [] }) {
               variant="ghost"
               onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             >
-              Parent Name
+              Parent Folder
               <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
-          )
-        },
-      },
-      {
-        accessorKey: 'parentId',
-        header: 'Parent ID',
-        cell: ({ row }) => <div className="font-mono text-xs">{row.getValue('parentId')}</div>,
-      },
-      {
-        accessorKey: 'mimeType',
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            >
-              MIME Type
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          )
-        },
-        cell: ({ row }) => {
-          const mimeType = row.getValue('mimeType')
-          return (
-            <Badge variant="secondary" className="font-mono text-xs">
-              {getFileTypeLabel(mimeType)}
-            </Badge>
           )
         },
       },
@@ -191,10 +279,7 @@ export default function FileTable({ data = [] }) {
         enableHiding: false,
         cell: ({ row }) => {
           const file = row.original
-          const isFolder = file.mimeType === 'application/vnd.google-apps.folder'
-          const driveUrl = isFolder
-            ? `https://drive.google.com/drive/folders/${file.fileId}`
-            : `https://drive.google.com/file/d/${file.fileId}/view`
+          const driveUrl = file.driveLink || `https://drive.google.com/file/d/${file.fileId}/view`
 
           return (
             <DropdownMenu>
@@ -213,10 +298,10 @@ export default function FileTable({ data = [] }) {
                   Copy File ID
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => copyToClipboard(file.parentId)}
+                  onClick={() => copyToClipboard(driveUrl)}
                 >
                   <Copy className="mr-2 h-4 w-4" />
-                  Copy Parent ID
+                  Copy Drive Link
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem

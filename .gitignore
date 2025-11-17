@@ -147,6 +147,9 @@ public
 .claude/
 !.claude/settings.json
 
+# GitHub workflows and templates (managed separately)
+.github/
+
 # Google Apps Script
 .clasprc.json
 .clasp.json

@@ -13,6 +13,19 @@ export default {
         sm: 'calc(var(--radius) - 4px)'
       },
       colors: {
+        // Blue/Indigo Theme Colors
+        'app-bg': {
+          start: '#0f172a',  // Slate 900
+          mid: '#1e3a8a',    // Blue 900
+          end: '#1e40af',    // Blue 800
+        },
+        'glass': {
+          surface: 'rgba(30, 58, 138, 0.3)',
+          border: 'rgba(59, 130, 246, 0.2)',
+          hover: 'rgba(59, 130, 246, 0.4)',
+        },
+
+        // Shadcn colors adapted for blue/indigo theme
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
@@ -53,7 +66,23 @@ export default {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))'
         }
-      }
+      },
+      backdropBlur: {
+        xs: '2px',
+      },
+      animation: {
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      },
+      keyframes: {
+        'slide-in': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(0)' },
+        },
+        'fade-in': {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+      },
     }
   },
   plugins: [],

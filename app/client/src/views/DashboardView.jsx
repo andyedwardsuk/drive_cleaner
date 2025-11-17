@@ -1,0 +1,190 @@
+import { useState, useEffect } from 'react'
+import { Home, FolderSearch, RefreshCw } from 'lucide-react'
+import Hero from '@/components/Hero'
+import FileTable from '@/components/FileTable'
+import DrivePicker from '@/components/DrivePicker'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+
+export default function DashboardView() {
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [folderId, setFolderId] = useState('')
+
+  const isGAS = typeof google !== 'undefined' && google.script && google.script.run
+
+  const loadData = (folderIdToLoad, corpora = 'user') => {
+    if (!isGAS) {
+      setData([
+        {
+          icon: '📂',
+          fileName: 'Sample Folder',
+          fileSize: '',
+          fileCategory: 'Folder',
+          modifiedDate: '17/11/2024 14:30',
+          createdDate: '15/11/2024 10:00',
+          lastViewedDate: '17/11/2024 09:15',
+          ownerNames: 'Sample User',
+          sharingStatus: 'Private',
+          starred: '',
+          parentName: 'Root',
+          fileId: '1234567890abcdef',
+          driveLink: 'https://drive.google.com/drive/folders/1234567890abcdef',
+          mimeType: 'application/vnd.google-apps.folder',
+          fileSizeBytes: 0,
+        },
+        {
+          icon: '📃',
+          fileName: 'Sample Document.docx',
+          fileSize: '125.50 KB',
+          fileCategory: 'Document',
+          modifiedDate: '16/11/2024 16:45',
+          createdDate: '14/11/2024 11:30',
+          lastViewedDate: '16/11/2024 18:20',
+          ownerNames: 'Sample User',
+          sharingStatus: 'Shared',
+          starred: '⭐',
+          parentName: 'Sample Folder',
+          fileId: 'abcdef1234567890',
+          driveLink: 'https://drive.google.com/file/d/abcdef1234567890/view',
+          mimeType: 'application/vnd.google-apps.document',
+          fileSizeBytes: 128512,
+        },
+      ])
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+
+    const payload = JSON.stringify({
+      urlId: folderIdToLoad || 'root',
+      corpora: corpora,
+    })
+
+    google.script.run
+      .withSuccessHandler((result) => {
+        setLoading(false)
+        if (result && result.data) {
+          const transformedData = result.data.map((item) => ({
+            icon: item[0],                    // Icon
+            fileName: item[1],                // File Name
+            fileSize: item[2],                // File Size (formatted)
+            fileCategory: item[3],            // File Type Category
+            modifiedDate: item[4],            // Last Modified
+            createdDate: item[5],             // Created Date
+            lastViewedDate: item[6],          // Last Viewed
+            ownerNames: item[7],              // Owner(s)
+            sharingStatus: item[8],           // Sharing Status
+            starred: item[9],                 // Starred indicator
+            parentName: item[10],             // Parent Folder Name
+            fileId: item[11],                 // File|Folder ID
+            driveLink: item[12],              // Drive Link
+            mimeType: item[13],               // MIME Type
+            fileSizeBytes: item[14],          // Size (bytes - for sorting)
+          }))
+          setData(transformedData)
+        } else {
+          setData(result || [])
+        }
+      })
+      .withFailureHandler((err) => {
+        setLoading(false)
+        setError(err.message || 'Failed to load data')
+        console.error('Error loading data:', err)
+      })
+      .getFilesAndFoldersForWeb(payload)
+  }
+
+  useEffect(() => {
+    if (isGAS) {
+      google.script.run
+        .withSuccessHandler((cachedData) => {
+          if (cachedData && cachedData.folderId) {
+            setFolderId(cachedData.folderId)
+            loadData(cachedData.folderId, cachedData.corpora)
+          }
+        })
+        .withFailureHandler((err) => {
+          console.error('Error loading cached data:', err)
+        })
+        .getCachedFolderId()
+    } else {
+      loadData()
+    }
+  }, [])
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    loadData(folderId)
+  }
+
+  const handleFolderSelected = (folder) => {
+    setFolderId(folder.id)
+    loadData(folder.id)
+  }
+
+  return (
+    <div className="space-y-6">
+      <Hero
+        icon={Home}
+        title="Dashboard"
+        subtitle="List and manage your Google Drive files and folders"
+        illustration="🏠"
+      />
+
+      <div className="p-6 border rounded-xl bg-card border-glass-border backdrop-blur-sm">
+        <form onSubmit={handleSubmit} className="flex items-end gap-4">
+          <div className="flex-1">
+            <Label htmlFor="folderId">Folder ID or URL</Label>
+            <div className="flex gap-2">
+              <Input
+                id="folderId"
+                type="text"
+                placeholder="Enter folder ID, URL, or use Browse to select"
+                value={folderId}
+                onChange={(e) => setFolderId(e.target.value)}
+                disabled={loading}
+                className="flex-1"
+              />
+              <DrivePicker onFolderSelected={handleFolderSelected} disabled={loading} />
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Leave empty for My Drive root, or click Browse to select a folder
+            </p>
+          </div>
+          <Button type="submit" disabled={loading}>
+            {loading ? (
+              <>
+                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              <>
+                <FolderSearch className="mr-2 h-4 w-4" />
+                Load Folder
+              </>
+            )}
+          </Button>
+        </form>
+      </div>
+
+      {error && (
+        <div className="p-4 border border-destructive rounded-xl bg-destructive/10 text-destructive">
+          <p className="font-semibold">Error</p>
+          <p className="text-sm">{error}</p>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="flex items-center justify-center p-12">
+          <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : (
+        <FileTable data={data} />
+      )}
+    </div>
+  )
+}
