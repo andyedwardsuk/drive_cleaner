@@ -1,11 +1,14 @@
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 /**
  * Build configuration
  */
 const config = {
-  sourceDir: './app/server',
+  serverDir: './app/server',
+  clientDir: './app/client',
+  clientBuildDir: './app/client/build',
   outputDir: './dist',
   includeDev: process.argv.includes('--dev'),
   preserveDirs: ['libraries', 'utilities'] // Preserve these directories in dist
@@ -92,6 +95,21 @@ function build() {
   console.log(`Mode: ${config.includeDev ? 'Development (includes tests)' : 'Production (excludes tests)'}`);
   console.log('============================================================\n');
 
+  // Build React app first
+  if (fs.existsSync(config.clientDir)) {
+    console.log('⚛️  Building React app...');
+    try {
+      execSync('pnpm run build', {
+        cwd: config.clientDir,
+        stdio: 'inherit'
+      });
+      console.log('✓ React app built\n');
+    } catch (error) {
+      console.error('❌ React build failed:', error.message);
+      throw error;
+    }
+  }
+
   // Clean dist directory but preserve specific folders and appsscript.json
   console.log('📦 Cleaning dist directory...');
   if (fs.existsSync(config.outputDir)) {
@@ -114,9 +132,20 @@ function build() {
   console.log('✓ Cleaned dist directory\n');
 
   // Copy files from app/server to dist
-  console.log('📋 Copying files...');
-  copyFiles(config.sourceDir, config.outputDir);
-  console.log('\n✓ Files copied\n');
+  console.log('📋 Copying server files...');
+  copyFiles(config.serverDir, config.outputDir);
+  console.log('✓ Server files copied\n');
+
+  // Copy React build output (index.html) to dist
+  if (fs.existsSync(config.clientBuildDir)) {
+    console.log('📋 Copying React build output...');
+    const indexPath = path.join(config.clientBuildDir, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      fs.copyFileSync(indexPath, path.join(config.outputDir, 'index.html'));
+      console.log('✓ Copied: index.html');
+    }
+    console.log('✓ React build output copied\n');
+  }
 
   // Preserve special directories
   config.preserveDirs.forEach(dir => {

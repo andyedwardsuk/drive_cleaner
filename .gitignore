@@ -227,3 +227,4 @@ server-backup/
 # tasks.json
 # tasks/
 client_secret.json
+.vscode/

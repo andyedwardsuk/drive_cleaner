@@ -4,7 +4,7 @@
  *                                    PROJECT DETAILS
  * #######################################################################################
  * This project creates List all files and folders in a selected folder.
- * The user selectes a folder by clicking the menu "List Files/Folders" > "List All Files and Folders"
+ * The user selects a folder by clicking the menu "List Files/Folders" > "List All Files and Folders"
  * Alternatively, the user may wish to refresh the list by selecting "List Files/Folders" > "Refresh"
  *
  * @license https://docs.google.com/document/d/1kn5lof_GtJyTLa74BSAQxEFVkVfrNy8e4Ilr8a3pJQQ
@@ -423,4 +423,3 @@ function convertUrlToId_test(){
   convertUrlToId(eg3)
 
 }
-
