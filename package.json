@@ -1,0 +1,23 @@
+{
+  "name": "drive_cleaner",
+  "version": "1.0.0",
+  "description": "Google Apps Script JavaScript Project with JSDoc",
+  "scripts": {
+    "build": "node build.js",
+    "build:dev": "node build.js --dev",
+    "push": "pnpm run build && clasp push",
+    "push:dev": "pnpm run build:dev && clasp push",
+    "push:watch": "pnpm run build && clasp push --watch",
+    "pull": "clasp pull",
+    "open": "clasp open",
+    "logs": "clasp logs",
+    "lint": "eslint app/**/*.js",
+    "lint:fix": "eslint app/**/*.js --fix"
+  },
+  "devDependencies": {
+    "@types/google-apps-script": "^1.0.97",
+    "eslint": "^8.57.0",
+    "eslint-plugin-googleappsscript": "^1.0.4"
+  },
+  "packageManager": "pnpm@10.21.0"
+}
