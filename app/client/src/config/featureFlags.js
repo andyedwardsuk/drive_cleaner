@@ -11,7 +11,7 @@ export const FEATURE_FLAGS = {
 
   // Phase 1 (v0.2.0) - Now Available
   FEATURE_SMART_SCAN: true,
-  FEATURE_LARGE_FILES: false,
+  FEATURE_LARGE_FILES: true,
   FEATURE_OLD_FILES: false,
   FEATURE_SHARED_FILES: false,
   FEATURE_SETTINGS: false,
