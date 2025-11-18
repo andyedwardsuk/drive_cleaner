@@ -1,434 +1,463 @@
-//########### LIST ALL FILES AND FOLDERS ###########
-
-/**#######################################################################################
- *                                    PROJECT DETAILS
- * #######################################################################################
- * This project creates List all files and folders in a selected folder.
- * The user selects a folder by clicking the menu "List Files/Folders" > "List All Files and Folders"
- * Alternatively, the user may wish to refresh the list by selecting "List Files/Folders" > "Refresh"
+/**
+ * Drive Cleaner - List All Files and Folders
+ *
+ * Provides functionality to list all files and folders in Google Drive
+ * with support for both My Drive and Shared Drives.
  *
  * @license https://docs.google.com/document/d/1kn5lof_GtJyTLa74BSAQxEFVkVfrNy8e4Ilr8a3pJQQ
  * @author Scott Donald <yagisanatode@gmail.com>
- * @version [0.1.0] - 2024-01-29
- *
+ * @author Andy Edwards (refactored)
+ * @version [0.2.0] - 2025-11-17
  */
 
+var DriveFileList = (function () {
+
+  // ============================================
+  // PRIVATE CONSTANTS
+  // ============================================
+
+  /** Maximum folders per Drive API query to avoid URL length limits */
+  const MAX_FOLDERS_PER_QUERY = 250;
+
+  /** MIME type identifier for Google Drive folders */
+  const MIME_TYPE_FOLDER = 'application/vnd.google-apps.folder';
+
+  /** User property key for caching folder refresh data */
+  const CACHE_KEY_REFRESH = 'refresh';
+
+  /** Spreadsheet header row labels */
+  const HEADER_LABELS = ['Icon', 'File Name', 'File ID', 'Parent Name', 'Parent ID', 'File MIME type'];
+
+  /** Icon constants */
+  const ICON_FOLDER = '📂';
+  const ICON_FILE = '📃';
+
+  // ============================================
+  // PUBLIC API FUNCTIONS
+  // ============================================
+
+  /**
+   * Creates menu items when spreadsheet opens
+   * Called by global onOpen() trigger
+   */
+  function createMenu() {
+    const userInterface = SpreadsheetApp.getUi();
+    userInterface.createMenu('List Files/Folders')
+      .addItem('List All Files and Folders', 'DriveFileList.showPickerDialog')
+      .addItem('Refresh', 'DriveFileList.refreshList')
+      .addToUi();
+  }
+
+  /**
+   * Shows folder picker dialog to user
+   */
+  function showPickerDialog() {
+    const htmlOutput = HtmlService.createHtmlOutputFromFile('index')
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+      .setTitle('List all files and folders')
+      .setHeight(340)
+      .setWidth(500);
+
+    const userInterface = SpreadsheetApp.getUi();
+    userInterface.showModalDialog(htmlOutput, 'List all files and folders');
+  }
+
+  /**
+   * Refreshes file list using cached folder ID
+   */
+  function refreshList() {
+    const cachedData = getCachedFolderData_();
+
+    if (cachedData) {
+      const { folderId, corpora } = cachedData;
+      listFilesAndFolders(folderId, corpora);
+    }
+  }
+
+  /**
+   * Processes directory submission from picker dialog
+   * @param {string} payload - JSON string containing {urlId, corpora}
+   */
+  function submitDirectory(payload) {
+    const { urlId, corpora } = JSON.parse(payload);
+    const folderId = convertUrlToId_(urlId);
+
+    cacheFolderData_(folderId, corpora);
+    listFilesAndFolders(folderId, corpora);
+  }
+
+  /**
+   * Main function to list all files and folders and write to spreadsheet
+   * @param {string} rootFolderId - Root folder ID or 'root' for My Drive
+   * @param {string} corpora - Either 'drive' (Shared Drive) or 'user' (My Drive)
+   */
+  function listFilesAndFolders(rootFolderId, corpora) {
+    console.time('listFilesAndFolders');
+
+    const activeSpreadsheet = SpreadsheetApp.getActive();
+    const activeSheet = activeSpreadsheet.getActiveSheet();
+
+    activeSpreadsheet.toast('This may take a moment', 'Retrieving files...');
+
+    // Fetch all directory data
+    const directoryData = fetchAllDirectoryData_(rootFolderId, corpora);
+
+    // Write to sheet
+    writeDataToSheet_(activeSheet, directoryData);
+
+    // Format sheet
+    formatSheet_(activeSheet);
+
+    console.timeEnd('listFilesAndFolders');
+    activeSpreadsheet.toast('Files retrieved.');
+  }
+
+  // ============================================
+  // PRIVATE HELPER FUNCTIONS
+  // ============================================
+
+  /**
+   * Fetches all directory data recursively
+   * @param {string} rootFolderId - Root folder ID
+   * @param {string} corpora - 'drive' or 'user'
+   * @returns {Array<Array>} 2D array of file/folder data
+   * @private
+   */
+  function fetchAllDirectoryData_(rootFolderId, corpora) {
+    const rootFolder = getRootFolderInfo_(rootFolderId);
+    const folderPathLookup = new Map([[rootFolder.id, rootFolder.name]]);
+
+    let directoryRows = [HEADER_LABELS];
+    let foldersToProcess = [rootFolder];
+    let foldersRemaining = [];
+
+    // Process folders in batches
+    while (foldersToProcess.length > 0) {
+      // Split into batches if needed
+      if (foldersToProcess.length > MAX_FOLDERS_PER_QUERY) {
+        foldersRemaining = foldersToProcess.splice(MAX_FOLDERS_PER_QUERY);
+      } else {
+        foldersRemaining = [];
+      }
+
+      // Fetch items from current batch of folders
+      const items = fetchAllItemsFromFolders_(foldersToProcess, rootFolder.driveId, corpora);
+
+      // Process items into rows and extract child folders
+      const processedData = processItemsIntoRows_(items, foldersToProcess, folderPathLookup);
+
+      // Queue child folders for next iteration
+      foldersToProcess = [...foldersRemaining, ...processedData.childFolders];
+      directoryRows = directoryRows.concat(processedData.rows);
+    }
+
+    return directoryRows;
+  }
+
+  /**
+   * Gets root folder information from Drive API
+   * @param {string} folderId - Folder ID or 'root'
+   * @returns {Object} {id, name, driveId}
+   * @private
+   */
+  function getRootFolderInfo_(folderId) {
+    try {
+      const response = Drive.Files.get(folderId, {
+        fields: 'title, id, driveId',
+        supportsAllDrives: true
+      });
+
+      return {
+        id: folderId === 'root' ? response.id : folderId,
+        name: response.title,
+        driveId: response.driveId
+      };
+    } catch (error) {
+      const userInterface = SpreadsheetApp.getUi();
+      userInterface.alert(
+        '🤖 ERROR',
+        `No folder found with ID: ${folderId}`,
+        userInterface.ButtonSet.OK
+      );
+      throw new Error(`Folder not found: ${folderId}`);
+    }
+  }
+
+  /**
+   * Fetches all items from folders with pagination support
+   * @param {Array<Object>} folders - Array of {id, name} objects
+   * @param {string} driveId - Shared Drive ID or undefined
+   * @param {string} corpora - 'drive' or 'user'
+   * @returns {Array<Object>} All items found
+   * @private
+   */
+  function fetchAllItemsFromFolders_(folders, driveId, corpora) {
+    let allItems = [];
+    let pageToken = null;
+
+    do {
+      const response = queryDriveApi_(folders, pageToken, driveId, corpora);
+      allItems = allItems.concat(response.items);
+      pageToken = response.nextPageToken;
+    } while (pageToken);
+
+    return allItems;
+  }
+
+  /**
+   * Queries Drive API for items in specified folders
+   * @param {Array<Object>} folders - Folders to query
+   * @param {string|null} pageToken - Pagination token
+   * @param {string} driveId - Shared Drive ID
+   * @param {string} corpora - 'drive' or 'user'
+   * @returns {Object} Drive API response {items, nextPageToken}
+   * @private
+   */
+  function queryDriveApi_(folders, pageToken, driveId, corpora) {
+    const queryString = buildQueryString_(folders);
+
+    const requestPayload = {
+      q: queryString,
+      fields: 'items(id, title, mimeType, parents(id)), nextPageToken',
+      supportsAllDrives: true,
+      includeItemsFromAllDrives: true
+    };
+
+    // Add Shared Drive parameters if applicable
+    if (driveId && corpora === 'drive') {
+      requestPayload.corpora = corpora;
+      requestPayload.driveId = driveId;
+    }
+
+    if (pageToken) {
+      requestPayload.pageToken = pageToken;
+    }
+
+    return Drive.Files.list(requestPayload);
+  }
+
+  /**
+   * Builds Drive API query string from folder array
+   * @param {Array<Object>} folders - Folders with id property
+   * @returns {string} Query string for Drive API
+   * @private
+   */
+  function buildQueryString_(folders) {
+    const parentQueries = folders.map(folder => `'${folder.id}' in parents`);
+
+    const parentClause = folders.length === 1
+      ? parentQueries[0]
+      : `(${parentQueries.join(' OR ')})`;
+
+    return `${parentClause} AND trashed=false`;
+  }
+
+  /**
+   * Processes Drive items into spreadsheet rows and extracts child folders
+   * @param {Array<Object>} items - Drive API items
+   * @param {Array<Object>} parentFolders - Parent folders being processed
+   * @param {Map<string, string>} folderPathLookup - Folder ID to path mapping
+   * @returns {Object} {rows: Array<Array>, childFolders: Array<Object>}
+   * @private
+   */
+  function processItemsIntoRows_(items, parentFolders, folderPathLookup) {
+    const rows = [];
+    const childFolders = [];
+
+    items.forEach(item => {
+      const isFolder = item.mimeType === MIME_TYPE_FOLDER;
+      const parentFolderId = item.parents[0].id;
+      const parentFolder = parentFolders.find(folder => folder.id === parentFolderId);
+
+      // Build spreadsheet row
+      const row = createItemRow_(item, parentFolder, isFolder);
+      rows.push(row);
+
+      // Track child folders and update path lookup
+      if (isFolder) {
+        const folderPath = buildFolderPath_(item.title, parentFolderId, folderPathLookup);
+        folderPathLookup.set(item.id, folderPath);
+        childFolders.push({ id: item.id, name: item.title });
+      }
+    });
+
+    return { rows, childFolders };
+  }
+
+  /**
+   * Creates a spreadsheet row for a Drive item
+   * @param {Object} item - Drive item
+   * @param {Object} parentFolder - Parent folder object
+   * @param {boolean} isFolder - Whether item is a folder
+   * @returns {Array} Spreadsheet row
+   * @private
+   */
+  function createItemRow_(item, parentFolder, isFolder) {
+    const icon = isFolder ? ICON_FOLDER : ICON_FILE;
+    const parentIdLink = createHyperlinkFormula_(parentFolder.id, parentFolder.id);
+
+    return [
+      icon,
+      item.title,
+      item.id,
+      parentFolder.name,
+      parentIdLink,
+      item.mimeType
+    ];
+  }
+
+  /**
+   * Builds full folder path from parent path and folder name
+   * @param {string} folderName - Folder name
+   * @param {string} parentFolderId - Parent folder ID
+   * @param {Map<string, string>} folderPathLookup - Path lookup map
+   * @returns {string} Full folder path
+   * @private
+   */
+  function buildFolderPath_(folderName, parentFolderId, folderPathLookup) {
+    const parentPath = folderPathLookup.get(parentFolderId);
+    return `${parentPath}/${folderName}`;
+  }
+
+  /**
+   * Creates a HYPERLINK formula for Google Sheets
+   * @param {string} folderId - Folder ID
+   * @param {string} displayText - Text to display
+   * @returns {string} HYPERLINK formula
+   * @private
+   */
+  function createHyperlinkFormula_(folderId, displayText) {
+    return `=HYPERLINK("https://drive.google.com/drive/folders/${folderId}","${displayText}")`;
+  }
+
+  /**
+   * Converts URL or ID to folder ID
+   * @param {string} urlOrId - Google Drive URL or folder ID
+   * @returns {string} Folder ID or 'root'
+   * @private
+   */
+  function convertUrlToId_(urlOrId) {
+    // Handle My Drive root
+    if (!urlOrId || urlOrId.toLowerCase() === 'root') {
+      return 'root';
+    }
+
+    // Check if already an ID (no slashes)
+    if (!urlOrId.includes('/')) {
+      return urlOrId;
+    }
+
+    // Extract ID from URL
+    const folderMatch = urlOrId.match(/folders\/([A-Za-z0-9_-]+)/);
+    return folderMatch ? folderMatch[1] : urlOrId;
+  }
+
+  /**
+   * Caches folder data to user properties for refresh functionality
+   * @param {string} folderId - Folder ID
+   * @param {string} corpora - 'drive' or 'user'
+   * @private
+   */
+  function cacheFolderData_(folderId, corpora) {
+    const cacheData = JSON.stringify({ id: folderId, corpora });
+    PropertiesService.getUserProperties().setProperty(CACHE_KEY_REFRESH, cacheData);
+  }
+
+  /**
+   * Retrieves cached folder data from user properties
+   * @returns {Object|null} {folderId, corpora} or null if not cached
+   * @private
+   */
+  function getCachedFolderData_() {
+    const cached = PropertiesService.getUserProperties().getProperty(CACHE_KEY_REFRESH);
+
+    if (!cached) {
+      return null;
+    }
+
+    const { id, corpora } = JSON.parse(cached);
+    return {
+      folderId: id,
+      corpora: corpora || 'user'
+    };
+  }
+
+  /**
+   * Writes directory data to spreadsheet
+   * @param {Sheet} sheet - Target sheet
+   * @param {Array<Array>} data - 2D array of data
+   * @private
+   */
+  function writeDataToSheet_(sheet, data) {
+    sheet.clear();
+
+    const targetRange = sheet.getRange(1, 1, data.length, data[0].length);
+    targetRange.setValues(data);
+  }
+
+  /**
+   * Formats the spreadsheet for better readability
+   * @param {Sheet} sheet - Sheet to format
+   * @private
+   */
+  function formatSheet_(sheet) {
+    // Apply row banding for readability
+    sheet.getDataRange().applyRowBanding();
+
+    // Bold header row
+    sheet.getRange('1:1').setFontWeight('bold');
+
+    // Wrap text in name and ID columns
+    sheet.getRange('B2:C').setWrap(true);
+  }
+
+  // ============================================
+  // EXPORT PUBLIC API
+  // ============================================
+
+  return {
+    createMenu: createMenu,
+    showPickerDialog: showPickerDialog,
+    refreshList: refreshList,
+    submitDirectory: submitDirectory,
+    listFilesAndFolders: listFilesAndFolders
+  };
+
+})();
+
+// ============================================
+// GLOBAL SIMPLE TRIGGERS
+// ============================================
 
 /**
- * Creates the menu items for the List.
- * Simple trigger that is run when the Sheet is opened.
+ * Simple trigger called when spreadsheet opens
+ * Must be in global scope for Apps Script to recognize it
  */
 function onOpen() {
-
-  const ui = SpreadsheetApp.getUi();
-  ui.createMenu('List Files/Folders')
-    .addItem('List All Files and Folders', 'listFilesAndFolders_v2')
-    .addItem('Refresh', 'refresh')
-    .addToUi();
-};
-
-function listFilesAndFolders_v2(){
-  const html = HtmlService.createHtmlOutputFromFile("index")
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-    .setTitle("List all files and folders")
-    .setHeight(340)
-    .setWidth(500)
-
-  const ui = SpreadsheetApp.getUi()
-
-  ui.showModalDialog(html, "List all files and folders")
+  DriveFileList.createMenu();
 }
 
 /**
- * Called when "List All Files and Folders" menu items is selected.
- * Generates a dialogue for the user to enter their folder id.
- * Stores the id of the current folder.
+ * Legacy function name for backwards compatibility
+ * @deprecated Use DriveFileList.showPickerDialog() instead
  */
-function listFilesAndFolders() {
-  var folderId = Browser.inputBox('Enter folder ID', Browser.Buttons.OK_CANCEL);
-  if (folderId === "cancel") return;
-
-  if (folderId === "") {
-    Browser.msgBox('Folder ID is invalid');
-    return;
-  }
-  PropertiesService.getUserProperties().setProperty("refresh", folderId)
-  getFileandFolders(folderId);
-};
-
+function listFilesAndFolders_v2() {
+  DriveFileList.showPickerDialog();
+}
 
 /**
- * Called when "Refresh" is selected.
- * Retrieves the stored ID and reruns the process.
- *
+ * Legacy function name for backwards compatibility
+ * @deprecated Use DriveFileList.refreshList() instead
  */
 function refresh() {
-  const hasProp = PropertiesService.getUserProperties().getProperty("refresh")
-
-  if(hasProp){
-    const {id, corpora} = JSON.parse(hasProp)
-    getFileandFolders(id, corpora)
-  }
+  DriveFileList.refreshList();
 }
 
-
 /**
- * Submits the directory data from the payload called from the dialogue box.
- * @param {JSON} paload - {urlId, corpora}
+ * Legacy function name for backwards compatibility
+ * @deprecated Use DriveFileList.submitDirectory() instead
+ * @param {string} payload - JSON payload
  */
-function submitDirectory(payload){
-  console.log(payload)
-
-  const {urlId, corpora} = JSON.parse(payload)
-
-  console.log(urlId, corpora)
-
-
-  // Convert URL to id
-  const id = convertUrlToId(urlId)
-
-  PropertiesService.getUserProperties().setProperty("refresh", JSON.stringify({
-    id,
-    corpora
-  }))
-
-  console.log( id, corpora)
-  getFileandFolders(id, corpora)
-
-}
-
-
-/**
- * Update with max query string
- * @param {String} rootId - The main rood id.
- * @param {String} corpora - either 'drive' or 'user'
- */
-function getFileandFolders(rootId, corpora) {
-  console.time("getFilesAndFoldersIds")
-
-  const ss = SpreadsheetApp.getActive()
-  const ui = SpreadsheetApp.getUi()
-
-  ss.toast("This may take a moment", "Retrieving files...")
-
-  const sheet = ss.getActiveSheet()
-  sheet.clear();
-
-  const maxNumOfFoldersPerQuery = "250"; // "598" @see test_queryLen()
-
-  let pageToken = null;
-  let folderData = {};
-  let driveId = "";
-  let directoryArray = [
-    [
-      "Icon",
-      "File Name",
-      "File ID",
-      "Parent Name",
-      "Parent ID",
-      "File MIME type",
-
-    ]
-  ];
-
-  let folders = []
-  if (rootId === 'root') {
-      const resp = Drive.Files.get(rootId, {
-        'fields': 'title, id, driveId',
-        'supportsAllDrives': true,
-      })
-
-    folders = [{ name: resp.title, id: resp.id }]
-    driveId = resp.driveId
-  } else {
-    try{
-
-      var resp = Drive.Files.get(rootId, {
-        'fields': 'title, driveId',
-        'supportsAllDrives': true,
-      })
-
-    }catch(e){
-      ui.alert("🤖 ERROR", `!!! No folder found with this id:${rootId} !!!`, ui.ButtonSet.OK)
-    }
-    folders = [
-      {
-        name: resp.title,
-        id: rootId
-      }
-    ];
-
-    driveId = resp.driveId;
-  }
-  console.log(driveId)
-
-  // Set first path
-  FOLDER_LIST[folders[0].id] = folders[0].name
-
-
-  // Temporarily stores any extra folders that could not be added to the query.
-  let foldersRemaining = []
-
-
-  // Iterate over each folder in the fodlers arrage.
-  while (folders.length) {
-    let items = [];// Stores all found files and folders.
-
-    // If the folder length is greater than or equal to the Max num of folders per query,
-    // Then store any extra folders in the foldersRemaining array.
-    // Alternatively, if the folder len is less than the max num then clear the fodlers remaining array.
-    if (folders.length > maxNumOfFoldersPerQuery) {
-      foldersRemaining = folders.splice(maxNumOfFoldersPerQuery)
-    } else {
-      foldersRemaining = [];
-    }
-
-    // If a page token is present from our call to the Google Drive API, there are multiple pages. Here we iterate over them
-    // storing the items retrieved from each version in the items variable.
-    do {
-
-      folderData = getItemsForFolderArray_(folders, pageToken, driveId, corpora) // Calls the Drive API to retireve all items.
-      items = items.concat(folderData.items); // Extracts the items array from the folder data object.
-      // console.log(items)
-      pageToken = folderData.nextPageToken;
-
-    } while (pageToken); // if page token exists, repeat.
-
-    const itemArrays = createFileArrays_(items, folders);
-
-    // Store remaining folders and new child folders.
-    folders = [...foldersRemaining, ...itemArrays.childFolderIds];
-
-
-    directoryArray = directoryArray.concat(itemArrays.spreadsheetFormatted);
-
-  };
-
-
-
-  const totalRange = sheet
-    .getRange(1, 1, directoryArray.length, directoryArray[0].length)
-    .setValues(directoryArray);
-
-  totalRange.applyRowBanding();
-
-  sheet.getRange("1:1").setFontWeight("bold")
-  sheet.getRange("B2:C").setWrap(true)
-
-  console.timeEnd("getFilesAndFoldersIds");
-  ss.toast("Files retrieved.")
-};
-
-
-/**
- * Retrieves the current list of items from the selected folders from the Drive API.
- *
- * @see FIELDS {@link https://developers.google.com/drive/api/guides/fields-parameter}
- * @see FILE_RESOURCE {@link https://developers.google.com/drive/api/v2/reference/files}
- *
- * Enhanced Metadata Fields (Issue #1 - ROADMAP.md Phase 1):
- * - Basic: id, title, mimeType, parents, alternateLink
- * - Size: fileSize (for Smart Scan large file detection)
- * - Dates: createdDate, modifiedDate, lastViewedByMeDate (for age analysis & safety)
- * - Ownership: owners(displayName, emailAddress)
- * - Sharing: shared, labels/starred
- * - Media: fileExtension, thumbnailLink
- *
- * Fields can be modified to your preference here. You can nest fields by using brackets.
- * @param {Array<Object>} folders - all parent folders to query [{id, name}]
- * @param {String|null} pageToken - The page token should there be more items to retrieve or null if not.
- * @param {string|undefined} driveId - The source Shared Drive ID or undefined if My Drive.
- * @param {string} corpora - 'drive' or 'user'.
- * @returns {Object} Object containing a page token and an array of found items of files and
- * folders {items<array>, nextpageToken}.
- */
-function getItemsForFolderArray_(folders, pageToken, driveId, corpora) {
-
-  const queryString = createQueryString_(folders);
-  // console.log("queryString", queryString)
-  let payload =
-  {
-    'q': queryString,
-    'fields': 'items(id, title, mimeType, parents(id), alternateLink, fileSize, createdDate, modifiedDate, lastViewedByMeDate, owners(displayName, emailAddress), shared, labels/starred, fileExtension, thumbnailLink), nextPageToken',
-    'supportsAllDrives': true,
-    'includeItemsFromAllDrives': true,
-
-  };
-
-  if(driveId && corpora === "drive"){
-    payload.corpora = corpora
-    payload.driveId = driveId
-  }
-  if (pageToken) payload.pageToken = pageToken;
-  console.log("PAYLOAD", payload)
-
-  return Drive.Files.list(payload);
-}
-
-
-
-/**
- * Generates the query string
- *
- * called from getCurrentDirectory()
- *
- * @see QUERY {@link https://developers.google.com/drive/api/guides/ref-search-terms}
- *
- * @param {Array<Object>} folders - Array of objects containg [{id, name}]
- * @returns {String} The query string for the Drive API request.
- */
-function createQueryString_(folders) {
-
-  let queryString = ""
-
-
-  // If just one folder no need to add brackets.
-  if (folders.length === 1) {
-    queryString = `'${folders[0].id}' in parents `
-    // Iterate through each folder and create the query for each.
-  } else {
-    queryString = `(`
-    folders.forEach((folder, idx) => {
-      queryString += (idx === folders.length - 1) ? `'${folder.id}' in parents ` : `'${folder.id}' in parents OR `
-    })
-    queryString += `) `
-  }
-
-  // Add any extra queries here. You might add a list of file types.
-  queryString += `AND trashed=false`
-  // console.log(queryString.length, folders.length)
-
-  return queryString;
-};
-
-
-
-
-
-/**
- * Iterates through all found items and creates two arrays:
- * 1) spreadsheetFormatted - A 2d array to be added to the selected sheet tab.
- * conatins [[image, file title, file id, parent name, parent id, file mimeType]]
- * 2) childFolderIds - used to update the folder variable [{id, name}]
- * @param {Array<Object>} folderArray - Array of objects containg [{id, title, mimeType, parents[{id}]}]
- * @param {Array<Object>} folders - Array of objects containg [{id, name}]
- * @returns {Object}
- *
- */
-function createFileArrays_(folderArray, folders) {
-
-  let fileArrays = {
-    spreadsheetFormatted: [],
-    childFolderIds: []
-  };
-
-  // Iterate over each found item.
-  folderArray.forEach(file => {
-    // console.log("CURRENT FILE",file)
-
-    const isFolder = file.mimeType === "application/vnd.google-apps.folder"; // Is current file a folder?
-
-    console.log(file.parents, folders)
-    //## For shreadsheetFormatted ##
-    const fileParentFolderIds = file.parents.map(parent => parent.id)
-    let parentFolder = folders.find(folder => fileParentFolderIds.includes(folder.id))
-    // console.log(file)
-
-
-    const parentFolderId = `=HYPERLINK("https://drive.google.com/drive/folders/${parentFolder.id}","${parentFolder.id}")`
-
-    const image = (isFolder) ? "📂" : "📃"
-    const fileData = [
-      image,                    // File or Folder imgage
-      file.title,               // File|Folder Name
-      file.id,                  // File|Folder ID
-      parentFolder.name,        // Parent Folder Name
-      parentFolderId,           // Parent Folder ID
-      file.mimeType             // File|Folder MimeType
-    ]
-
-
-
-
-    fileArrays.spreadsheetFormatted = fileArrays.spreadsheetFormatted.concat([fileData])
-
-
-    //## For childFolderIds ##
-    if (isFolder) {
-      fileArrays.childFolderIds = fileArrays.childFolderIds.concat([
-        {
-          name: file.title,
-          id: file.id
-        }
-      ])
-    }
-  })
-
-  return fileArrays;
-};
-
-
-
-const FOLDER_LIST = {}
-/**
- * Returns the filepath of the current file/folder.
- * If a folder is the file, then the the path is added to the path list.
- * @param {Object} file - file.title, file.id
- * @returns {String} The file path
- */
-function getPath(file, isFolder, parentFolderId) {
-  // console.log(file)
-  let path = ""
-  // if
-  if (isFolder) {
-    if (FOLDER_LIST.hasOwnProperty(file.id)) {
-      path = FOLDER_LIST[file.id] // The root folder path.
-    } else {
-      // New path
-      const newPath = `${FOLDER_LIST[parentFolderId]}/${file.title}`
-      FOLDER_LIST[file.id] = newPath
-      path = newPath
-    }
-  } else {
-    path = FOLDER_LIST[parentFolderId]
-  }
-
-  // console.log("FOLDER_LIST:", FOLDER_LIST)
-  return path;
-}
-
-
-
-/**
- * Convers a URL to an id. If the ID is blank ("") then it will convert to 'root' for MyDrive
- * @param {String} urlId - url or id generated by user.
- * @returns {String} the folder id or 'root'.
- */
-function convertUrlToId(urlId){
-
-  // Handle for My Drive
-  if(urlId.length == 0 || urlId.toLowerCase() == 'root') return 'root'
-
-  // Check if just ID provided.
-  const isId = urlId.match(/\//)
-  console.log(isId)
-  if(!isId){
-    return urlId
-  }else{
-    const match = urlId.match(/folders\/([A-Za-z0-9\_\-].*)|folders\/([A-Za-z0-9\_\-].*)\//)
-    if(!match) return urlId
-    const id = match[1].replace("/", "")
-    return id
-  }
-}
-
-
-function convertUrlToId_test(){
-  const eg = 'https://drive.google.com/drive/folders/0AKg4gkqTIiD3Uk9PVA/'
-  const eg2 = '0AKg4gkqTIiD3Uk9PVA'
-  const eg3 = "https://yagisanatode.com"
-  convertUrlToId(eg)
-  convertUrlToId(eg2)
-  convertUrlToId(eg3)
-
+function submitDirectory(payload) {
+  DriveFileList.submitDirectory(payload);
 }

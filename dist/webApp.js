@@ -1,10 +1,220 @@
-//########### WEB APP FUNCTIONS ###########
+/**
+ * Drive Cleaner - Web App Interface
+ *
+ * Provides web application entry points and API functions
+ * for the Drive Cleaner React application.
+ *
+ * @author Andy Edwards
+ * @version [0.2.0] - 2025-11-17
+ */
+
+var DriveCleanerWebApp = (function () {
+
+  // ============================================
+  // PRIVATE CONSTANTS
+  // ============================================
+
+  /** User property key for caching refresh data */
+  const CACHE_KEY_REFRESH = 'refresh';
+
+  /** Default corpora value */
+  const DEFAULT_CORPORA = 'user';
+
+  // ============================================
+  // PUBLIC API FUNCTIONS
+  // ============================================
+
+  /**
+   * Serves the web application HTML
+   * Entry point for Google Apps Script Web App
+   * @returns {HtmlOutput} HTML output for web app
+   */
+  function serveWebApp() {
+    return HtmlService.createHtmlOutputFromFile('index')
+      .setTitle('Drive Cleaner')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  }
+
+  /**
+   * Gets OAuth token for Drive Picker API
+   * Called from client-side JavaScript via google.script.run
+   * @returns {string} OAuth access token
+   */
+  function getOAuthToken() {
+    try {
+      return ScriptApp.getOAuthToken();
+    } catch (error) {
+      console.error('Error getting OAuth token:', error);
+      throw new Error(`Failed to get OAuth token: ${error.message}`);
+    }
+  }
+
+  /**
+   * Gets files and folders for web interface
+   * Called from React app via google.script.run
+   * @param {string} payload - JSON string containing {urlId, corpora}
+   * @returns {Object} {success: boolean, data: Array<Array>}
+   */
+  function getFilesAndFolders(payload) {
+    try {
+      const { urlId, corpora } = JSON.parse(payload);
+      const folderId = convertUrlToId_(urlId);
+
+      // Cache for refresh functionality
+      cacheRequestData_(folderId, corpora);
+
+      // Fetch directory data
+      const directoryData = fetchDirectoryData_(folderId, corpora);
+
+      return {
+        success: true,
+        data: directoryData
+      };
+    } catch (error) {
+      console.error('Error in getFilesAndFolders:', error);
+      throw new Error(`Failed to retrieve files and folders: ${error.message}`);
+    }
+  }
+
+  /**
+   * Gets cached folder ID from user properties
+   * @returns {Object|null} {folderId, corpora} or null
+   */
+  function getCachedFolderId() {
+    try {
+      const cached = PropertiesService.getUserProperties().getProperty(CACHE_KEY_REFRESH);
+
+      if (!cached) {
+        return null;
+      }
+
+      const { id, corpora } = JSON.parse(cached);
+      return {
+        folderId: id,
+        corpora: corpora || DEFAULT_CORPORA
+      };
+    } catch (error) {
+      console.error('Error getting cached folder ID:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Gets Google Drive storage quota information
+   * Called from React app via google.script.run
+   * @returns {Object} {success: boolean, data: Object}
+   */
+  function getDriveQuota() {
+    try {
+      const about = Drive.About.get({
+        fields: 'storageQuota,user'
+      });
+
+      const quota = about.storageQuota || {};
+
+      return {
+        success: true,
+        data: {
+          // Total storage limit in bytes
+          limit: parseInt(quota.limit) || 0,
+          // Total storage used across all services in bytes
+          usage: parseInt(quota.usage) || 0,
+          // Storage used in Drive in bytes
+          usageInDrive: parseInt(quota.usageInDrive) || 0,
+          // Storage used in Drive trash
+          usageInDriveTrash: parseInt(quota.usageInDriveTrash) || 0,
+          // User email
+          userEmail: about.user ? about.user.emailAddress : null,
+          // Calculated values
+          available: (parseInt(quota.limit) || 0) - (parseInt(quota.usage) || 0),
+          percentUsed: quota.limit ? ((parseInt(quota.usage) / parseInt(quota.limit)) * 100).toFixed(2) : 0
+        }
+      };
+    } catch (error) {
+      console.error('Error getting Drive quota:', error);
+      return {
+        success: false,
+        error: 'Failed to retrieve storage quota: ' + error.message
+      };
+    }
+  }
+
+  // ============================================
+  // PRIVATE HELPER FUNCTIONS
+  // ============================================
+
+  /**
+   * Fetches directory data for specified folder
+   * @param {string} rootFolderId - Root folder ID
+   * @param {string} corpora - 'drive' or 'user'
+   * @returns {Array<Array>} 2D array of file/folder data
+   * @private
+   */
+  function fetchDirectoryData_(rootFolderId, corpora) {
+    console.time('fetchDirectoryData');
+
+    const directoryData = getFileandFoldersData(rootFolderId, corpora);
+
+    console.timeEnd('fetchDirectoryData');
+    return directoryData;
+  }
+
+  /**
+   * Caches request data to user properties
+   * @param {string} folderId - Folder ID
+   * @param {string} corpora - 'drive' or 'user'
+   * @private
+   */
+  function cacheRequestData_(folderId, corpora) {
+    const cacheData = JSON.stringify({ id: folderId, corpora });
+    PropertiesService.getUserProperties().setProperty(CACHE_KEY_REFRESH, cacheData);
+  }
+
+  /**
+   * Converts URL to folder ID
+   * @param {string} urlOrId - Drive URL or folder ID
+   * @returns {string} Folder ID or 'root'
+   * @private
+   */
+  function convertUrlToId_(urlOrId) {
+    // Handle My Drive root
+    if (!urlOrId || urlOrId.toLowerCase() === 'root') {
+      return 'root';
+    }
+
+    // Check if already an ID (no slashes)
+    if (!urlOrId.includes('/')) {
+      return urlOrId;
+    }
+
+    // Extract ID from URL
+    const folderMatch = urlOrId.match(/folders\/([A-Za-z0-9_-]+)/);
+    return folderMatch ? folderMatch[1] : urlOrId;
+  }
+
+  // ============================================
+  // EXPORT PUBLIC API
+  // ============================================
+
+  return {
+    serveWebApp: serveWebApp,
+    getOAuthToken: getOAuthToken,
+    getFilesAndFolders: getFilesAndFolders,
+    getCachedFolderId: getCachedFolderId,
+    getDriveQuota: getDriveQuota
+  };
+
+})();
+
+// ============================================
+// GLOBAL WEB APP ENTRY POINT
+// ============================================
 
 /**
- * Serves the web application
- * This is the entry point for the Google Apps Script Web App
+ * Web app doGet entry point
+ * Must be in global scope for Apps Script to recognize it
  * @param {Object} e - Event object with query parameters
- * @returns {HtmlOutput|TextOutput} The HTML output for the web app or test results
+ * @returns {HtmlOutput|TextOutput} Web app HTML or test results
  */
 function doGet(e) {
   // Check for test endpoints
@@ -29,8 +239,11 @@ function doGet(e) {
         // eslint-disable-next-line no-undef
         result = runAllSmartScanTests();
         break;
+      case 'quota':
+        result = getDriveQuota();
+        break;
       default:
-        result = { error: 'Unknown test. Use ?test=metadata, ?test=scan, ?test=analyzer, or ?test=all' };
+        result = { error: 'Unknown test. Use ?test=metadata, ?test=scan, ?test=analyzer, ?test=quota, or ?test=all' };
     }
 
     return ContentService
@@ -39,138 +252,42 @@ function doGet(e) {
   }
 
   // Serve the regular web app
-  return HtmlService.createHtmlOutputFromFile('index')
-    .setTitle('Drive Cleaner')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+  return DriveCleanerWebApp.serveWebApp();
 }
 
 /**
- * Gets the OAuth token for the Drive Picker API
- * @returns {String} The OAuth access token
+ * Legacy function name for backwards compatibility
+ * @deprecated Use DriveCleanerWebApp.getOAuthToken() instead
+ * @returns {string} OAuth token
  */
 function getOAuthToken() {
-  try {
-    return ScriptApp.getOAuthToken()
-  } catch (error) {
-    console.error('Error getting OAuth token:', error)
-    throw new Error('Failed to get OAuth token: ' + error.message)
-  }
+  return DriveCleanerWebApp.getOAuthToken();
 }
 
 /**
- * Gets files and folders for the web interface
- * Called from the React app via google.script.run
- * @param {String} payload - JSON string containing {urlId, corpora}
- * @returns {Object} Object containing the file/folder data
+ * Legacy function name for backwards compatibility
+ * @deprecated Use DriveCleanerWebApp.getFilesAndFolders() instead
+ * @param {string} payload - JSON payload
+ * @returns {Object} Response object
  */
 function getFilesAndFoldersForWeb(payload) {
-  try {
-    const { urlId, corpora } = JSON.parse(payload)
-    const id = convertUrlToId(urlId)
-
-    // Store the folder ID and corpora for refresh
-    PropertiesService.getUserProperties().setProperty("refresh", JSON.stringify({
-      id,
-      corpora
-    }))
-
-    // Get the data using the existing function
-    const data = getFileandFoldersData(id, corpora)
-
-    return {
-      success: true,
-      data: data
-    }
-  } catch (error) {
-    console.error('Error in getFilesAndFoldersForWeb:', error)
-    throw new Error('Failed to retrieve files and folders: ' + error.message)
-  }
+  return DriveCleanerWebApp.getFilesAndFolders(payload);
 }
 
 /**
- * Gets the cached folder ID from user properties
- * @returns {Object|null} Object containing {folderId, corpora} or null
+ * Legacy function name for backwards compatibility
+ * @deprecated Use DriveCleanerWebApp.getCachedFolderId() instead
+ * @returns {Object|null} Cached folder data
  */
 function getCachedFolderId() {
-  try {
-    const cached = PropertiesService.getUserProperties().getProperty("refresh")
-    if (cached) {
-      const { id, corpora } = JSON.parse(cached)
-      return {
-        folderId: id,
-        corpora: corpora || 'user'
-      }
-    }
-    return null
-  } catch (error) {
-    console.error('Error getting cached folder ID:', error)
-    return null
-  }
+  return DriveCleanerWebApp.getCachedFolderId();
 }
 
 /**
- * Modified version of getFileandFolders that returns data instead of writing to sheet
- * @param {String} rootId - The main root id.
- * @param {String} corpora - either 'drive' or 'user'
- * @returns {Array<Array>} 2D array of file/folder data
+ * Gets Drive quota information
+ * Called from React app via google.script.run
+ * @returns {Object} Quota data object
  */
-function getFileandFoldersData(rootId, corpora) {
-  console.time("getFilesAndFoldersData")
-
-  const maxNumOfFoldersPerQuery = "250"
-  let pageToken = null
-  let folderData = {}
-  let driveId = ""
-  let directoryArray = []
-
-  let folders = []
-  if (rootId === 'root') {
-    const resp = Drive.Files.get(rootId, {
-      'fields': 'title, id, driveId',
-      'supportsAllDrives': true,
-    })
-    folders = [{ name: resp.title, id: resp.id }]
-    driveId = resp.driveId
-  } else {
-    try {
-      var resp = Drive.Files.get(rootId, {
-        'fields': 'title, driveId',
-        'supportsAllDrives': true,
-      })
-    } catch(e) {
-      throw new Error(`No folder found with this id: ${rootId}`)
-    }
-    folders = [{ name: resp.title, id: rootId }]
-    driveId = resp.driveId
-  }
-
-  // Set first path
-  FOLDER_LIST[folders[0].id] = folders[0].name
-
-  // Temporarily stores any extra folders that could not be added to the query
-  let foldersRemaining = []
-
-  // Iterate over each folder in the folders array
-  while (folders.length) {
-    let items = []
-
-    if (folders.length > maxNumOfFoldersPerQuery) {
-      foldersRemaining = folders.splice(maxNumOfFoldersPerQuery)
-    } else {
-      foldersRemaining = []
-    }
-
-    do {
-      folderData = getItemsForFolderArray_(folders, pageToken, driveId, corpora)
-      items = items.concat(folderData.items)
-      pageToken = folderData.nextPageToken
-    } while (pageToken)
-
-    const itemArrays = createFileArrays_(items, folders)
-    folders = [...foldersRemaining, ...itemArrays.childFolderIds]
-    directoryArray = directoryArray.concat(itemArrays.spreadsheetFormatted)
-  }
-
-  console.timeEnd("getFilesAndFoldersData")
-  return directoryArray
+function getDriveQuota() {
+  return DriveCleanerWebApp.getDriveQuota();
 }
