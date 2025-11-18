@@ -9,8 +9,8 @@ export const FEATURE_FLAGS = {
   FEATURE_MY_FOLDERS: true,
   FEATURE_ABOUT: true,
 
-  // Phase 1 (v0.2.0) - Coming Soon
-  FEATURE_SMART_SCAN: false,
+  // Phase 1 (v0.2.0) - Now Available
+  FEATURE_SMART_SCAN: true,
   FEATURE_LARGE_FILES: false,
   FEATURE_OLD_FILES: false,
   FEATURE_SHARED_FILES: false,
