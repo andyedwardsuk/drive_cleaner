@@ -224,6 +224,15 @@ function getFileandFolders(rootId, corpora) {
  * Retrieves the current list of items from the selected folders from the Drive API.
  *
  * @see FIELDS {@link https://developers.google.com/drive/api/guides/fields-parameter}
+ * @see FILE_RESOURCE {@link https://developers.google.com/drive/api/v2/reference/files}
+ *
+ * Enhanced Metadata Fields (Issue #1 - ROADMAP.md Phase 1):
+ * - Basic: id, title, mimeType, parents, alternateLink
+ * - Size: fileSize (for Smart Scan large file detection)
+ * - Dates: createdDate, modifiedDate, lastViewedByMeDate (for age analysis & safety)
+ * - Ownership: owners(displayName, emailAddress)
+ * - Sharing: shared, labels/starred
+ * - Media: fileExtension, thumbnailLink
  *
  * Fields can be modified to your preference here. You can nest fields by using brackets.
  * @param {Array<Object>} folders - all parent folders to query [{id, name}]
@@ -240,7 +249,7 @@ function getItemsForFolderArray_(folders, pageToken, driveId, corpora) {
   let payload =
   {
     'q': queryString,
-    'fields': `items(id, title, mimeType, parents(id), alternateLink), nextPageToken`,
+    'fields': 'items(id, title, mimeType, parents(id), alternateLink, fileSize, createdDate, modifiedDate, lastViewedByMeDate, owners(displayName, emailAddress), shared, labels/starred, fileExtension, thumbnailLink), nextPageToken',
     'supportsAllDrives': true,
     'includeItemsFromAllDrives': true,
 
