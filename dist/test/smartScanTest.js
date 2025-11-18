@@ -1,4 +1,4 @@
-/**
+`/**
  * @fileoverview Smart Scan Test Functions
  *
  * Test functions for Smart Scan feature. These can be run remotely using:
