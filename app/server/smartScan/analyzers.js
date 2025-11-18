@@ -334,7 +334,16 @@ function analyzeEmptyItems(filesData) {
     // Identify empty files and folders
     const emptyItems = filesData.filter(file => {
       const isFolder = file.mime_type === 'application/vnd.google-apps.folder';
-      const isEmptyFile = !isFolder && (file.size_bytes === 0 || file.size_bytes === null || file.size_bytes === undefined);
+      const isGoogleWorkspaceDoc = file.mime_type && file.mime_type.startsWith('application/vnd.google-apps.');
+
+      // Google Workspace docs (Docs, Sheets, Slides, etc.) don't have fileSize - exclude them
+      // They're stored differently and can't be "empty" in the traditional sense
+      if (isGoogleWorkspaceDoc && !isFolder) {
+        return false;
+      }
+
+      // Only treat as empty if size_bytes exists and equals 0 (not undefined/null)
+      const isEmptyFile = !isFolder && file.size_bytes === 0;
 
       // For folders, check if they have children
       if (isFolder) {

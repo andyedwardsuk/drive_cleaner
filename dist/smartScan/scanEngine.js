@@ -361,5 +361,17 @@ function calculateSpaceSavings_(categoryResults) {
   }
 }
 
-// Export public function to global scope for GAS
+/**
+ * Test wrapper for Smart Scan - scans My Drive root
+ * Simple function to test Smart Scan from Apps Script editor without parameters
+ *
+ * @returns {Object} Smart Scan results for My Drive root
+ */
+function testSmartScan() {
+  console.log('Running Smart Scan test on My Drive root...');
+  return runSmartScan('root', 'user');
+}
+
+// Export public functions to global scope for GAS
 globalThis.runSmartScan = runSmartScan;
+globalThis.testSmartScan = testSmartScan;
