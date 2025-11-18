@@ -21,11 +21,11 @@ export const FEATURE_FLAGS = {
   FEATURE_HISTORY: false,
 
   // Phase 3 (v0.4.0) - Coming Soon
-  FEATURE_DUPLICATES: false,
+  FEATURE_DUPLICATES: true,
 
   // Phase 4 (v0.5.0) - Coming Soon
-  FEATURE_EMPTY_ITEMS: false,
-  FEATURE_TEMP_FILES: false,
+  FEATURE_EMPTY_ITEMS: true,
+  FEATURE_TEMP_FILES: true,
 
   // Phase 5 (v0.6.0) - Coming Soon
   FEATURE_BULK_ACTIONS: false,
