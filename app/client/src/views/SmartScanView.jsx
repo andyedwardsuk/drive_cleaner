@@ -19,18 +19,29 @@ function formatBytes(bytes) {
  * Category summary card component
  */
 function CategoryCard({ icon: Icon, title, count, size, color = 'blue', onClick }) {
+  // Map colors to static Tailwind classes
+  const colorClasses = {
+    purple: { bg: 'bg-purple-500/10', icon: 'text-purple-400' },
+    orange: { bg: 'bg-orange-500/10', icon: 'text-orange-400' },
+    blue: { bg: 'bg-blue-500/10', icon: 'text-blue-400' },
+    gray: { bg: 'bg-gray-500/10', icon: 'text-gray-400' },
+    yellow: { bg: 'bg-yellow-500/10', icon: 'text-yellow-400' },
+  }
+
+  const classes = colorClasses[color] || colorClasses.blue
+
   return (
     <div
       className="p-6 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm hover:bg-card/70 transition-all cursor-pointer"
       onClick={onClick}
     >
       <div className="flex items-start justify-between mb-4">
-        <div className={`p-3 rounded-lg bg-${color}-500/10`}>
-          <Icon className={`w-6 h-6 text-${color}-500`} />
+        <div className={`p-3 rounded-lg ${classes.bg}`}>
+          <Icon className={`w-6 h-6 ${classes.icon}`} />
         </div>
         <Badge variant="secondary">{count}</Badge>
       </div>
-      <h3 className="font-semibold text-lg mb-1">{title}</h3>
+      <h3 className="font-semibold text-lg mb-1 text-white">{title}</h3>
       {size !== undefined && (
         <p className="text-sm text-gray-400">{formatBytes(size)}</p>
       )}
