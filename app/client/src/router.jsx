@@ -26,7 +26,9 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: DashboardView,
+  beforeLoad: ({ navigate }) => {
+    navigate({ to: '/dashboard' })
+  },
 })
 
 const dashboardRoute = createRoute({
