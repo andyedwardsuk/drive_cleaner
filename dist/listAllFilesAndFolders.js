@@ -119,24 +119,15 @@ function getFileandFolders(rootId, corpora) {
   let pageToken = null;
   let folderData = {};
   let driveId = "";
-  // Enhanced header row with all new metadata columns
   let directoryArray = [
     [
       "Icon",
       "File Name",
-      "File Size",
-      "File Type",
-      "Last Modified",
-      "Created",
-      "Last Viewed",
-      "Owner(s)",
-      "Sharing",
-      "Starred",
-      "Parent Folder",
       "File ID",
-      "Drive Link",
-      "MIME Type",
-      "Size (Bytes)",
+      "Parent Name",
+      "Parent ID",
+      "File MIME type",
+
     ]
   ];
 
@@ -233,6 +224,15 @@ function getFileandFolders(rootId, corpora) {
  * Retrieves the current list of items from the selected folders from the Drive API.
  *
  * @see FIELDS {@link https://developers.google.com/drive/api/guides/fields-parameter}
+ * @see FILE_RESOURCE {@link https://developers.google.com/drive/api/v2/reference/files}
+ *
+ * Enhanced Metadata Fields (Issue #1 - ROADMAP.md Phase 1):
+ * - Basic: id, title, mimeType, parents, alternateLink
+ * - Size: fileSize (for Smart Scan large file detection)
+ * - Dates: createdDate, modifiedDate, lastViewedByMeDate (for age analysis & safety)
+ * - Ownership: owners(displayName, emailAddress)
+ * - Sharing: shared, labels/starred
+ * - Media: fileExtension, thumbnailLink
  *
  * Fields can be modified to your preference here. You can nest fields by using brackets.
  * @param {Array<Object>} folders - all parent folders to query [{id, name}]
@@ -246,39 +246,13 @@ function getItemsForFolderArray_(folders, pageToken, driveId, corpora) {
 
   const queryString = createQueryString_(folders);
   // console.log("queryString", queryString)
-
-  // Enhanced metadata fields for comprehensive file analysis
-  // Includes: size, dates, owner, sharing, thumbnails, and additional metadata
-  const fieldsString = [
-    'items(id',
-    'title',
-    'mimeType',
-    'parents(id)',
-    'alternateLink',
-    // Size information
-    'fileSize',
-    // Date information
-    'createdDate',
-    'modifiedDate',
-    'lastViewedByMeDate',
-    // Owner and sharing
-    'ownerNames',
-    'owners(displayName,emailAddress)',
-    'shared',
-    'permissions(type)',
-    // Additional metadata
-    'starred',
-    'description',
-    'thumbnailLink',
-    'fileExtension)',
-    'nextPageToken'
-  ].join(',');
-
-  let payload = {
+  let payload =
+  {
     'q': queryString,
-    'fields': fieldsString,
+    'fields': 'items(id, title, mimeType, parents(id), alternateLink, fileSize, createdDate, modifiedDate, lastViewedByMeDate, owners(displayName, emailAddress), shared, labels/starred, fileExtension, thumbnailLink), nextPageToken',
     'supportsAllDrives': true,
     'includeItemsFromAllDrives': true,
+
   };
 
   if(driveId && corpora === "drive"){
@@ -333,14 +307,13 @@ function createQueryString_(folders) {
 
 /**
  * Iterates through all found items and creates two arrays:
- * 1) spreadsheetFormatted - A 2d array to be added to the selected sheet tab with enhanced metadata
+ * 1) spreadsheetFormatted - A 2d array to be added to the selected sheet tab.
+ * conatins [[image, file title, file id, parent name, parent id, file mimeType]]
  * 2) childFolderIds - used to update the folder variable [{id, name}]
+ * @param {Array<Object>} folderArray - Array of objects containg [{id, title, mimeType, parents[{id}]}]
+ * @param {Array<Object>} folders - Array of objects containg [{id, name}]
+ * @returns {Object}
  *
- * Now includes enhanced metadata: size, dates, owner, sharing status
- *
- * @param {Array<Object>} folderArray - Array of objects from Drive API
- * @param {Array<Object>} folders - Array of parent folder objects [{id, name}]
- * @returns {Object} Object containing spreadsheetFormatted and childFolderIds arrays
  */
 function createFileArrays_(folderArray, folders) {
 
@@ -349,34 +322,29 @@ function createFileArrays_(folderArray, folders) {
     childFolderIds: []
   };
 
-  // Iterate over each found item
+  // Iterate over each found item.
   folderArray.forEach(file => {
-    const isFolder = file.mimeType === "application/vnd.google-apps.folder";
+    // console.log("CURRENT FILE",file)
 
-    // Find parent folder
+    const isFolder = file.mimeType === "application/vnd.google-apps.folder"; // Is current file a folder?
+
+    console.log(file.parents, folders)
+    //## For shreadsheetFormatted ##
     const fileParentFolderIds = file.parents.map(parent => parent.id)
     let parentFolder = folders.find(folder => fileParentFolderIds.includes(folder.id))
+    // console.log(file)
 
-    // Parse enhanced metadata using metadata parser
-    const metadata = parseFileMetadata(file, parentFolder)
 
-    // Create spreadsheet row with enhanced metadata
+    const parentFolderId = `=HYPERLINK("https://drive.google.com/drive/folders/${parentFolder.id}","${parentFolder.id}")`
+
+    const image = (isFolder) ? "📂" : "📃"
     const fileData = [
-      metadata.icon,                          // File or Folder icon
-      metadata.fileName,                      // File|Folder Name
-      metadata.fileSizeFormatted,            // File Size (formatted)
-      metadata.fileCategory,                  // File Type Category
-      metadata.modifiedDateFormatted,        // Last Modified
-      metadata.createdDateFormatted,         // Created Date
-      metadata.lastViewedDateFormatted,      // Last Viewed
-      metadata.ownerNames,                    // Owner(s)
-      metadata.sharingStatus,                 // Sharing Status
-      metadata.starred ? '⭐' : '',          // Starred indicator
-      metadata.parentName,                    // Parent Folder Name
-      metadata.fileId,                        // File|Folder ID
-      metadata.driveLink,                     // Drive Link
-      metadata.mimeType,                      // MIME Type
-      metadata.fileSizeBytes,                 // File Size (bytes - for sorting)
+      image,                    // File or Folder imgage
+      file.title,               // File|Folder Name
+      file.id,                  // File|Folder ID
+      parentFolder.name,        // Parent Folder Name
+      parentFolderId,           // Parent Folder ID
+      file.mimeType             // File|Folder MimeType
     ]
 
 

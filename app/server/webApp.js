@@ -3,9 +3,42 @@
 /**
  * Serves the web application
  * This is the entry point for the Google Apps Script Web App
- * @returns {HtmlOutput} The HTML output for the web app
+ * @param {Object} e - Event object with query parameters
+ * @returns {HtmlOutput|TextOutput} The HTML output for the web app or test results
  */
-function doGet() {
+function doGet(e) {
+  // Check for test endpoints
+  if (e && e.parameter && e.parameter.test) {
+    const testName = e.parameter.test;
+    let result;
+
+    switch(testName) {
+      case 'metadata':
+        // eslint-disable-next-line no-undef
+        result = testSmartScanMetadata();
+        break;
+      case 'scan':
+        // eslint-disable-next-line no-undef
+        result = testSmartScanSampleFolder();
+        break;
+      case 'analyzer':
+        // eslint-disable-next-line no-undef
+        result = testLargeFilesAnalyzer();
+        break;
+      case 'all':
+        // eslint-disable-next-line no-undef
+        result = runAllSmartScanTests();
+        break;
+      default:
+        result = { error: 'Unknown test. Use ?test=metadata, ?test=scan, ?test=analyzer, or ?test=all' };
+    }
+
+    return ContentService
+      .createTextOutput(JSON.stringify(result, null, 2))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // Serve the regular web app
   return HtmlService.createHtmlOutputFromFile('index')
     .setTitle('Drive Cleaner')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
