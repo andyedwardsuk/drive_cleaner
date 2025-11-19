@@ -20,9 +20,9 @@ export default {
           end: '#1e40af',    // Blue 800
         },
         'glass': {
-          surface: 'rgba(30, 58, 138, 0.3)',
-          border: 'rgba(59, 130, 246, 0.2)',
-          hover: 'rgba(59, 130, 246, 0.4)',
+          surface: 'rgba(30, 58, 138, 0.4)',  // Increased from 0.3 for better visibility
+          border: 'rgba(59, 130, 246, 0.4)',   // Increased from 0.2 for WCAG compliance
+          hover: 'rgba(59, 130, 246, 0.5)',    // Increased from 0.4
         },
 
         // Shadcn colors adapted for blue/indigo theme

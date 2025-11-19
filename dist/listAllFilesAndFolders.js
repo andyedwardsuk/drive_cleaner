@@ -218,7 +218,7 @@ var DriveFileList = (function () {
 
     const requestPayload = {
       q: queryString,
-      fields: 'items(id, title, mimeType, parents(id)), nextPageToken',
+      fields: 'items(id, title, mimeType, parents(id), fileSize, createdDate, modifiedDate, lastViewedByMeDate, ownerNames, owners(displayName, emailAddress), shared, permissions, starred, description, thumbnailLink, fileExtension, alternateLink), nextPageToken',
       supportsAllDrives: true,
       includeItemsFromAllDrives: true
     };
@@ -286,24 +286,19 @@ var DriveFileList = (function () {
 
   /**
    * Creates a spreadsheet row for a Drive item
-   * @param {Object} item - Drive item
-   * @param {Object} parentFolder - Parent folder object
+   * Uses metadata parser to extract and format all enhanced metadata
+   *
+   * @param {Object} item - Drive item from Drive API
+   * @param {Object} parentFolder - Parent folder object { id, name }
    * @param {boolean} isFolder - Whether item is a folder
-   * @returns {Array} Spreadsheet row
+   * @returns {Array} Spreadsheet row with enhanced metadata
    * @private
    */
   function createItemRow_(item, parentFolder, isFolder) {
-    const icon = isFolder ? ICON_FOLDER : ICON_FILE;
-    const parentIdLink = createHyperlinkFormula_(parentFolder.id, parentFolder.id);
-
-    return [
-      icon,
-      item.title,
-      item.id,
-      parentFolder.name,
-      parentIdLink,
-      item.mimeType
-    ];
+    // eslint-disable-next-line no-undef
+    const metadata = parseFileMetadata(item, parentFolder);
+    // eslint-disable-next-line no-undef
+    return parseForSpreadsheet(metadata);
   }
 
   /**

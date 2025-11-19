@@ -127,7 +127,7 @@ var DriveApiHelpers = (function () {
 
     const requestPayload = {
       q: queryString,
-      fields: 'items(id, title, mimeType, parents(id)), nextPageToken',
+      fields: 'items(id, title, mimeType, parents(id), fileSize, createdDate, modifiedDate, lastViewedByMeDate, ownerNames, owners(displayName, emailAddress), shared, permissions, starred, description, thumbnailLink, fileExtension, alternateLink), nextPageToken',
       supportsAllDrives: true,
       includeItemsFromAllDrives: true
     };
@@ -162,6 +162,8 @@ var DriveApiHelpers = (function () {
 
   /**
    * Processes Drive items into rows and extracts child folders
+   * Uses metadata parser to extract and format all enhanced metadata
+   *
    * @param {Array<Object>} items - Drive API items
    * @param {Array<Object>} parentFolders - Parent folders
    * @param {Map<string, string>} folderPathLookup - Folder ID to path map
@@ -177,15 +179,11 @@ var DriveApiHelpers = (function () {
       const parentFolderId = item.parents[0].id;
       const parentFolder = findParentFolder_(item.parents, parentFolders);
 
-      // Build row data
-      const row = [
-        isFolder ? '📂' : '📃',
-        item.title,
-        item.id,
-        parentFolder.name,
-        parentFolder.id,
-        item.mimeType
-      ];
+      // Parse metadata and create row using metadata parser
+      // eslint-disable-next-line no-undef
+      const metadata = parseFileMetadata(item, parentFolder);
+      // eslint-disable-next-line no-undef
+      const row = parseForSpreadsheet(metadata);
       rows.push(row);
 
       // Track child folders

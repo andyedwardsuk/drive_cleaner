@@ -58,12 +58,12 @@ export default function Hero({
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-4xl font-bold text-white">{title}</h1>
             {badge && (
-              <span className="px-3 py-1 rounded-full text-sm font-medium bg-blue-500/20 text-blue-300 border border-blue-500/30">
+              <span className="px-3 py-1 rounded-full text-sm font-medium bg-blue-500/30 text-blue-200 border border-blue-500/50">
                 {badge}
               </span>
             )}
           </div>
-          <p className="text-lg text-gray-300 max-w-2xl">{subtitle}</p>
+          <p className="text-lg text-gray-200 max-w-2xl">{subtitle}</p>
 
           {/* Actions */}
           {actions && <div className="mt-6 flex items-center gap-4">{actions}</div>}

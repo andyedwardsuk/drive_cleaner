@@ -43,24 +43,30 @@ function parseFileMetadata(driveFileObject, parentFolder) {
       fileId: driveFileObject.id || '',
       fileName: driveFileObject.title || 'Untitled',
       mimeType: driveFileObject.mimeType || '',
+      // eslint-disable-next-line no-undef
       fileCategory: getMimeTypeCategory(driveFileObject.mimeType),
 
       // === File Size ===
       fileSizeBytes: parseInt(driveFileObject.fileSize) || 0,
+      // eslint-disable-next-line no-undef
       fileSizeFormatted: formatFileSize(parseInt(driveFileObject.fileSize) || 0),
 
       // === Dates ===
       createdDate: driveFileObject.createdDate || null,
+      // eslint-disable-next-line no-undef
       createdDateFormatted: formatDate(driveFileObject.createdDate),
       modifiedDate: driveFileObject.modifiedDate || null,
+      // eslint-disable-next-line no-undef
       modifiedDateFormatted: formatDate(driveFileObject.modifiedDate),
       lastViewedDate: driveFileObject.lastViewedByMeDate || null,
+      // eslint-disable-next-line no-undef
       lastViewedDateFormatted: formatDate(driveFileObject.lastViewedByMeDate),
 
       // === Ownership & Sharing ===
       ownerNames: extractOwnerNames(driveFileObject.ownerNames),
       ownerFormatted: formatOwnerInfo(driveFileObject.owners),
       shared: driveFileObject.shared || false,
+      // eslint-disable-next-line no-undef
       sharingStatus: formatSharingStatus(driveFileObject.shared, driveFileObject.permissions),
 
       // === Parent Folder ===
@@ -71,6 +77,7 @@ function parseFileMetadata(driveFileObject, parentFolder) {
       starred: driveFileObject.starred || false,
       description: driveFileObject.description || '',
       thumbnailLink: driveFileObject.thumbnailLink || '',
+      // eslint-disable-next-line no-undef
       fileExtension: getFileExtension(driveFileObject.title),
       driveLink: driveFileObject.alternateLink || '',
 
@@ -128,6 +135,7 @@ function formatOwnerInfo(ownersArray) {
 
   // Use first owner (files typically have one owner)
   const primaryOwner = ownersArray[0];
+  // eslint-disable-next-line no-undef
   return formatOwner(primaryOwner);
 }
 
@@ -169,29 +177,34 @@ function getFileIcon(mimeType) {
 
 /**
  * Parse file array for spreadsheet output
- * Converts metadata object to array format for Google Sheets
- * Used when writing to spreadsheet tabs
+ * Converts metadata object to array format for web interface
+ * Array format matches frontend expectations in DashboardView.jsx
  *
  * @param {Object} metadata - Parsed metadata from parseFileMetadata()
- * @returns {Array} Array of values for spreadsheet row
+ * @returns {Array} Array of values for spreadsheet row (15 elements)
  *
  * @example
  * const metadata = parseFileMetadata(file, folder);
  * const row = parseForSpreadsheet(metadata);
- * // Returns: ["📄", "document.pdf", "1.5 MB", "17/11/2024", ...]
+ * // Returns: ["📄", "document.pdf", "1.5 MB", "Document", "17/11/2024", ...]
  */
 function parseForSpreadsheet(metadata) {
   return [
-    metadata.icon,
-    metadata.fileName,
-    metadata.fileSizeFormatted,
-    metadata.fileCategory,
-    metadata.modifiedDateFormatted,
-    metadata.ownerNames,
-    metadata.sharingStatus,
-    metadata.parentName,
-    metadata.fileId,
-    metadata.driveLink,
+    metadata.icon,                      // [0] Icon
+    metadata.fileName,                  // [1] File Name
+    metadata.fileSizeFormatted,         // [2] File Size (formatted)
+    metadata.fileCategory,              // [3] File Category
+    metadata.modifiedDateFormatted,     // [4] Last Modified
+    metadata.createdDateFormatted,      // [5] Created Date
+    metadata.lastViewedDateFormatted,   // [6] Last Viewed
+    metadata.ownerNames,                // [7] Owner(s)
+    metadata.sharingStatus,             // [8] Sharing Status
+    metadata.starred ? '⭐' : '',       // [9] Starred indicator
+    metadata.parentName,                // [10] Parent Folder Name
+    metadata.fileId,                    // [11] File ID
+    metadata.driveLink,                 // [12] Drive Link
+    metadata.mimeType,                  // [13] MIME Type
+    metadata.fileSizeBytes,             // [14] Size (bytes - for sorting)
   ];
 }
 
