@@ -107,12 +107,28 @@ function runSmartScan(folderId, corpora) {
       } else {
         const folderMetadata = Drive.Files.get(cleanFolderId, {
           fields: 'title',
-          supportsAllDrives: true
+          supportsAllDrives: true,
+          supportsTeamDrives: true
         });
         folderName = folderMetadata.title;
       }
     } catch (error) {
-      console.warn(`Could not retrieve folder name: ${error.message}`);
+      console.warn(`Could not retrieve folder name via Drive.Files.get: ${error.message}`);
+      // Fallback 1: DriveApp
+      try {
+        const f = DriveApp.getFolderById(cleanFolderId);
+        if (f) folderName = f.getName();
+      } catch (e) {
+        // Fallback 2: Drive.Drives (Shared Drive root)
+        try {
+          if (typeof Drive !== 'undefined' && Drive.Drives && Drive.Drives.get) {
+            const d = Drive.Drives.get(cleanFolderId);
+            if (d && d.name) folderName = d.name;
+          }
+        } catch (err) {
+          console.warn(`Could not retrieve folder name: ${error.message}`);
+        }
+      }
     }
 
     // Retrieve all files using existing function

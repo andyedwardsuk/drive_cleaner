@@ -76,20 +76,78 @@ var DriveApiHelpers = (function () {
    * @private
    */
   function getRootFolderInfo_(folderId) {
+    if (!folderId || folderId === 'root') {
+      try {
+        const response = Drive.Files.get('root', {
+          fields: 'title, id, driveId',
+          supportsAllDrives: true,
+          supportsTeamDrives: true
+        });
+        return {
+          id: response.id || 'root',
+          name: response.title || 'My Drive',
+          driveId: undefined
+        };
+      } catch (e) {
+        return { id: 'root', name: 'My Drive', driveId: undefined };
+      }
+    }
+
+    let lastError = null;
+
+    // 1. Try Drive.Files.get with supportsAllDrives and supportsTeamDrives (Drive API v2)
     try {
       const response = Drive.Files.get(folderId, {
         fields: 'title, id, driveId',
-        supportsAllDrives: true
+        supportsAllDrives: true,
+        supportsTeamDrives: true
       });
 
       return {
-        id: folderId === 'root' ? response.id : folderId,
-        name: response.title,
+        id: response.id || folderId,
+        name: response.title || 'Untitled Folder',
         driveId: response.driveId
       };
     } catch (error) {
-      throw new Error(`No folder found with ID: ${folderId}`);
+      lastError = error;
+      console.warn(`Drive.Files.get failed for ${folderId}: ${error.message}`);
     }
+
+    // 2. Try Drive.Drives.get if folderId is a Shared Drive root
+    try {
+      if (typeof Drive !== 'undefined' && Drive.Drives && Drive.Drives.get) {
+        const driveRes = Drive.Drives.get(folderId);
+        if (driveRes && driveRes.name) {
+          return {
+            id: folderId,
+            name: driveRes.name,
+            driveId: folderId
+          };
+        }
+      }
+    } catch (e) {
+      console.warn(`Drive.Drives.get failed for ${folderId}: ${e.message}`);
+    }
+
+    // 3. Try DriveApp.getFolderById as fallback
+    try {
+      const folder = DriveApp.getFolderById(folderId);
+      if (folder) {
+        return {
+          id: folder.getId(),
+          name: folder.getName(),
+          driveId: undefined
+        };
+      }
+    } catch (e) {
+      console.warn(`DriveApp.getFolderById failed for ${folderId}: ${e.message}`);
+    }
+
+    const errorDetails = lastError ? lastError.message : 'Folder not accessible or does not exist.';
+    throw new Error(
+      `No folder found with ID: ${folderId} (${errorDetails}). ` +
+      'Please ensure that the folder is shared with your account, not in Trash, and that you have view access.'
+    );
   }
 
   /**
@@ -129,6 +187,7 @@ var DriveApiHelpers = (function () {
       q: queryString,
       fields: 'items(id, title, mimeType, parents(id), fileSize, createdDate, modifiedDate, lastViewedByMeDate, ownerNames, owners(displayName, emailAddress), shared, permissions, starred, description, thumbnailLink, fileExtension, alternateLink), nextPageToken',
       supportsAllDrives: true,
+      supportsTeamDrives: true,
       includeItemsFromAllDrives: true
     };
 
