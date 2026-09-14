@@ -317,6 +317,62 @@ function testRotAnalysis() {
 }
 
 /**
+ * Test Cloud Carbon Footprint Analysis
+ *
+ * Verifies calculation of kWh, kg CO2 emissions, real-world equivalents,
+ * media breakdowns, and potential savings.
+ *
+ * @returns {Object} Test results
+ */
+function testCarbonFootprint() {
+  console.log('===== TESTING CLOUD CARBON FOOTPRINT ANALYSIS =====');
+
+  try {
+    const mockFiles = [
+      { file_id: 'vid1', file_name: 'Recording.mp4', mime_type: 'video/mp4', size_bytes: 2147483648 }, // 2 GB
+      { file_id: 'img1', file_name: 'Photo.jpg', mime_type: 'image/jpeg', size_bytes: 524288000 },      // 500 MB
+      { file_id: 'doc1', file_name: 'Report.pdf', mime_type: 'application/pdf', size_bytes: 52428800 }  // 50 MB
+    ];
+
+    const mockCategoryResults = {
+      duplicates: { total_size_bytes: 524288000 },
+      temp_files: { total_size_bytes: 10485760 }
+    };
+
+    // eslint-disable-next-line no-undef
+    const carbon = calculateCarbonFootprint(mockFiles, mockCategoryResults);
+
+    const hasStorage = carbon.storage_gb > 0;
+    const hasEmissions = carbon.annual_co2_kg > 0;
+    const hasEnergy = carbon.annual_energy_kwh > 0;
+    const hasEquivalents = Boolean(carbon.equivalents?.headline);
+    const hasBreakdown = Boolean(carbon.breakdown_by_type?.videos && carbon.breakdown_by_type?.photos);
+    const hasSavings = carbon.potential_savings?.co2_saved_kg > 0;
+
+    const success = hasStorage && hasEmissions && hasEnergy && hasEquivalents && hasBreakdown && hasSavings;
+
+    console.log(`Carbon Footprint Test: Storage=${carbon.storage_gb} GB, CO2=${carbon.annual_co2_kg} kg/yr, Rating=${carbon.eco_rating?.level}`);
+    console.log(`Headline Equivalent: "${carbon.equivalents?.headline}"`);
+
+    return {
+      success,
+      message: success ? 'Carbon footprint verified successfully' : 'Carbon footprint verification failed',
+      annual_co2_kg: carbon.annual_co2_kg,
+      storage_gb: carbon.storage_gb,
+      eco_rating: carbon.eco_rating?.level
+    };
+  } catch (error) {
+    console.error('Carbon footprint test failed:', error);
+    return {
+      success: false,
+      message: 'Carbon footprint test failed',
+      error: error.message,
+      stack: error.stack
+    };
+  }
+}
+
+/**
  * Run All Tests
  *
  * Convenience function to run all Smart Scan tests in sequence
@@ -332,12 +388,14 @@ function runAllSmartScanTests() {
     metadata_test: testSmartScanMetadata(),
     analyzer_test: testLargeFilesAnalyzer(),
     rot_test: testRotAnalysis(),
+    carbon_test: testCarbonFootprint(),
     full_scan_test: testSmartScanSampleFolder()
   };
 
   const allPassed = results.metadata_test.success &&
                     results.analyzer_test.success &&
                     results.rot_test.success &&
+                    results.carbon_test.success &&
                     results.full_scan_test.success;
 
   console.log('========================================');
@@ -350,6 +408,7 @@ function runAllSmartScanTests() {
       metadata_test: results.metadata_test.success ? 'PASS' : 'FAIL',
       analyzer_test: results.analyzer_test.success ? 'PASS' : 'FAIL',
       rot_test: results.rot_test.success ? 'PASS' : 'FAIL',
+      carbon_test: results.carbon_test.success ? 'PASS' : 'FAIL',
       full_scan_test: results.full_scan_test.success ? 'PASS' : 'FAIL'
     },
     detailed_results: results

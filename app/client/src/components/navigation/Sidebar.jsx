@@ -11,6 +11,7 @@ import {
   Trash2,
   FileSpreadsheet,
   Flame,
+  Leaf,
   Star,
   Layers,
   FolderHeart,
@@ -49,6 +50,12 @@ export default function Sidebar() {
           label: 'Storage Analytics',
           path: '/storage-analytics',
           flag: 'FEATURE_STORAGE_ANALYTICS',
+        },
+        {
+          icon: Leaf,
+          label: 'Carbon Footprint',
+          path: '/carbon-footprint',
+          flag: 'FEATURE_CARBON_FOOTPRINT',
         },
       ],
     },
@@ -182,7 +189,7 @@ export default function Sidebar() {
                 </div>
                 <div>
                   <h1 className="text-lg font-bold text-white">Drive Cleaner</h1>
-                  <p className="text-xs text-gray-400">v1.3.0</p>
+                  <p className="text-xs text-gray-400">v1.4.0</p>
                 </div>
               </motion.div>
             )}

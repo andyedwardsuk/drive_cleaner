@@ -126,6 +126,7 @@ function runSmartScan(folderId, corpora) {
         temp_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Temporary Files', category_type: 'temp_files' },
         workspace_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Google Workspace Files', category_type: 'workspace_files', type_breakdown: {}, unused_breakdown: { six_months: 0, one_year: 0, two_years: 0 }, sharing_breakdown: { shared: 0, private: 0, unknown: 0 } },
         rot_analysis: { count: 0, total_size_bytes: 0, category_name: 'Data ROT Analysis', category_type: 'rot_analysis', breakdown: { redundant: { count: 0, total_size_bytes: 0 }, obsolete: { count: 0, total_size_bytes: 0 }, trivial: { count: 0, total_size_bytes: 0 } }, clutter_index: { score: 0, target: 20, breakdown: { rot_ratio: 0, disorganization: 0, inertia: 0, data_gravity: 0 } }, hoarding_score: { total_score: 0, rating: { level: 'Minimal', color: 'green', icon: '✨' }, components: { clutter_volume: 0, disorganization: 0, accumulation: 0, attachment: 0 } }, freshness_distribution: { fresh: { count: 0, percentage: 0 }, aging: { count: 0, percentage: 0 }, stale: { count: 0, percentage: 0 }, rotting: { count: 0, percentage: 0 }, decayed: { count: 0, percentage: 0 } }, items: [] },
+        carbon_footprint: { storage_gb: 0, annual_energy_kwh: 0, annual_co2_kg: 0, annual_co2_tonnes: 0, equivalents: { headline: '0 smartphone charges', car_miles: 0, car_km: 0, smartphone_charges: 0, tree_years: 0, burgers: 0, laptop_hours: 0, coffee_cups: 0 }, breakdown_by_type: {}, potential_savings: { cleanup_gb: 0, co2_saved_kg: 0, energy_saved_kwh: 0, equivalents: { headline: '0 smartphone charges', car_miles: 0, car_km: 0, smartphone_charges: 0, tree_years: 0, burgers: 0 } }, eco_rating: { level: 'Eco Champion', color: 'emerald', icon: '🌟', badge: 'Minimal Carbon Impact', message: 'No storage footprint.' }, achievements: [] },
         recommendations: [],
         error: null
       };
@@ -154,6 +155,7 @@ function runSmartScan(folderId, corpora) {
         temp_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Temporary Files', category_type: 'temp_files' },
         workspace_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Google Workspace Files', category_type: 'workspace_files', type_breakdown: {}, unused_breakdown: { six_months: 0, one_year: 0, two_years: 0 }, sharing_breakdown: { shared: 0, private: 0, unknown: 0 } },
         rot_analysis: { count: 0, total_size_bytes: 0, category_name: 'Data ROT Analysis', category_type: 'rot_analysis', breakdown: { redundant: { count: 0, total_size_bytes: 0 }, obsolete: { count: 0, total_size_bytes: 0 }, trivial: { count: 0, total_size_bytes: 0 } }, clutter_index: { score: 0, target: 20, breakdown: { rot_ratio: 0, disorganization: 0, inertia: 0, data_gravity: 0 } }, hoarding_score: { total_score: 0, rating: { level: 'Minimal', color: 'green', icon: '✨' }, components: { clutter_volume: 0, disorganization: 0, accumulation: 0, attachment: 0 } }, freshness_distribution: { fresh: { count: 0, percentage: 0 }, aging: { count: 0, percentage: 0 }, stale: { count: 0, percentage: 0 }, rotting: { count: 0, percentage: 0 }, decayed: { count: 0, percentage: 0 } }, items: [] },
+        carbon_footprint: { storage_gb: 0, annual_energy_kwh: 0, annual_co2_kg: 0, annual_co2_tonnes: 0, equivalents: { headline: '0 smartphone charges', car_miles: 0, car_km: 0, smartphone_charges: 0, tree_years: 0, burgers: 0, laptop_hours: 0, coffee_cups: 0 }, breakdown_by_type: {}, potential_savings: { cleanup_gb: 0, co2_saved_kg: 0, energy_saved_kwh: 0, equivalents: { headline: '0 smartphone charges', car_miles: 0, car_km: 0, smartphone_charges: 0, tree_years: 0, burgers: 0 } }, eco_rating: { level: 'Eco Champion', color: 'emerald', icon: '🌟', badge: 'Minimal Carbon Impact', message: 'No storage footprint.' }, achievements: [] },
         recommendations: [],
         error: null
       };
@@ -201,6 +203,12 @@ function runSmartScan(folderId, corpora) {
 
     const totalSavings = calculateSpaceSavings_(categoryResults);
 
+    // Calculate Carbon Footprint
+    console.log('Calculating carbon footprint...');
+    // eslint-disable-next-line no-undef
+    const carbonFootprintResult = calculateCarbonFootprint(structuredFiles, categoryResults);
+    console.log(`- Annual CO2: ${carbonFootprintResult.annual_co2_kg} kg CO2 (${carbonFootprintResult.eco_rating.level})`);
+
     // Generate recommendations
     console.log('Generating recommendations...');
     // eslint-disable-next-line no-undef
@@ -222,6 +230,7 @@ function runSmartScan(folderId, corpora) {
       temp_files: tempFilesResult,
       workspace_files: workspaceFilesResult,
       rot_analysis: rotAnalysisResult,
+      carbon_footprint: carbonFootprintResult,
       recommendations: recommendations,
       error: null
     };
@@ -250,6 +259,7 @@ function runSmartScan(folderId, corpora) {
       temp_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Temporary Files', category_type: 'temp_files' },
       workspace_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Google Workspace Files', category_type: 'workspace_files', type_breakdown: {}, unused_breakdown: { six_months: 0, one_year: 0, two_years: 0 }, sharing_breakdown: { shared: 0, private: 0, unknown: 0 } },
       rot_analysis: { count: 0, total_size_bytes: 0, category_name: 'Data ROT Analysis', category_type: 'rot_analysis', breakdown: { redundant: { count: 0, total_size_bytes: 0 }, obsolete: { count: 0, total_size_bytes: 0 }, trivial: { count: 0, total_size_bytes: 0 } }, clutter_index: { score: 0, target: 20, breakdown: { rot_ratio: 0, disorganization: 0, inertia: 0, data_gravity: 0 } }, hoarding_score: { total_score: 0, rating: { level: 'Minimal', color: 'green', icon: '✨' }, components: { clutter_volume: 0, disorganization: 0, accumulation: 0, attachment: 0 } }, freshness_distribution: { fresh: { count: 0, percentage: 0 }, aging: { count: 0, percentage: 0 }, stale: { count: 0, percentage: 0 }, rotting: { count: 0, percentage: 0 }, decayed: { count: 0, percentage: 0 } }, items: [] },
+      carbon_footprint: { storage_gb: 0, annual_energy_kwh: 0, annual_co2_kg: 0, annual_co2_tonnes: 0, equivalents: { headline: '0 smartphone charges', car_miles: 0, car_km: 0, smartphone_charges: 0, tree_years: 0, burgers: 0, laptop_hours: 0, coffee_cups: 0 }, breakdown_by_type: {}, potential_savings: { cleanup_gb: 0, co2_saved_kg: 0, energy_saved_kwh: 0, equivalents: { headline: '0 smartphone charges', car_miles: 0, car_km: 0, smartphone_charges: 0, tree_years: 0, burgers: 0 } }, eco_rating: { level: 'Eco Champion', color: 'emerald', icon: '🌟', badge: 'Minimal Carbon Impact', message: 'No storage footprint.' }, achievements: [] },
       recommendations: [],
       error: error.message
     };

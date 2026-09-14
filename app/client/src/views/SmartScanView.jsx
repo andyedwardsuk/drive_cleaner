@@ -1,4 +1,4 @@
-import { Scan, FileText, Clock, Copy, Trash2, AlertCircle, CheckCircle, ChevronRight, FileSpreadsheet, Flame } from 'lucide-react'
+import { Scan, FileText, Clock, Copy, Trash2, AlertCircle, CheckCircle, ChevronRight, FileSpreadsheet, Flame, Leaf } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
@@ -154,6 +154,26 @@ function ScanResults({ data }) {
           <p className="text-xs text-gray-400 mt-4">
             Scanned: {new Date(data.scan_date).toLocaleString()}
           </p>
+        )}
+
+        {data.carbon_footprint && (
+          <div
+            onClick={() => navigate({ to: '/carbon-footprint' })}
+            className="mt-4 pt-4 border-t border-glass-border flex flex-col sm:flex-row sm:items-center justify-between gap-2 cursor-pointer group hover:opacity-95 transition-opacity"
+          >
+            <div className="flex items-center gap-2 text-xs text-gray-300">
+              <span className="p-1.5 rounded-md bg-emerald-500/10 text-emerald-400">
+                <Leaf className="w-4 h-4" />
+              </span>
+              <span>
+                Annual Cloud Carbon Footprint: <strong className="text-emerald-300">{data.carbon_footprint.annual_co2_kg} kg CO₂</strong> ({data.carbon_footprint.equivalents?.headline})
+              </span>
+            </div>
+            <div className="flex items-center gap-1 text-xs text-emerald-400 font-medium group-hover:translate-x-0.5 transition-transform">
+              <span>View Eco Impact</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </div>
+          </div>
         )}
       </div>
 

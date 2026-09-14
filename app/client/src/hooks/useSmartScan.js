@@ -411,6 +411,84 @@ export const useSmartScanStore = create((set) => ({
                 }
               ]
             },
+            carbon_footprint: {
+              storage_gb: 4.88,
+              storage_bytes: 5242880000,
+              annual_energy_kwh: 0.0005,
+              annual_co2_kg: 0.244,
+              annual_co2_tonnes: 0.000244,
+              equivalents: {
+                headline: '0.6 miles driven in a car',
+                car_miles: 0.6,
+                car_km: 1.0,
+                smartphone_charges: 31,
+                tree_years: 0.01,
+                burgers: 0.1,
+                laptop_hours: 12,
+                coffee_cups: 5
+              },
+              breakdown_by_type: {
+                videos: { count: 3, size_bytes: 2684354560, size_gb: 2.5, annual_co2_kg: 0.125, percentage: 51, label: 'Videos', icon: '📽️', color: 'rose' },
+                photos: { count: 18, size_bytes: 1288490188, size_gb: 1.2, annual_co2_kg: 0.060, percentage: 25, label: 'Photos & Images', icon: '🖼️', color: 'amber' },
+                documents: { count: 45, size_bytes: 858993459, size_gb: 0.8, annual_co2_kg: 0.040, percentage: 16, label: 'Documents & Sheets', icon: '📄', color: 'blue' },
+                other: { count: 12, size_bytes: 411041792, size_gb: 0.38, annual_co2_kg: 0.019, percentage: 8, label: 'Archives & Other', icon: '📦', color: 'purple' }
+              },
+              potential_savings: {
+                cleanup_gb: 0.88,
+                cleanup_bytes: 944892800,
+                co2_saved_kg: 0.044,
+                energy_saved_kwh: 0.0001,
+                equivalents: {
+                  headline: '6 smartphone charges prevented',
+                  car_miles: 0.1,
+                  car_km: 0.2,
+                  smartphone_charges: 6,
+                  tree_years: 0.002,
+                  burgers: 0.02
+                }
+              },
+              eco_rating: {
+                level: 'Eco Champion',
+                color: 'emerald',
+                icon: '🌟',
+                badge: 'Minimal Carbon Impact',
+                message: 'Your cloud storage has an ultra-low carbon footprint.'
+              },
+              achievements: [
+                {
+                  id: 'sapling_saver',
+                  name: 'Sapling Saver',
+                  icon: '🌱',
+                  description: 'Potential to save 0.05 kg CO2 (~1 GB deleted)',
+                  unlocked: false,
+                  progress: 88
+                },
+                {
+                  id: 'tree_planter',
+                  name: 'Tree Planter',
+                  icon: '🌳',
+                  description: 'Offset equivalent of 1 tree for a year (21 kg CO2)',
+                  unlocked: false,
+                  progress: 5
+                },
+                {
+                  id: 'carbon_neutral',
+                  name: 'Drive Carbon Neutral',
+                  icon: '♻️',
+                  description: 'Clean enough obsolete files to offset your entire annual Drive footprint',
+                  unlocked: false,
+                  progress: 35
+                },
+                {
+                  id: 'forest_guardian',
+                  name: 'Forest Guardian',
+                  icon: '🌲',
+                  description: 'Save 100 kg CO2 through comprehensive cleanup',
+                  unlocked: false,
+                  progress: 1
+                }
+              ]
+            },
             recommendations: [
               {
                 priority: 'high',

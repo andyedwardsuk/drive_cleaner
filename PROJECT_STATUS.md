@@ -1,27 +1,27 @@
 # Drive Cleaner - Project Status
 
 **Last Updated**: 2024-11-20
-**Current Phase**: Sprint 1 (Active) - Fast Track (6 weeks)
-**Current Sprint**: Sprint 1, Week 2 - Data ROT Analysis & Digital Hoarding Assessment
+**Current Phase**: Sprint 2 (Active) - Fast Track (6 weeks)
+**Current Sprint**: Sprint 2, Week 1 - Cloud Carbon Footprint & Green Gamification
 
 ---
 
 ## 🎯 Quick Summary
 
-**Completed**: 10 major features ✅ (Sprint 0 + Sprint 1)
+**Completed**: 11 major features ✅ (Sprint 0, Sprint 1, Sprint 2)
 **In Progress**: 0 major features 🔄
-**Planned**: 4 major features 📋 (Sprints 2-3)
+**Planned**: 3 major features 📋 (Sprint 3 + Backlog)
 **Sprint Approach**: ⭐ Fast Track (6 weeks) - Sprints 1-3
-**Current Velocity**: 10 features completed (67% of core product)
+**Current Velocity**: 11 features completed (73% of core product)
 
 ---
 
-## ✅ Completed Features (Sprint 0 & Sprint 1)
+## ✅ Completed Features (Sprint 0, 1 & 2)
 
 | Feature | Type | Status | Deployed |
 |---------|------|--------|----------|
 | **#1: Enhanced Metadata Collection** | Backend | ✅ Complete | v1.0.0 |
-| **#2: Smart Scan (6 analyzers + ROT)**| Full Stack | ✅ Complete | v1.0.0 - v1.3.0 |
+| **#2: Smart Scan (Analyzers Engine)** | Full Stack | ✅ Complete | v1.0.0 - v1.4.0 |
 | - Large Files Analyzer | Backend | ✅ Complete | v1.0.0 |
 | - Old Files Analyzer | Backend | ✅ Complete | v1.0.0 |
 | - Duplicates Detector | Backend | ✅ Complete | v1.0.0 |
@@ -29,6 +29,7 @@
 | - Temp Files Identifier | Backend | ✅ Complete | v1.0.0 |
 | - Workspace Analyzer | Full Stack | ✅ Complete | v1.2.0 |
 | - ROT Analyzer & DHQ Engine | Full Stack | ✅ Complete | v1.3.0 |
+| - Carbon Footprint Analyzer | Full Stack | ✅ Complete | v1.4.0 |
 | **#7: Storage Analytics Dashboard** | Frontend | ✅ Complete | v1.1.0 |
 | **#3: Large Files View** | Frontend | ✅ Complete | v1.1.0 |
 | **Old Files View** | Frontend | ✅ Complete | v1.1.0 |
@@ -37,10 +38,11 @@
 | **Temp Files View** | Frontend | ✅ Complete | v1.1.0 |
 | **#10: Google Workspace Files View** | Full Stack | ✅ Complete | v1.2.0 |
 | **#11: Data ROT Analysis & Hoarding** | Full Stack | ✅ Complete | v1.3.0 |
+| **#12: Cloud Carbon Footprint** | Full Stack | ✅ Complete | v1.4.0 |
 
-**Total**: 10 major features (Enhanced Metadata + 7 analyzers + 7 category views + Storage Analytics + ROT & Hoarding Engine)
-**Latest Deployment**: v1.3.0
-**Deployment URL**: https://script.google.com/macros/s/AKfycbwns68_rZPtjEsRT5LhikMBfdLvgF35-tyEFKlSEMV9bycljNIgcPfjSsFSk1pKPOnm9w/exec
+**Total**: 11 major features (Enhanced Metadata + 8 analyzers + 8 category/analytics views + Carbon Footprint & Green Gamification)
+**Latest Deployment**: v1.4.0
+**Deployment URL**: https://script.google.com/macros/s/AKfycbzxAjjYJm6OkqTPCJR2HXNk7BgRqzsmJ01UxZN3ePYBRcTAAFJdpAsuboVmzQtPYeqkLA/exec
 
 ---
 
@@ -50,7 +52,6 @@
 
 | Issue | Feature | Sprint | Effort | Dependencies |
 |-------|---------|--------|--------|--------------|
-| #12 | **Carbon Footprint & Gamification** | Sprint 2 | 7-10 days | None |
 | #13 | **Daily Impact Tracker** | Sprint 3 | 7-10 days | #11, #12 |
 
 **Critical Path**: Sprint 1 → Sprint 2 → Sprint 3 (6 weeks total)
