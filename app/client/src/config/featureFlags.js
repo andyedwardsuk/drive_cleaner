@@ -31,8 +31,8 @@ export const FEATURE_FLAGS = {
   FEATURE_CARBON_FOOTPRINT: true,
   FEATURE_DAILY_IMPACT: true,
 
-  // Phase 5 (v0.6.0) - Coming Soon
-  FEATURE_BULK_ACTIONS: false,
+  // Phase 5 (v0.6.0) - Now Available
+  FEATURE_BULK_ACTIONS: true,
   FEATURE_FILE_PREVIEW: false,
 
   // Phase 6 (v0.7.0) - Coming Soon

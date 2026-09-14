@@ -74,7 +74,7 @@ function parseFileMetadata(driveFileObject, parentFolder) {
       parentId: parentFolder ? parentFolder.id : '',
 
       // === Additional Metadata ===
-      starred: driveFileObject.starred || false,
+      starred: (driveFileObject.labels && driveFileObject.labels.starred) || driveFileObject.starred || false,
       description: driveFileObject.description || '',
       thumbnailLink: driveFileObject.thumbnailLink || '',
       // eslint-disable-next-line no-undef

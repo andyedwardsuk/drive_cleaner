@@ -138,6 +138,88 @@ var DriveCleanerWebApp = (function () {
     }
   }
 
+  /**
+   * Moves a list of files to Google Drive Trash
+   * @param {Array<string>} fileIds - Array of file IDs to trash
+   * @returns {Object} {success: boolean, trashedCount: number, failedCount: number, trashedIds: Array<string>, errors: Array<Object>}
+   */
+  function trashFiles(fileIds) {
+    if (!fileIds || !Array.isArray(fileIds)) {
+      return { success: false, error: 'Invalid fileIds array' };
+    }
+
+    const trashed = [];
+    const failed = [];
+
+    for (let i = 0; i < fileIds.length; i++) {
+      const id = fileIds[i];
+      try {
+        if (typeof Drive !== 'undefined' && Drive.Files && Drive.Files.trash) {
+          Drive.Files.trash(id);
+        } else {
+          DriveApp.getFileById(id).setTrashed(true);
+        }
+        trashed.push(id);
+      } catch (err) {
+        try {
+          DriveApp.getFileById(id).setTrashed(true);
+          trashed.push(id);
+        } catch (fallbackErr) {
+          failed.push({ id: id, error: err.message || fallbackErr.message });
+        }
+      }
+    }
+
+    return {
+      success: trashed.length > 0 || (failed.length === 0 && fileIds.length === 0),
+      trashedCount: trashed.length,
+      failedCount: failed.length,
+      trashedIds: trashed,
+      errors: failed
+    };
+  }
+
+  /**
+   * Restores a list of files from Google Drive Trash (Undo operation)
+   * @param {Array<string>} fileIds - Array of file IDs to untrash
+   * @returns {Object} {success: boolean, restoredCount: number, failedCount: number, restoredIds: Array<string>, errors: Array<Object>}
+   */
+  function untrashFiles(fileIds) {
+    if (!fileIds || !Array.isArray(fileIds)) {
+      return { success: false, error: 'Invalid fileIds array' };
+    }
+
+    const restored = [];
+    const failed = [];
+
+    for (let i = 0; i < fileIds.length; i++) {
+      const id = fileIds[i];
+      try {
+        if (typeof Drive !== 'undefined' && Drive.Files && Drive.Files.untrash) {
+          Drive.Files.untrash(id);
+        } else {
+          DriveApp.getFileById(id).setTrashed(false);
+        }
+        restored.push(id);
+      } catch (err) {
+        try {
+          DriveApp.getFileById(id).setTrashed(false);
+          restored.push(id);
+        } catch (fallbackErr) {
+          failed.push({ id: id, error: err.message || fallbackErr.message });
+        }
+      }
+    }
+
+    return {
+      success: restored.length > 0 || (failed.length === 0 && fileIds.length === 0),
+      restoredCount: restored.length,
+      failedCount: failed.length,
+      restoredIds: restored,
+      errors: failed
+    };
+  }
+
   // ============================================
   // PRIVATE HELPER FUNCTIONS
   // ============================================
@@ -201,7 +283,9 @@ var DriveCleanerWebApp = (function () {
     getOAuthToken: getOAuthToken,
     getFilesAndFolders: getFilesAndFolders,
     getCachedFolderId: getCachedFolderId,
-    getDriveQuota: getDriveQuota
+    getDriveQuota: getDriveQuota,
+    trashFiles: trashFiles,
+    untrashFiles: untrashFiles
   };
 
 })();
@@ -290,6 +374,26 @@ function getCachedFolderId() {
  */
 function getDriveQuota() {
   return DriveCleanerWebApp.getDriveQuota();
+}
+
+/**
+ * Moves specified files to Google Drive Trash
+ * Called from React app via google.script.run
+ * @param {Array<string>} fileIds - File IDs to trash
+ * @returns {Object} Result {success, trashedCount, failedCount, trashedIds, errors}
+ */
+function trashFiles(fileIds) {
+  return DriveCleanerWebApp.trashFiles(fileIds);
+}
+
+/**
+ * Restores specified files from Google Drive Trash (Undo operation)
+ * Called from React app via google.script.run
+ * @param {Array<string>} fileIds - File IDs to restore
+ * @returns {Object} Result {success, restoredCount, failedCount, restoredIds, errors}
+ */
+function untrashFiles(fileIds) {
+  return DriveCleanerWebApp.untrashFiles(fileIds);
 }
 
 /**

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   flexRender,
   getCoreRowModel,
@@ -7,7 +7,16 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ArrowUpDown, MoreHorizontal, Copy, ExternalLink, Download, FileText, FolderOpen } from 'lucide-react'
+import {
+  ArrowUpDown,
+  MoreHorizontal,
+  Copy,
+  ExternalLink,
+  Download,
+  FileText,
+  FolderOpen,
+  Trash2,
+} from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -35,10 +44,22 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
+import { useFileActions } from '@/hooks/useFileActions'
+import { TrashConfirmationModal } from './actions/TrashConfirmationModal'
+import { UndoToast } from './actions/UndoToast'
 
 // Helper to copy text to clipboard
 const copyToClipboard = (text) => {
   navigator.clipboard.writeText(text)
+}
+
+// Helper to format bytes
+const formatBytes = (bytes) => {
+  if (!bytes || bytes === 0) return '0 B'
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return `${(bytes / Math.pow(k, i)).toFixed(1)} ${sizes[i]}`
 }
 
 // Helper to export data as CSV
@@ -61,7 +82,7 @@ const exportToCSV = (data) => {
   ]
   const csvContent = [
     headers.join(','),
-    ...data.map(row =>
+    ...data.map((row) =>
       [
         row.icon,
         row.fileName,
@@ -78,9 +99,9 @@ const exportToCSV = (data) => {
         row.driveLink,
         row.mimeType,
       ]
-        .map(cell => `"${cell || ''}"`)
+        .map((cell) => `"${cell || ''}"`)
         .join(',')
-    )
+    ),
   ].join('\n')
 
   const blob = new Blob([csvContent], { type: 'text/csv' })
@@ -104,29 +125,89 @@ const exportToJSON = (data) => {
   window.URL.revokeObjectURL(url)
 }
 
-// Get file type label
-const getFileTypeLabel = (mimeType) => {
-  if (mimeType === 'application/vnd.google-apps.folder') return 'Folder'
-  if (mimeType.startsWith('application/vnd.google-apps.')) {
-    return mimeType.replace('application/vnd.google-apps.', 'Google ').split('.').pop()
-  }
-  if (mimeType.startsWith('image/')) return 'Image'
-  if (mimeType.startsWith('video/')) return 'Video'
-  if (mimeType.startsWith('audio/')) return 'Audio'
-  if (mimeType.includes('pdf')) return 'PDF'
-  if (mimeType.includes('document')) return 'Document'
-  if (mimeType.includes('spreadsheet')) return 'Spreadsheet'
-  if (mimeType.includes('presentation')) return 'Presentation'
-  return 'File'
-}
-
 export default function FileTable({ data = [] }) {
   const [sorting, setSorting] = useState([])
   const [globalFilter, setGlobalFilter] = useState('')
   const [columnFilters, setColumnFilters] = useState([])
+  const [rowSelection, setRowSelection] = useState({})
+  const [trashedIds, setTrashedIds] = useState(new Set())
+
+  const {
+    isTrashing,
+    isRestoring,
+    confirmModalOpen,
+    filesPendingTrash,
+    requestTrash,
+    cancelTrash,
+    executeTrash,
+    undoToast,
+    executeRestore,
+    dismissUndo,
+  } = useFileActions()
+
+  // Track trashed & restored files via global events
+  useEffect(() => {
+    const handleTrashed = (e) => {
+      const ids = e.detail?.fileIds || []
+      setTrashedIds((prev) => {
+        const next = new Set(prev)
+        ids.forEach((id) => next.add(id))
+        return next
+      })
+      setRowSelection({})
+    }
+
+    const handleRestored = (e) => {
+      const files = e.detail?.files || []
+      setTrashedIds((prev) => {
+        const next = new Set(prev)
+        files.forEach((f) => next.delete(f.fileId))
+        return next
+      })
+    }
+
+    window.addEventListener('drive_cleaner_files_trashed', handleTrashed)
+    window.addEventListener('drive_cleaner_files_restored', handleRestored)
+    return () => {
+      window.removeEventListener('drive_cleaner_files_trashed', handleTrashed)
+      window.removeEventListener('drive_cleaner_files_restored', handleRestored)
+    }
+  }, [])
+
+  // Filter out actively trashed files
+  const activeData = useMemo(() => {
+    return data.filter((item) => !trashedIds.has(item.fileId))
+  }, [data, trashedIds])
 
   const columns = useMemo(
     () => [
+      {
+        id: 'select',
+        header: ({ table }) => (
+          <div className="flex items-center justify-center">
+            <input
+              type="checkbox"
+              className="rounded border-gray-600 bg-zinc-800 text-primary focus:ring-primary h-4 w-4 cursor-pointer"
+              checked={table.getIsAllPageRowsSelected()}
+              onChange={(e) => table.toggleAllPageRowsSelected(!!e.target.checked)}
+              aria-label="Select all"
+            />
+          </div>
+        ),
+        cell: ({ row }) => (
+          <div className="flex items-center justify-center">
+            <input
+              type="checkbox"
+              className="rounded border-gray-600 bg-zinc-800 text-primary focus:ring-primary h-4 w-4 cursor-pointer"
+              checked={row.getIsSelected()}
+              onChange={(e) => row.toggleSelected(!!e.target.checked)}
+              aria-label="Select row"
+            />
+          </div>
+        ),
+        enableSorting: false,
+        enableGlobalFilter: false,
+      },
       {
         accessorKey: 'icon',
         header: 'Type',
@@ -291,24 +372,26 @@ export default function FileTable({ data = [] }) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem
-                  onClick={() => copyToClipboard(file.fileId)}
-                >
+                <DropdownMenuItem onClick={() => copyToClipboard(file.fileId)}>
                   <Copy className="mr-2 h-4 w-4" />
                   Copy File ID
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => copyToClipboard(driveUrl)}
-                >
+                <DropdownMenuItem onClick={() => copyToClipboard(driveUrl)}>
                   <Copy className="mr-2 h-4 w-4" />
                   Copy Drive Link
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => window.open(driveUrl, '_blank')}
-                >
+                <DropdownMenuItem onClick={() => window.open(driveUrl, '_blank')}>
                   <ExternalLink className="mr-2 h-4 w-4" />
                   Open in Drive
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => requestTrash([file])}
+                  className="text-red-400 focus:text-red-300 focus:bg-red-500/10 cursor-pointer"
+                >
+                  <Trash2 className="mr-2 h-4 w-4 text-red-400" />
+                  Move to Trash
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -316,15 +399,16 @@ export default function FileTable({ data = [] }) {
         },
       },
     ],
-    []
+    [requestTrash]
   )
 
   const table = useReactTable({
-    data,
+    data: activeData,
     columns,
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     onColumnFiltersChange: setColumnFilters,
+    onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -333,6 +417,7 @@ export default function FileTable({ data = [] }) {
       sorting,
       globalFilter,
       columnFilters,
+      rowSelection,
     },
     initialState: {
       pagination: {
@@ -341,8 +426,13 @@ export default function FileTable({ data = [] }) {
     },
   })
 
+  // Selected rows calculation
+  const selectedRows = table.getSelectedRowModel().rows.map((r) => r.original)
+  const selectedBytes = selectedRows.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0)
+
   return (
     <div className="w-full space-y-4">
+      {/* Controls & Search */}
       <div className="flex items-center justify-between gap-4">
         <Input
           placeholder="Search files..."
@@ -351,24 +441,51 @@ export default function FileTable({ data = [] }) {
           className="max-w-sm"
         />
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => exportToCSV(data)}
-          >
+          <Button variant="outline" size="sm" onClick={() => exportToCSV(activeData)}>
             <Download className="mr-2 h-4 w-4" />
             Export CSV
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => exportToJSON(data)}
-          >
+          <Button variant="outline" size="sm" onClick={() => exportToJSON(activeData)}>
             <Download className="mr-2 h-4 w-4" />
             Export JSON
           </Button>
         </div>
       </div>
+
+      {/* Floating Bulk Action Bar when rows selected */}
+      {selectedRows.length > 0 && (
+        <div className="flex items-center justify-between p-3.5 rounded-xl bg-primary/10 border border-primary/25 shadow-lg backdrop-blur-md animate-in fade-in-0 slide-in-from-top-1">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-semibold text-white">
+              {selectedRows.length} {selectedRows.length === 1 ? 'file' : 'files'} selected
+            </span>
+            <span className="text-xs text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+              {formatBytes(selectedBytes)} to reclaim
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setRowSelection({})}
+              className="text-xs text-gray-400 hover:text-white"
+            >
+              Clear Selection
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => requestTrash(selectedRows)}
+              className="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-4 py-2 h-auto rounded-xl flex items-center gap-1.5 shadow-lg shadow-red-600/25"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              Move {selectedRows.length} to Trash
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Table */}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -379,10 +496,7 @@ export default function FileTable({ data = [] }) {
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                        : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   )
                 })}
@@ -392,26 +506,17 @@ export default function FileTable({ data = [] }) {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
+                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
+                <TableCell colSpan={columns.length} className="h-24 text-center">
                   No results.
                 </TableCell>
               </TableRow>
@@ -419,6 +524,8 @@ export default function FileTable({ data = [] }) {
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination */}
       <div className="flex items-center justify-between space-x-2 py-4">
         <div className="flex items-center gap-2">
           <p className="text-sm text-muted-foreground">
@@ -466,6 +573,23 @@ export default function FileTable({ data = [] }) {
           </Button>
         </div>
       </div>
+
+      {/* Safety Confirmation Modal */}
+      <TrashConfirmationModal
+        isOpen={confirmModalOpen}
+        files={filesPendingTrash}
+        onConfirm={executeTrash}
+        onCancel={cancelTrash}
+        isTrashing={isTrashing}
+      />
+
+      {/* Undo Toast Banner */}
+      <UndoToast
+        undoToast={undoToast}
+        onUndo={executeRestore}
+        onDismiss={dismissUndo}
+        isRestoring={isRestoring}
+      />
     </div>
   )
 }

@@ -13,7 +13,7 @@
   "rules": {
     "no-unused-vars": ["warn", {
       "argsIgnorePattern": "^_",
-      "varsIgnorePattern": "^(doGet|doPost|onOpen|onEdit|onInstall|onFormSubmit|include|test|refresh|submit|list|get|set|delete|update|create|convert).*"
+      "varsIgnorePattern": "^(doGet|doPost|onOpen|onEdit|onInstall|onFormSubmit|include|test|refresh|submit|list|get|set|delete|update|create|convert|trash|untrash).*"
     }],
     "no-console": "off",
     "quotes": ["warn", "single", { "avoidEscape": true }],

@@ -185,7 +185,7 @@ var DriveApiHelpers = (function () {
 
     const requestPayload = {
       q: queryString,
-      fields: 'items(id, title, mimeType, parents(id), fileSize, createdDate, modifiedDate, lastViewedByMeDate, ownerNames, owners(displayName, emailAddress), shared, permissions, starred, description, thumbnailLink, fileExtension, alternateLink), nextPageToken',
+      fields: 'items(id, title, mimeType, parents(id), fileSize, createdDate, modifiedDate, lastViewedByMeDate, ownerNames, owners(displayName, emailAddress), shared, permissions, labels(starred), description, thumbnailLink, fileExtension, alternateLink), nextPageToken',
       supportsAllDrives: true,
       supportsTeamDrives: true,
       includeItemsFromAllDrives: true
