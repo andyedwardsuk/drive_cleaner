@@ -124,6 +124,7 @@ function runSmartScan(folderId, corpora) {
         duplicates: { count: 0, total_size_bytes: 0, items: [], category_name: 'Duplicate Files', category_type: 'duplicates' },
         empty_items: { count: 0, total_size_bytes: 0, items: [], category_name: 'Empty Items', category_type: 'empty_items' },
         temp_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Temporary Files', category_type: 'temp_files' },
+        workspace_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Google Workspace Files', category_type: 'workspace_files', type_breakdown: {}, unused_breakdown: { six_months: 0, one_year: 0, two_years: 0 }, sharing_breakdown: { shared: 0, private: 0, unknown: 0 } },
         recommendations: [],
         error: null
       };
@@ -150,6 +151,7 @@ function runSmartScan(folderId, corpora) {
         duplicates: { count: 0, total_size_bytes: 0, items: [], category_name: 'Duplicate Files', category_type: 'duplicates' },
         empty_items: { count: 0, total_size_bytes: 0, items: [], category_name: 'Empty Items', category_type: 'empty_items' },
         temp_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Temporary Files', category_type: 'temp_files' },
+        workspace_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Google Workspace Files', category_type: 'workspace_files', type_breakdown: {}, unused_breakdown: { six_months: 0, one_year: 0, two_years: 0 }, sharing_breakdown: { shared: 0, private: 0, unknown: 0 } },
         recommendations: [],
         error: null
       };
@@ -167,6 +169,8 @@ function runSmartScan(folderId, corpora) {
     const tempFilesResult = analyzeTempFiles(structuredFiles);
     // eslint-disable-next-line no-undef
     const duplicatesResult = analyzeDuplicates(structuredFiles);
+    // eslint-disable-next-line no-undef
+    const workspaceFilesResult = analyzeWorkspaceFiles(structuredFiles);
 
     console.log('Analyzers complete');
     console.log(`- Large files: ${largeFilesResult.count}`);
@@ -174,6 +178,7 @@ function runSmartScan(folderId, corpora) {
     console.log(`- Empty items: ${emptyItemsResult.count}`);
     console.log(`- Temp files: ${tempFilesResult.count}`);
     console.log(`- Duplicates: ${duplicatesResult.count}`);
+    console.log(`- Workspace files: ${workspaceFilesResult.count}`);
 
     // Calculate total space used
     const totalSpaceUsed = structuredFiles.reduce((sum, file) => sum + (file.size_bytes || 0), 0);
@@ -184,7 +189,8 @@ function runSmartScan(folderId, corpora) {
       old_files: oldFilesResult,
       duplicates: duplicatesResult,
       empty_items: emptyItemsResult,
-      temp_files: tempFilesResult
+      temp_files: tempFilesResult,
+      workspace_files: workspaceFilesResult
     };
 
     const totalSavings = calculateSpaceSavings_(categoryResults);
@@ -208,6 +214,7 @@ function runSmartScan(folderId, corpora) {
       duplicates: duplicatesResult,
       empty_items: emptyItemsResult,
       temp_files: tempFilesResult,
+      workspace_files: workspaceFilesResult,
       recommendations: recommendations,
       error: null
     };
@@ -234,6 +241,7 @@ function runSmartScan(folderId, corpora) {
       duplicates: { count: 0, total_size_bytes: 0, items: [], category_name: 'Duplicate Files', category_type: 'duplicates' },
       empty_items: { count: 0, total_size_bytes: 0, items: [], category_name: 'Empty Items', category_type: 'empty_items' },
       temp_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Temporary Files', category_type: 'temp_files' },
+      workspace_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Google Workspace Files', category_type: 'workspace_files', type_breakdown: {}, unused_breakdown: { six_months: 0, one_year: 0, two_years: 0 }, sharing_breakdown: { shared: 0, private: 0, unknown: 0 } },
       recommendations: [],
       error: error.message
     };
@@ -261,10 +269,61 @@ function createAnalysisContext_(filesData) {
       return [];
     }
 
-    const structuredFiles = filesData.map((fileArray) => {
-      // Current format: [icon, file_name, file_id, parent_name, parent_id, mime_type]
-      // Note: Additional fields (size, dates) expected from Issue #1
-      const [_icon, fileName, fileId, parentName, parentId, mimeType, ...extraFields] = fileArray;
+    const structuredFiles = filesData.map((fileItem) => {
+      // If already a plain object
+      if (fileItem && typeof fileItem === 'object' && !Array.isArray(fileItem)) {
+        return {
+          file_id: fileItem.file_id || fileItem.fileId || fileItem.id,
+          file_name: fileItem.file_name || fileItem.fileName || fileItem.title,
+          mime_type: fileItem.mime_type || fileItem.mimeType,
+          parent_id: fileItem.parent_id || fileItem.parentId || '',
+          parent_name: fileItem.parent_name || fileItem.parentName || '',
+          size_bytes: fileItem.size_bytes || fileItem.fileSizeBytes || 0,
+          created_date: fileItem.created_date || fileItem.createdDate || null,
+          modified_date: fileItem.modified_date || fileItem.modifiedDate || null,
+          last_viewed_date: fileItem.last_viewed_date || fileItem.lastViewedDate || null,
+          is_shared: fileItem.is_shared !== undefined ? fileItem.is_shared : (fileItem.shared === true || (fileItem.sharingStatus && fileItem.sharingStatus !== 'Private')),
+          sharing_status: fileItem.sharing_status || fileItem.sharingStatus || 'Private',
+          owner_names: fileItem.owner_names || fileItem.ownerNames || ''
+        };
+      }
+
+      // Enhanced 15-element array format from parseForSpreadsheet:
+      // [0: icon, 1: fileName, 2: fileSizeFormatted, 3: fileCategory, 4: modifiedDateFormatted,
+      //  5: createdDateFormatted, 6: lastViewedDateFormatted, 7: ownerNames, 8: sharingStatus,
+      //  9: starred, 10: parentName, 11: fileId, 12: driveLink, 13: mimeType, 14: fileSizeBytes]
+      if (Array.isArray(fileItem) && fileItem.length >= 14) {
+        const fileName = fileItem[1];
+        const modifiedDate = fileItem[4];
+        const createdDate = fileItem[5];
+        const lastViewedDate = fileItem[6];
+        const ownerNames = fileItem[7];
+        const sharingStatus = fileItem[8];
+        const parentName = fileItem[10];
+        const fileId = fileItem[11];
+        const driveLink = fileItem[12];
+        const mimeType = fileItem[13];
+        const sizeBytes = typeof fileItem[14] === 'number' ? fileItem[14] : (parseInt(fileItem[14], 10) || 0);
+
+        return {
+          file_id: fileId,
+          file_name: fileName,
+          mime_type: mimeType,
+          parent_id: '',
+          parent_name: parentName,
+          size_bytes: sizeBytes,
+          created_date: createdDate,
+          modified_date: modifiedDate,
+          last_viewed_date: lastViewedDate,
+          is_shared: Boolean(sharingStatus && sharingStatus !== 'Private'),
+          sharing_status: sharingStatus,
+          owner_names: ownerNames,
+          drive_link: driveLink
+        };
+      }
+
+      // Legacy array format: [icon, file_name, file_id, parent_name, parent_id, mime_type, ...extraFields]
+      const [_icon, fileName, fileId, parentName, parentId, mimeType, ...extraFields] = fileItem;
 
       // Extract parentId from hyperlink formula if present
       let actualParentId = parentId;
@@ -282,11 +341,13 @@ function createAnalysisContext_(filesData) {
         mime_type: mimeType,
         parent_id: actualParentId,
         parent_name: parentName,
-        // Enhanced metadata from Issue #1 (gracefully handle if missing)
-        size_bytes: extraFields[0] || 0, // Expected at index 6
-        created_date: extraFields[1] || null, // Expected at index 7
-        modified_date: extraFields[2] || null, // Expected at index 8
-        last_viewed_date: extraFields[3] || null // Expected at index 9
+        size_bytes: extraFields[0] || 0,
+        created_date: extraFields[1] || null,
+        modified_date: extraFields[2] || null,
+        last_viewed_date: extraFields[3] || null,
+        is_shared: false,
+        sharing_status: 'Private',
+        owner_names: ''
       };
     });
 

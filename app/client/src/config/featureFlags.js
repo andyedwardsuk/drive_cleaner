@@ -16,16 +16,17 @@ export const FEATURE_FLAGS = {
   FEATURE_SHARED_FILES: false,
   FEATURE_SETTINGS: false,
 
-  // Phase 2 (v0.3.0) - Coming Soon
-  FEATURE_STORAGE_ANALYTICS: false,
+  // Phase 2 (v0.3.0)
+  FEATURE_STORAGE_ANALYTICS: true,
   FEATURE_HISTORY: false,
 
   // Phase 3 (v0.4.0) - Coming Soon
   FEATURE_DUPLICATES: true,
 
-  // Phase 4 (v0.5.0) - Coming Soon
+  // Phase 4 (v0.5.0) - Now Available
   FEATURE_EMPTY_ITEMS: true,
   FEATURE_TEMP_FILES: true,
+  FEATURE_WORKSPACE_FILES: true,
 
   // Phase 5 (v0.6.0) - Coming Soon
   FEATURE_BULK_ACTIONS: false,
@@ -78,6 +79,7 @@ export const getFeatureVersion = (flagName) => {
     // v0.5.0
     FEATURE_EMPTY_ITEMS: 'v0.5.0',
     FEATURE_TEMP_FILES: 'v0.5.0',
+    FEATURE_WORKSPACE_FILES: 'v0.5.0',
 
     // v0.6.0
     FEATURE_BULK_ACTIONS: 'v0.6.0',

@@ -1,4 +1,5 @@
-import { Scan, FileText, Clock, Copy, Trash2, AlertCircle, CheckCircle } from 'lucide-react'
+import { Scan, FileText, Clock, Copy, Trash2, AlertCircle, CheckCircle, ChevronRight, FileSpreadsheet } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -32,14 +33,17 @@ function CategoryCard({ icon: Icon, title, count, size, color = 'blue', onClick 
 
   return (
     <div
-      className="p-6 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm hover:bg-card/70 transition-all cursor-pointer"
+      className="p-6 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm hover:bg-card/70 hover:border-primary/40 transition-all cursor-pointer group"
       onClick={onClick}
     >
       <div className="flex items-start justify-between mb-4">
         <div className={`p-3 rounded-lg ${classes.bg}`}>
           <Icon className={`w-6 h-6 ${classes.icon}`} />
         </div>
-        <Badge variant="secondary">{count}</Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary">{count}</Badge>
+          <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-gray-300 group-hover:translate-x-0.5 transition-all" />
+        </div>
       </div>
       <h3 className="font-semibold text-lg mb-1 text-white">{title}</h3>
       {size !== undefined && (
@@ -53,6 +57,8 @@ function CategoryCard({ icon: Icon, title, count, size, color = 'blue', onClick 
  * Scan results summary component
  */
 function ScanResults({ data }) {
+  const navigate = useNavigate()
+
   const categories = [
     {
       icon: FileText,
@@ -60,6 +66,7 @@ function ScanResults({ data }) {
       count: data.large_files?.count || 0,
       size: data.large_files?.total_size_bytes,
       color: 'purple',
+      path: '/large-files',
     },
     {
       icon: Clock,
@@ -67,6 +74,7 @@ function ScanResults({ data }) {
       count: data.old_files?.count || 0,
       size: data.old_files?.total_size_bytes,
       color: 'orange',
+      path: '/old-files',
     },
     {
       icon: Copy,
@@ -77,6 +85,7 @@ function ScanResults({ data }) {
         0
       ),
       color: 'blue',
+      path: '/duplicates',
     },
     {
       icon: Trash2,
@@ -84,6 +93,7 @@ function ScanResults({ data }) {
       count: data.empty_items?.count || 0,
       size: 0,
       color: 'gray',
+      path: '/empty-items',
     },
     {
       icon: AlertCircle,
@@ -91,6 +101,15 @@ function ScanResults({ data }) {
       count: data.temp_files?.count || 0,
       size: data.temp_files?.total_size_bytes,
       color: 'yellow',
+      path: '/temp-files',
+    },
+    {
+      icon: FileSpreadsheet,
+      title: 'Workspace Files',
+      count: data.workspace_files?.count || 0,
+      size: data.workspace_files?.total_size_bytes,
+      color: 'blue',
+      path: '/workspace-files',
     },
   ]
 
@@ -132,7 +151,11 @@ function ScanResults({ data }) {
       {/* Category Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {categories.map((category, index) => (
-          <CategoryCard key={index} {...category} />
+          <CategoryCard
+            key={index}
+            {...category}
+            onClick={() => category.path && navigate({ to: category.path })}
+          />
         ))}
       </div>
 

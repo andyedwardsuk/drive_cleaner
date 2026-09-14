@@ -9,6 +9,7 @@ import {
   Clock,
   FolderOpen,
   Trash2,
+  FileSpreadsheet,
   Star,
   Layers,
   FolderHeart,
@@ -82,6 +83,12 @@ export default function Sidebar() {
           label: 'Temporary Files',
           path: '/temp-files',
           flag: 'FEATURE_TEMP_FILES',
+        },
+        {
+          icon: FileSpreadsheet,
+          label: 'Workspace Files',
+          path: '/workspace-files',
+          flag: 'FEATURE_WORKSPACE_FILES',
         },
         {
           icon: Star,
@@ -168,7 +175,7 @@ export default function Sidebar() {
                 </div>
                 <div>
                   <h1 className="text-lg font-bold text-white">Drive Cleaner</h1>
-                  <p className="text-xs text-gray-400">v0.1.0</p>
+                  <p className="text-xs text-gray-400">v1.2.0</p>
                 </div>
               </motion.div>
             )}

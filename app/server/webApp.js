@@ -153,6 +153,7 @@ var DriveCleanerWebApp = (function () {
   function fetchDirectoryData_(rootFolderId, corpora) {
     console.time('fetchDirectoryData');
 
+    // eslint-disable-next-line no-undef
     const directoryData = getFileandFoldersData(rootFolderId, corpora);
 
     console.timeEnd('fetchDirectoryData');

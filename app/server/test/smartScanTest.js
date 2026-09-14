@@ -142,7 +142,8 @@ function testSmartScanSampleFolder() {
       'old_files',
       'duplicates',
       'empty_items',
-      'temp_files'
+      'temp_files',
+      'workspace_files'
     ];
 
     const categoriesPresent = {};
@@ -169,7 +170,8 @@ function testSmartScanSampleFolder() {
         old_files: scanResults.old_files?.count || 0,
         duplicates: scanResults.duplicates?.count || 0,
         empty_items: scanResults.empty_items?.count || 0,
-        temp_files: scanResults.temp_files?.count || 0
+        temp_files: scanResults.temp_files?.count || 0,
+        workspace_files: scanResults.workspace_files?.count || 0
       },
       recommendations_count: scanResults.recommendations?.length || 0,
       full_results: scanResults

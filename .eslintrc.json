@@ -1,4 +1,5 @@
 {
+  "ignorePatterns": ["app/client/**", "dist/**", "node_modules/**"],
   "env": {
     "es2020": true,
     "googleappsscript/googleappsscript": true

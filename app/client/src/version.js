@@ -3,12 +3,14 @@
  * Auto-generated build timestamp for cache debugging
  */
 
-export const APP_VERSION = '0.2.0'
+export const APP_VERSION = '1.2.0'
 export const BUILD_TIMESTAMP = new Date().toISOString()
 export const FEATURES = [
   'Smart Scan',
   'Enhanced Metadata',
   'Dashboard',
+  'Storage Analytics',
+  'Google Workspace Files',
   'My Folders',
 ]
 

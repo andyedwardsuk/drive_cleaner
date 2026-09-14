@@ -16,6 +16,7 @@ import MyFoldersView from './views/MyFoldersView'
 import HistoryView from './views/HistoryView'
 import SettingsView from './views/SettingsView'
 import AboutView from './views/AboutView'
+import GoogleWorkspaceView from './views/GoogleWorkspaceView'
 
 // Create root route
 const rootRoute = createRootRoute({
@@ -79,6 +80,12 @@ const tempFilesRoute = createRoute({
   component: TempFilesView,
 })
 
+const workspaceFilesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/workspace-files',
+  component: GoogleWorkspaceView,
+})
+
 const sharedFilesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/shared-files',
@@ -126,6 +133,7 @@ const routeTree = rootRoute.addChildren([
   oldFilesRoute,
   emptyItemsRoute,
   tempFilesRoute,
+  workspaceFilesRoute,
   sharedFilesRoute,
   bulkActionsRoute,
   myFoldersRoute,
