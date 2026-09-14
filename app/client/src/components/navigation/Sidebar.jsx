@@ -57,6 +57,12 @@ export default function Sidebar() {
           path: '/carbon-footprint',
           flag: 'FEATURE_CARBON_FOOTPRINT',
         },
+        {
+          icon: Flame,
+          label: 'Daily Impact',
+          path: '/daily-impact',
+          flag: 'FEATURE_DAILY_IMPACT',
+        },
       ],
     },
     {

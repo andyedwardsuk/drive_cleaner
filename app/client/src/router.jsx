@@ -19,6 +19,7 @@ import AboutView from './views/AboutView'
 import GoogleWorkspaceView from './views/GoogleWorkspaceView'
 import RotAnalysisView from './views/RotAnalysisView'
 import CarbonFootprintView from './views/CarbonFootprintView'
+import DailyImpactView from './views/DailyImpactView'
 
 // Create root route
 const rootRoute = createRootRoute({
@@ -57,6 +58,13 @@ const carbonFootprintRoute = createRoute({
   path: '/carbon-footprint',
   component: CarbonFootprintView,
 })
+
+const dailyImpactRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/daily-impact',
+  component: DailyImpactView,
+})
+
 
 const duplicatesRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -143,6 +151,7 @@ const routeTree = rootRoute.addChildren([
   smartScanRoute,
   storageAnalyticsRoute,
   carbonFootprintRoute,
+  dailyImpactRoute,
   duplicatesRoute,
   largeFilesRoute,
   oldFilesRoute,

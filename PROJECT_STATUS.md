@@ -39,22 +39,18 @@
 | **#10: Google Workspace Files View** | Full Stack | ✅ Complete | v1.2.0 |
 | **#11: Data ROT Analysis & Hoarding** | Full Stack | ✅ Complete | v1.3.0 |
 | **#12: Cloud Carbon Footprint** | Full Stack | ✅ Complete | v1.4.0 |
+| **Folder Attachment & Selector Hub** | Full Stack | ✅ Complete | v1.5.0 |
+| **#13: Daily Impact Tracker & Gamification** | Full Stack | ✅ Complete | v1.6.0 |
 
-**Total**: 11 major features (Enhanced Metadata + 8 analyzers + 8 category/analytics views + Carbon Footprint & Green Gamification)
-**Latest Deployment**: v1.4.0
-**Deployment URL**: https://script.google.com/macros/s/AKfycbzxAjjYJm6OkqTPCJR2HXNk7BgRqzsmJ01UxZN3ePYBRcTAAFJdpAsuboVmzQtPYeqkLA/exec
+**Total**: 13 major features (Enhanced Metadata + 8 analyzers + 10 category/analytics/gamification views)
+**Latest Deployment**: v1.6.0 (@24)
+**Deployment URL**: https://script.google.com/a/macros/andyedwards.uk/s/AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w/exec
 
 ---
 
 ## 📋 Planned Features (Sprint Backlog)
 
-### High Priority (Core Product)
-
-| Issue | Feature | Sprint | Effort | Dependencies |
-|-------|---------|--------|--------|--------------|
-| #13 | **Daily Impact Tracker** | Sprint 3 | 7-10 days | #11, #12 |
-
-**Critical Path**: Sprint 1 → Sprint 2 → Sprint 3 (6 weeks total)
+### Sprint 4 (Optional): Labels & Organization
 
 ### Medium Priority (Enhanced Features)
 
