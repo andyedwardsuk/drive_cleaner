@@ -106,28 +106,27 @@ var DriveCleanerWebApp = (function () {
    */
   function getDriveQuota() {
     try {
-      const about = Drive.About.get({
-        fields: 'storageQuota,user'
-      });
+      // In Drive API v2 (Apps Script default), fields are quotaBytesTotal, quotaBytesUsed, etc.
+      // Calling Drive.About.get() without field masks returns all fields safely in v2.
+      const about = Drive.About.get();
 
       const quota = about.storageQuota || {};
+      const limit = parseInt(quota.limit || about.quotaBytesTotal) || 0;
+      const usage = parseInt(quota.usage || about.quotaBytesUsed) || 0;
+      const usageInDrive = parseInt(quota.usageInDrive || about.quotaBytesUsedAggregate || about.quotaBytesUsed) || usage;
+      const usageInDriveTrash = parseInt(quota.usageInDriveTrash || about.quotaBytesUsedInTrash) || 0;
+      const userEmail = (about.user && (about.user.emailAddress || about.user.permissionId)) || null;
 
       return {
         success: true,
         data: {
-          // Total storage limit in bytes
-          limit: parseInt(quota.limit) || 0,
-          // Total storage used across all services in bytes
-          usage: parseInt(quota.usage) || 0,
-          // Storage used in Drive in bytes
-          usageInDrive: parseInt(quota.usageInDrive) || 0,
-          // Storage used in Drive trash
-          usageInDriveTrash: parseInt(quota.usageInDriveTrash) || 0,
-          // User email
-          userEmail: about.user ? about.user.emailAddress : null,
-          // Calculated values
-          available: (parseInt(quota.limit) || 0) - (parseInt(quota.usage) || 0),
-          percentUsed: quota.limit ? ((parseInt(quota.usage) / parseInt(quota.limit)) * 100).toFixed(2) : 0
+          limit: limit,
+          usage: usage,
+          usageInDrive: usageInDrive,
+          usageInDriveTrash: usageInDriveTrash,
+          userEmail: userEmail,
+          available: Math.max(0, limit - usage),
+          percentUsed: limit > 0 ? ((usage / limit) * 100).toFixed(2) : 0
         }
       };
     } catch (error) {
@@ -303,8 +302,9 @@ function authorizeDriveCleaner() {
   console.log('Testing Drive authorization...');
   const root = DriveApp.getRootFolder();
   console.log('DriveApp root folder:', root.getName());
-  const quota = Drive.About.get({ fields: 'user,storageQuota' });
-  console.log('Drive API user:', quota.user.displayName);
+  const about = Drive.About.get();
+  console.log('Drive API user:', about.user ? (about.user.displayName || about.user.emailAddress) : 'Authorized');
+  console.log('Total quota bytes:', about.quotaBytesTotal || (about.storageQuota && about.storageQuota.limit));
   const token = ScriptApp.getOAuthToken();
   console.log('OAuth token obtained successfully:', !!token);
   return 'SUCCESS: Drive Cleaner is fully authorized!';
