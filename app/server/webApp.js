@@ -292,3 +292,21 @@ function getCachedFolderId() {
 function getDriveQuota() {
   return DriveCleanerWebApp.getDriveQuota();
 }
+
+/**
+ * Run this function in the Google Apps Script editor to authorize all Drive permissions!
+ * Open editor: https://script.google.com/a/andyedwards.uk/d/1qkpaDFbdqq3OlpMCEdOUk68nr3svvVk3mmhhmHykRIbvaBUimsx2uN-G/edit
+ * Select 'authorizeDriveCleaner' in the function dropdown at top, then click 'Run'.
+ * Click 'Review Permissions', select your account, and click 'Allow'.
+ */
+function authorizeDriveCleaner() {
+  console.log('Testing Drive authorization...');
+  const root = DriveApp.getRootFolder();
+  console.log('DriveApp root folder:', root.getName());
+  const quota = Drive.About.get({ fields: 'user,storageQuota' });
+  console.log('Drive API user:', quota.user.displayName);
+  const token = ScriptApp.getOAuthToken();
+  console.log('OAuth token obtained successfully:', !!token);
+  return 'SUCCESS: Drive Cleaner is fully authorized!';
+}
+

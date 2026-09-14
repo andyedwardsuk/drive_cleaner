@@ -112,30 +112,39 @@ export default function DrivePicker({ onFolderSelected, disabled }) {
         .setSelectFolderEnabled(true)
         .setLabel('Starred')
 
-      // Fix origin for Google Apps Script
-      // GAS web apps run on googleusercontent.com but Picker expects script.google.com
-      const currentOrigin = window.location.protocol + '//' + window.location.host
-      const pickerOrigin = currentOrigin.includes('googleusercontent.com')
-        ? 'https://script.google.com'
-        : currentOrigin
+      let pickerOrigin = window.location.protocol + '//' + window.location.host
+      if (typeof google !== 'undefined' && google.script && google.script.host && google.script.host.origin) {
+        pickerOrigin = google.script.host.origin
+      } else if (pickerOrigin.includes('googleusercontent.com')) {
+        pickerOrigin = 'https://script.google.com'
+      }
 
-      const picker = new google.picker.PickerBuilder()
+      if (!token && isGAS) {
+        alert('Could not obtain an OAuth token. Please ensure Drive Cleaner is authorized in Google Apps Script.')
+        setIsAuthorizing(false)
+        return
+      }
+
+      const builder = new google.picker.PickerBuilder()
         .setTitle('Select a Google Drive Folder')
         .addView(myDriveView)
         .addView(sharedDrivesView)
         .addView(recentView)
         .addView(starredView)
-        .setOAuthToken(token)
         .setCallback(pickerCallback)
         .setOrigin(pickerOrigin)
         .enableFeature(google.picker.Feature.SUPPORT_DRIVES)
         .setMaxItems(1)
-        .build()
 
+      if (token) {
+        builder.setOAuthToken(token)
+      }
+
+      const picker = builder.build()
       picker.setVisible(true)
     } catch (error) {
       console.error('Error showing picker:', error)
-      alert('Failed to open Drive Picker. Please try again.')
+      alert(`Failed to open Drive Picker: ${error.message || error}`)
     } finally {
       setIsAuthorizing(false)
     }
