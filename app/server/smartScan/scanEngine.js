@@ -86,15 +86,26 @@ function runSmartScan(folderId, corpora) {
       };
     }
 
+    // Sanitize folderId if passed as a full URL or ID
+    let cleanFolderId = folderId.trim();
+    if (!cleanFolderId || cleanFolderId.toLowerCase() === 'root') {
+      cleanFolderId = 'root';
+    } else if (cleanFolderId.includes('/')) {
+      const match = cleanFolderId.match(/folders\/([A-Za-z0-9_-]+)/) || cleanFolderId.match(/[?&]id=([A-Za-z0-9_-]+)/);
+      if (match && match[1]) {
+        cleanFolderId = match[1];
+      }
+    }
+
     const actualCorpora = corpora || 'user';
 
     // Get folder metadata
     let folderName = 'Unknown Folder';
     try {
-      if (folderId === 'root') {
+      if (cleanFolderId === 'root') {
         folderName = 'My Drive';
       } else {
-        const folderMetadata = Drive.Files.get(folderId, {
+        const folderMetadata = Drive.Files.get(cleanFolderId, {
           fields: 'title',
           supportsAllDrives: true
         });
@@ -107,13 +118,13 @@ function runSmartScan(folderId, corpora) {
     // Retrieve all files using existing function
     console.log('Fetching files and folders...');
     // eslint-disable-next-line no-undef
-    const filesData = getFileandFoldersData(folderId, actualCorpora);
+    const filesData = getFileandFoldersData(cleanFolderId, actualCorpora);
 
     if (!filesData || filesData.length === 0) {
       console.log('No files found in folder');
       return {
         success: true,
-        folder_id: folderId,
+        folder_id: cleanFolderId,
         folder_name: folderName,
         total_files_scanned: 0,
         total_space_used_bytes: 0,
@@ -142,7 +153,7 @@ function runSmartScan(folderId, corpora) {
       console.warn('No valid files after creating analysis context');
       return {
         success: true,
-        folder_id: folderId,
+        folder_id: cleanFolderId,
         folder_name: folderName,
         total_files_scanned: 0,
         total_space_used_bytes: 0,
@@ -217,7 +228,7 @@ function runSmartScan(folderId, corpora) {
     // Format final results
     const scanResults = {
       success: true,
-      folder_id: folderId,
+      folder_id: cleanFolderId,
       folder_name: folderName,
       total_files_scanned: structuredFiles.length,
       total_space_used_bytes: totalSpaceUsed,

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Home, FolderSearch, RefreshCw } from 'lucide-react'
+import { Home, FolderSearch, RefreshCw, Sparkles } from 'lucide-react'
 import Hero from '@/components/Hero'
 import FileTable from '@/components/FileTable'
 import DrivePicker from '@/components/DrivePicker'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { extractFolderId } from '@/lib/driveUtils'
 
 export default function DashboardView() {
   const [data, setData] = useState([])
@@ -99,6 +100,26 @@ export default function DashboardView() {
   }
 
   useEffect(() => {
+    // Check if a folder was selected from MyFoldersView
+    let initialFolderId = ''
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const stored = localStorage.getItem('drive_cleaner_dashboard_folder_id')
+        if (stored) {
+          initialFolderId = stored
+          localStorage.removeItem('drive_cleaner_dashboard_folder_id')
+        }
+      }
+    } catch (e) {
+      console.warn(e)
+    }
+
+    if (initialFolderId) {
+      setFolderId(initialFolderId)
+      loadData(initialFolderId)
+      return
+    }
+
     if (isGAS) {
       google.script.run
         .withSuccessHandler((cachedData) => {
@@ -118,13 +139,17 @@ export default function DashboardView() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    loadData(folderId)
+    const cleanId = extractFolderId(folderId)
+    loadData(cleanId)
   }
 
   const handleFolderSelected = (folder) => {
     setFolderId(folder.id)
     loadData(folder.id)
   }
+
+  const parsedId = extractFolderId(folderId)
+  const isPastedUrl = folderId.includes('/') || folderId.includes('?')
 
   return (
     <div className="space-y-6">
@@ -138,7 +163,7 @@ export default function DashboardView() {
       <div className="p-6 border rounded-xl bg-card border-glass-border backdrop-blur-sm">
         <form onSubmit={handleSubmit} className="flex items-end gap-4">
           <div className="flex-1">
-            <Label htmlFor="folderId">Folder ID or URL</Label>
+            <Label htmlFor="folderId">Folder ID or Google Drive URL</Label>
             <div className="flex gap-2">
               <Input
                 id="folderId"
@@ -147,12 +172,18 @@ export default function DashboardView() {
                 value={folderId}
                 onChange={(e) => setFolderId(e.target.value)}
                 disabled={loading}
-                className="flex-1"
+                className="flex-1 font-mono text-sm"
               />
               <DrivePicker onFolderSelected={handleFolderSelected} disabled={loading} />
             </div>
+            {isPastedUrl && parsedId && parsedId !== 'root' && (
+              <p className="text-xs text-primary mt-1.5 flex items-center gap-1 font-mono">
+                <Sparkles className="w-3 h-3" />
+                Extracted Folder ID: <span className="font-semibold">{parsedId}</span>
+              </p>
+            )}
             <p className="text-xs text-muted-foreground mt-1">
-              Leave empty for My Drive root, or click Browse to select a folder
+              Leave empty for My Drive root, paste a Drive folder link, or click Browse to select
             </p>
           </div>
           <Button type="submit" disabled={loading}>

@@ -1,9 +1,11 @@
-import { Scan, FileText, Clock, Copy, Trash2, AlertCircle, CheckCircle, ChevronRight, FileSpreadsheet, Flame, Leaf } from 'lucide-react'
+import { Scan, FileText, Clock, Copy, Trash2, AlertCircle, CheckCircle, ChevronRight, FileSpreadsheet, Flame, Leaf, ExternalLink, RotateCcw, FolderSearch } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import FolderSelector from '@/components/FolderSelector'
 import { useSmartScan } from '@/hooks/useSmartScan'
+import { getDriveFolderUrl } from '@/lib/driveUtils'
 
 /**
  * Format bytes to human readable format
@@ -128,8 +130,47 @@ function ScanResults({ data }) {
 
   return (
     <div className="space-y-6">
-      {/* Summary Stats */}
+      {/* Summary Stats & Target Folder Banner */}
       <div className="p-6 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm">
+        {/* Scanned Folder Details Header */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-glass-border">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-lg bg-primary/10 text-primary">
+              <span className="text-xl">📁</span>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-semibold text-white">
+                  {data.folder_name || 'My Drive'}
+                </h3>
+                {data.folder_id && data.folder_id !== 'root' && (
+                  <Badge variant="outline" className="text-xs font-mono text-muted-foreground border-glass-border">
+                    ID: {data.folder_id}
+                  </Badge>
+                )}
+                <Badge variant="secondary" className="text-xs">
+                  {data.folder_id === 'root' ? 'Entire Drive' : 'Attached Folder'}
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Target: {data.folder_name || 'Selected Folder'}
+              </p>
+            </div>
+          </div>
+
+          {data.folder_id && (
+            <a
+              href={getDriveFolderUrl(data.folder_id)}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs text-primary hover:underline flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-all"
+            >
+              <span>Open in Drive</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          )}
+        </div>
+
         <div className="flex items-center gap-2 mb-4">
           <CheckCircle className="w-5 h-5 text-green-500" />
           <h2 className="text-xl font-semibold">Scan Complete</h2>
@@ -230,15 +271,22 @@ function ScanResults({ data }) {
  * Smart Scan View - Main component
  */
 export default function SmartScanView() {
-  const { data, loading, error, runScan, reset } = useSmartScan()
+  const { data, loading, error, targetFolder, recentFolders, setTargetFolder, runScan, reset } = useSmartScan()
 
   const handleStartScan = () => {
-    runScan('root', 'user')
+    const id = targetFolder?.id || 'root'
+    const corpora = targetFolder?.corpora || 'user'
+    const name = targetFolder?.name || (id === 'root' ? 'My Drive' : `Folder (${id.slice(0, 8)}...)`)
+    runScan(id, corpora, name)
   }
 
   const handleNewScan = () => {
     reset()
   }
+
+  const targetId = targetFolder?.id || 'root'
+  const isTargetReady = targetId === 'root' || (targetId && targetId.trim().length > 0)
+  const targetLabel = targetFolder?.name || (targetId === 'root' ? 'My Drive' : `Folder (${targetId.slice(0, 8)}...)`)
 
   // Show results if we have data
   if (data) {
@@ -247,12 +295,19 @@ export default function SmartScanView() {
         <Hero
           icon={Scan}
           title="Smart Scan"
-          subtitle={`Analyzed ${data.folder_name || 'My Drive'}`}
+          subtitle={`Analyzed ${data.folder_name || targetLabel}`}
           illustration="✅"
           actions={
-            <Button onClick={handleNewScan} size="lg">
-              Run New Scan
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button onClick={handleNewScan} variant="outline" size="lg" className="border-glass-border">
+                <FolderSearch className="mr-2 h-4 w-4" />
+                Change Folder
+              </Button>
+              <Button onClick={handleStartScan} size="lg">
+                <RotateCcw className="mr-2 h-4 w-4" />
+                Scan Again
+              </Button>
+            </div>
           }
         />
         <ScanResults data={data} />
@@ -260,34 +315,47 @@ export default function SmartScanView() {
     )
   }
 
-  // Show initial state
+  // Show initial or configuring state
   return (
     <div className="space-y-6">
       <Hero
         icon={Scan}
         title="Smart Scan"
-        subtitle="Comprehensive scan for all issues in your Google Drive"
+        subtitle="Comprehensive cleanup and carbon intelligence scan for your Google Drive"
         illustration="🔍"
         actions={
-          <Button onClick={handleStartScan} size="lg" disabled={loading}>
+          <Button
+            onClick={handleStartScan}
+            size="lg"
+            disabled={loading || !isTargetReady}
+            className="shadow-lg shadow-primary/20"
+          >
             {loading ? (
               <>
                 <span className="animate-spin mr-2">⏳</span>
-                Scanning...
+                Scanning {targetLabel}...
               </>
             ) : (
-              'Start Smart Scan'
+              `Start Smart Scan (${targetLabel})`
             )}
           </Button>
         }
       />
 
+      {/* Target Folder Attachment / Selection Card */}
+      <FolderSelector
+        value={targetFolder}
+        onChange={setTargetFolder}
+        recentFolders={recentFolders}
+        disabled={loading}
+      />
+
       {loading && (
         <div className="p-8 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm text-center">
           <div className="animate-pulse">
-            <p className="text-gray-300 mb-4">Analyzing your Drive...</p>
+            <p className="text-gray-300 font-medium mb-2">Analyzing files in {targetLabel}...</p>
             <p className="text-sm text-gray-400">
-              This may take a few moments depending on the number of files
+              Analyzing size distribution, duplicates, staleness, Google Workspace files, and carbon footprint.
             </p>
           </div>
         </div>
@@ -296,10 +364,13 @@ export default function SmartScanView() {
       {error && (
         <div className="p-6 border rounded-xl bg-red-500/10 border-red-500/20 backdrop-blur-sm">
           <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-500 mt-0.5" />
+            <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
             <div>
               <h3 className="font-semibold text-red-500 mb-1">Scan Failed</h3>
-              <p className="text-sm text-red-400">{error}</p>
+              <p className="text-sm text-red-400 mb-2">{error}</p>
+              <p className="text-xs text-muted-foreground">
+                Tip: Ensure you have read access to the specified folder ID or URL, and that the folder is not in the trash.
+              </p>
             </div>
           </div>
         </div>
@@ -308,17 +379,21 @@ export default function SmartScanView() {
       {!loading && !error && (
         <div className="p-8 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm text-center">
           <p className="text-gray-400 mb-4">
-            Smart Scan will comprehensively analyze your Drive for:
+            Smart Scan will comprehensively analyze <strong className="text-white">{targetLabel}</strong> for:
           </p>
           <ul className="text-left max-w-md mx-auto space-y-2 text-gray-300">
-            <li>✓ Duplicate files</li>
+            <li>✓ Duplicate files (byte-exact and name matches)</li>
             <li>✓ Large files (&gt;100MB, &gt;500MB, &gt;1GB)</li>
-            <li>✓ Old files (&gt;1 year, &gt;2 years, &gt;5 years)</li>
+            <li>✓ Old & abandoned files (&gt;1 year, &gt;2 years, &gt;5 years)</li>
             <li>✓ Empty files and folders</li>
-            <li>✓ Temporary files</li>
+            <li>✓ Temporary & cache files (.DS_Store, logs, temps)</li>
+            <li>✓ Google Workspace files (unused Docs, Sheets, Slides, Forms)</li>
+            <li>✓ Data ROT analysis (Redundant, Obsolete, Trivial clutter index)</li>
+            <li>✓ Cloud Carbon Footprint (CO₂ emissions & green achievements)</li>
           </ul>
         </div>
       )}
     </div>
   )
 }
+

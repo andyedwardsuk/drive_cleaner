@@ -5,25 +5,79 @@ import { create } from 'zustand'
  */
 const isGAS = typeof google !== 'undefined' && google?.script?.run
 
+const RECENT_FOLDERS_KEY = 'drive_cleaner_recent_folders'
+
+function getSavedRecentFolders() {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const raw = localStorage.getItem(RECENT_FOLDERS_KEY)
+      if (raw) return JSON.parse(raw)
+    }
+  } catch (e) {
+    console.warn('Failed to load recent folders', e)
+  }
+  return [
+    { id: 'root', name: 'My Drive (Root)', corpora: 'user', date: new Date().toISOString() }
+  ]
+}
+
+function saveRecentFolderToStorage(folder) {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const list = getSavedRecentFolders().filter((f) => f.id !== folder.id)
+      const updated = [
+        {
+          id: folder.id,
+          name: folder.name || (folder.id === 'root' ? 'My Drive (Root)' : `Folder (${folder.id.slice(0, 8)}...)`),
+          corpora: folder.corpora || 'user',
+          date: new Date().toISOString()
+        },
+        ...list
+      ].slice(0, 8)
+      localStorage.setItem(RECENT_FOLDERS_KEY, JSON.stringify(updated))
+      return updated
+    }
+  } catch (e) {
+    console.warn('Failed to save recent folder', e)
+  }
+  return []
+}
+
 /**
  * Global Zustand store for Smart Scan data
  */
-export const useSmartScanStore = create((set) => ({
+export const useSmartScanStore = create((set, get) => ({
   data: null,
   loading: false,
   error: null,
+  targetFolder: { id: 'root', name: 'My Drive', corpora: 'user' },
+  recentFolders: getSavedRecentFolders(),
 
   setData: (data) => set({ data }),
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
+  setTargetFolder: (folder) => set({ targetFolder: { ...get().targetFolder, ...folder } }),
   reset: () => set({ data: null, loading: false, error: null }),
 
   /**
    * Run Smart Scan on a folder
-   * @param {string} folderId - Folder ID to scan (default: 'root')
-   * @param {string} corpora - Corpora type ('user' or 'drive')
+   * @param {string} [folderId] - Folder ID to scan (default: current targetFolder.id)
+   * @param {string} [corpora] - Corpora type ('user' or 'drive')
+   * @param {string} [folderName] - Optional name of folder
    */
-  runScan: (folderId = 'root', corpora = 'user') => {
+  runScan: (folderId, corpora, folderName) => {
+    const currentTarget = get().targetFolder
+    const targetId = folderId || currentTarget.id || 'root'
+    const targetCorpora = corpora || currentTarget.corpora || 'user'
+    const resolvedName = folderName || currentTarget.name || (targetId === 'root' ? 'My Drive' : `Folder ${targetId.slice(0, 8)}...`)
+
+    // Update target folder in store and save to recents
+    set({ targetFolder: { id: targetId, name: resolvedName, corpora: targetCorpora } })
+    const updatedRecents = saveRecentFolderToStorage({ id: targetId, name: resolvedName, corpora: targetCorpora })
+    if (updatedRecents.length > 0) {
+      set({ recentFolders: updatedRecents })
+    }
+
     // Development mode - return mock data
     if (!isGAS) {
       set({ loading: true, error: null, data: null })
@@ -32,7 +86,8 @@ export const useSmartScanStore = create((set) => ({
           data: {
             success: true,
             scan_date: new Date().toISOString(),
-            folder_name: 'My Drive',
+            folder_id: targetId,
+            folder_name: resolvedName,
             total_files_scanned: 156,
             total_space_used_bytes: 5242880000,
             total_potential_savings_bytes: 524288000,
@@ -529,7 +584,7 @@ export const useSmartScanStore = create((set) => ({
         console.error('Smart Scan error:', err)
         set({ error: err.message || 'Failed to run Smart Scan', data: null, loading: false })
       })
-      .runSmartScan(folderId, corpora)
+      .runSmartScan(targetId, targetCorpora)
   },
 }))
 
@@ -540,6 +595,9 @@ export const useSmartScanStore = create((set) => ({
  * @property {Object|null} data - Smart Scan results
  * @property {boolean} loading - Loading state
  * @property {string|null} error - Error message if any
+ * @property {Object} targetFolder - Currently targeted folder ({ id, name, corpora })
+ * @property {Array} recentFolders - List of recently targeted folders
+ * @property {Function} setTargetFolder - Function to set target folder
  * @property {Function} runScan - Function to trigger a scan
  * @property {Function} reset - Function to reset state
  */
@@ -547,6 +605,9 @@ export function useSmartScan() {
   const data = useSmartScanStore((state) => state.data)
   const loading = useSmartScanStore((state) => state.loading)
   const error = useSmartScanStore((state) => state.error)
+  const targetFolder = useSmartScanStore((state) => state.targetFolder)
+  const recentFolders = useSmartScanStore((state) => state.recentFolders)
+  const setTargetFolder = useSmartScanStore((state) => state.setTargetFolder)
   const runScan = useSmartScanStore((state) => state.runScan)
   const reset = useSmartScanStore((state) => state.reset)
 
@@ -554,7 +615,11 @@ export function useSmartScan() {
     data,
     loading,
     error,
+    targetFolder,
+    recentFolders,
+    setTargetFolder,
     runScan,
     reset,
   }
 }
+
