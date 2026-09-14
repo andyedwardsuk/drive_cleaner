@@ -27,6 +27,7 @@ export const FEATURE_FLAGS = {
   FEATURE_EMPTY_ITEMS: true,
   FEATURE_TEMP_FILES: true,
   FEATURE_WORKSPACE_FILES: true,
+  FEATURE_ROT_ANALYSIS: true,
 
   // Phase 5 (v0.6.0) - Coming Soon
   FEATURE_BULK_ACTIONS: false,

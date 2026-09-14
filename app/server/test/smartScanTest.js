@@ -250,6 +250,73 @@ function testLargeFilesAnalyzer() {
 }
 
 /**
+ * Test ROT Analysis & Digital Hoarding Assessment
+ *
+ * Verifies that analyzeROT correctly identifies Redundant, Obsolete,
+ * and Trivial files and computes Clutter Index and Hoarding score.
+ *
+ * @returns {Object} Test results
+ */
+function testRotAnalysis() {
+  console.log('===== TESTING DATA ROT & HOARDING ANALYSIS =====');
+
+  try {
+    const twoYearsAgo = new Date();
+    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+
+    const eighteenMonthsAgo = new Date();
+    eighteenMonthsAgo.setMonth(eighteenMonthsAgo.getMonth() - 18);
+
+    const mockFiles = [
+      // Redundant
+      { file_id: 'r1', file_name: 'Budget.xlsx', size_bytes: 50000, modified_date: '2024-01-01', created_date: '2024-01-01', mime_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
+      { file_id: 'r2', file_name: 'Budget.xlsx', size_bytes: 50000, modified_date: '2024-01-02', created_date: '2024-01-02', mime_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
+      { file_id: 'r3', file_name: 'Pitch Deck v1.pptx', size_bytes: 2000000, modified_date: '2023-01-01', created_date: '2023-01-01', mime_type: 'application/vnd.google-apps.presentation' },
+      { file_id: 'r4', file_name: 'Pitch Deck final.pptx', size_bytes: 2100000, modified_date: '2024-01-01', created_date: '2024-01-01', mime_type: 'application/vnd.google-apps.presentation' },
+      // Obsolete
+      { file_id: 'o1', file_name: 'Archive 2022.pdf', size_bytes: 1000000, last_viewed_date: twoYearsAgo.toISOString(), modified_date: twoYearsAgo.toISOString(), mime_type: 'application/pdf' },
+      { file_id: 'o2', file_name: 'Old Notes.docx', size_bytes: 40000, last_viewed_date: eighteenMonthsAgo.toISOString(), modified_date: eighteenMonthsAgo.toISOString(), mime_type: 'application/vnd.google-apps.document' },
+      // Trivial
+      { file_id: 't1', file_name: 'Screenshot 2024-05-10 at 14.20.png', size_bytes: 350000, modified_date: '2024-05-10', mime_type: 'image/png' },
+      { file_id: 't2', file_name: 'Untitled document', size_bytes: 0, modified_date: '2024-05-10', mime_type: 'application/vnd.google-apps.document' },
+      { file_id: 't3', file_name: 'stub.txt', size_bytes: 256, modified_date: '2024-05-10', mime_type: 'text/plain' },
+      // Fresh/Active
+      { file_id: 'f1', file_name: 'Q3 Report.pdf', size_bytes: 500000, modified_date: new Date().toISOString(), last_viewed_date: new Date().toISOString(), mime_type: 'application/pdf' }
+    ];
+
+    // eslint-disable-next-line no-undef
+    const rot = analyzeROT(mockFiles);
+
+    const hasRedundant = rot.breakdown.redundant.count > 0;
+    const hasObsolete = rot.breakdown.obsolete.count > 0;
+    const hasTrivial = rot.breakdown.trivial.count > 0;
+    const validClutter = rot.clutter_index.score >= 0 && rot.clutter_index.score <= 100;
+    const validHoarding = rot.hoarding_score.total_score >= 0 && rot.hoarding_score.total_score <= 100;
+
+    const success = hasRedundant && hasObsolete && hasTrivial && validClutter && validHoarding;
+
+    console.log(`ROT Test Results: Redundant=${rot.breakdown.redundant.count}, Obsolete=${rot.breakdown.obsolete.count}, Trivial=${rot.breakdown.trivial.count}`);
+    console.log(`Clutter Index: ${rot.clutter_index.score}/100, Hoarding Score: ${rot.hoarding_score.total_score}/100 (${rot.hoarding_score.rating.level})`);
+
+    return {
+      success,
+      message: success ? 'ROT analysis verified successfully' : 'ROT verification failed',
+      clutter_score: rot.clutter_index.score,
+      hoarding_level: rot.hoarding_score.rating.level,
+      rot_items_count: rot.count
+    };
+  } catch (error) {
+    console.error('ROT analysis test failed:', error);
+    return {
+      success: false,
+      message: 'ROT analysis test failed',
+      error: error.message,
+      stack: error.stack
+    };
+  }
+}
+
+/**
  * Run All Tests
  *
  * Convenience function to run all Smart Scan tests in sequence
@@ -264,11 +331,13 @@ function runAllSmartScanTests() {
   const results = {
     metadata_test: testSmartScanMetadata(),
     analyzer_test: testLargeFilesAnalyzer(),
+    rot_test: testRotAnalysis(),
     full_scan_test: testSmartScanSampleFolder()
   };
 
   const allPassed = results.metadata_test.success &&
                     results.analyzer_test.success &&
+                    results.rot_test.success &&
                     results.full_scan_test.success;
 
   console.log('========================================');
@@ -280,6 +349,7 @@ function runAllSmartScanTests() {
     summary: {
       metadata_test: results.metadata_test.success ? 'PASS' : 'FAIL',
       analyzer_test: results.analyzer_test.success ? 'PASS' : 'FAIL',
+      rot_test: results.rot_test.success ? 'PASS' : 'FAIL',
       full_scan_test: results.full_scan_test.success ? 'PASS' : 'FAIL'
     },
     detailed_results: results

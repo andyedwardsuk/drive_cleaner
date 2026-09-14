@@ -17,6 +17,7 @@ import HistoryView from './views/HistoryView'
 import SettingsView from './views/SettingsView'
 import AboutView from './views/AboutView'
 import GoogleWorkspaceView from './views/GoogleWorkspaceView'
+import RotAnalysisView from './views/RotAnalysisView'
 
 // Create root route
 const rootRoute = createRootRoute({
@@ -86,6 +87,12 @@ const workspaceFilesRoute = createRoute({
   component: GoogleWorkspaceView,
 })
 
+const rotAnalysisRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/rot-analysis',
+  component: RotAnalysisView,
+})
+
 const sharedFilesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/shared-files',
@@ -134,6 +141,7 @@ const routeTree = rootRoute.addChildren([
   emptyItemsRoute,
   tempFilesRoute,
   workspaceFilesRoute,
+  rotAnalysisRoute,
   sharedFilesRoute,
   bulkActionsRoute,
   myFoldersRoute,

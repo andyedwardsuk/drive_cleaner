@@ -10,6 +10,7 @@ import {
   FolderOpen,
   Trash2,
   FileSpreadsheet,
+  Flame,
   Star,
   Layers,
   FolderHeart,
@@ -89,6 +90,12 @@ export default function Sidebar() {
           label: 'Workspace Files',
           path: '/workspace-files',
           flag: 'FEATURE_WORKSPACE_FILES',
+        },
+        {
+          icon: Flame,
+          label: 'Data ROT Analysis',
+          path: '/rot-analysis',
+          flag: 'FEATURE_ROT_ANALYSIS',
         },
         {
           icon: Star,
@@ -175,7 +182,7 @@ export default function Sidebar() {
                 </div>
                 <div>
                   <h1 className="text-lg font-bold text-white">Drive Cleaner</h1>
-                  <p className="text-xs text-gray-400">v1.2.0</p>
+                  <p className="text-xs text-gray-400">v1.3.0</p>
                 </div>
               </motion.div>
             )}

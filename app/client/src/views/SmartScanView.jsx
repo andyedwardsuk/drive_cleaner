@@ -1,4 +1,4 @@
-import { Scan, FileText, Clock, Copy, Trash2, AlertCircle, CheckCircle, ChevronRight, FileSpreadsheet } from 'lucide-react'
+import { Scan, FileText, Clock, Copy, Trash2, AlertCircle, CheckCircle, ChevronRight, FileSpreadsheet, Flame } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
@@ -27,6 +27,7 @@ function CategoryCard({ icon: Icon, title, count, size, color = 'blue', onClick 
     blue: { bg: 'bg-blue-500/10', icon: 'text-blue-400' },
     gray: { bg: 'bg-gray-500/10', icon: 'text-gray-400' },
     yellow: { bg: 'bg-yellow-500/10', icon: 'text-yellow-400' },
+    rose: { bg: 'bg-rose-500/10', icon: 'text-rose-400' },
   }
 
   const classes = colorClasses[color] || colorClasses.blue
@@ -110,6 +111,14 @@ function ScanResults({ data }) {
       size: data.workspace_files?.total_size_bytes,
       color: 'blue',
       path: '/workspace-files',
+    },
+    {
+      icon: Flame,
+      title: 'Data ROT Analysis',
+      count: data.rot_analysis?.count || 0,
+      size: data.rot_analysis?.total_size_bytes,
+      color: 'rose',
+      path: '/rot-analysis',
     },
   ]
 

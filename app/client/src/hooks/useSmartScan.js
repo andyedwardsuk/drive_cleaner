@@ -245,6 +245,172 @@ export const useSmartScanStore = create((set) => ({
                 }
               ]
             },
+            rot_analysis: {
+              count: 8,
+              total_size_bytes: 382400000,
+              category_name: 'Data ROT Analysis',
+              category_type: 'rot_analysis',
+              breakdown: {
+                redundant: { count: 3, total_size_bytes: 188743680 },
+                obsolete: { count: 4, total_size_bytes: 193400000 },
+                trivial: { count: 4, total_size_bytes: 256320, detail: { screenshots: 2, untitled: 1, tiny_stubs: 1, temp_system: 0 } }
+              },
+              clutter_index: {
+                score: 54,
+                target: 20,
+                average_age_days: 430,
+                breakdown: {
+                  rot_ratio: 48,
+                  disorganization: 32,
+                  inertia: 58,
+                  data_gravity: 24
+                }
+              },
+              hoarding_score: {
+                total_score: 52,
+                rating: {
+                  level: 'Moderate',
+                  color: 'yellow',
+                  icon: '📦',
+                  description: 'Noticeable digital clutter accumulating'
+                },
+                components: {
+                  clutter_volume: 14,
+                  disorganization: 12,
+                  accumulation: 16,
+                  attachment: 10
+                }
+              },
+              freshness_distribution: {
+                fresh: { count: 42, percentage: 27, label: 'Fresh', period: '0-3 months', color: 'emerald' },
+                aging: { count: 28, percentage: 18, label: 'Aging', period: '3-6 months', color: 'amber' },
+                stale: { count: 35, percentage: 22, label: 'Stale', period: '6-12 months', color: 'orange' },
+                rotting: { count: 31, percentage: 20, label: 'Rotting', period: '12-24 months', color: 'rose' },
+                decayed: { count: 20, percentage: 13, label: 'Decayed', period: '24+ months', color: 'slate' }
+              },
+              items: [
+                {
+                  file_id: 'rot1',
+                  file_name: 'Budget 2023 - Final Final.xlsx',
+                  mime_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                  parent_name: 'Finance',
+                  size_bytes: 48234496,
+                  modified_date: '2023-03-12T14:00:00.000Z',
+                  last_viewed_date: '2023-04-01T10:00:00.000Z',
+                  drive_link: 'https://drive.google.com',
+                  days_inactive: 530,
+                  freshness_level: 'rotting',
+                  rot_types: ['redundant', 'obsolete'],
+                  rot_reasons: ['superseded_version', 'inactive_1yr'],
+                  details: ['Superseded by newer version "Budget 2024.xlsx"', 'Inactive for 1.5 years']
+                },
+                {
+                  file_id: 'rot2',
+                  file_name: 'Company Deck v1 (copy).pptx',
+                  mime_type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                  parent_name: 'Marketing',
+                  size_bytes: 140509184,
+                  modified_date: '2022-11-04T12:00:00.000Z',
+                  last_viewed_date: '2022-11-04T12:00:00.000Z',
+                  drive_link: 'https://drive.google.com',
+                  days_inactive: 678,
+                  freshness_level: 'rotting',
+                  rot_types: ['redundant', 'obsolete'],
+                  rot_reasons: ['superseded_version', 'inactive_1yr'],
+                  details: ['Superseded by newer version "Company Deck v3"', 'Untouched for 1.8 years']
+                },
+                {
+                  file_id: 'rot3',
+                  file_name: 'Project Timeline 2021.pdf',
+                  mime_type: 'application/pdf',
+                  parent_name: 'Projects',
+                  size_bytes: 18874368,
+                  modified_date: '2021-06-20T08:00:00.000Z',
+                  last_viewed_date: '2021-08-15T11:00:00.000Z',
+                  drive_link: 'https://drive.google.com',
+                  days_inactive: 1120,
+                  freshness_level: 'decayed',
+                  rot_types: ['obsolete'],
+                  rot_reasons: ['decayed_2yr'],
+                  details: ['Inactive for 3.1 years (historic completed project)']
+                },
+                {
+                  file_id: 'rot4',
+                  file_name: 'Screenshot 2023-04-12 at 14.30.22.png',
+                  mime_type: 'image/png',
+                  parent_name: 'Desktop Backup',
+                  size_bytes: 1845000,
+                  modified_date: '2023-04-12T14:30:22.000Z',
+                  last_viewed_date: '2023-04-12T14:30:22.000Z',
+                  drive_link: 'https://drive.google.com',
+                  days_inactive: 520,
+                  freshness_level: 'rotting',
+                  rot_types: ['trivial', 'obsolete'],
+                  rot_reasons: ['screenshot', 'inactive_1yr'],
+                  details: ['Default screenshot naming pattern', 'Unopened in 1.4 years']
+                },
+                {
+                  file_id: 'rot5',
+                  file_name: 'Screenshot 2024-02-18 at 09.15.00.png',
+                  mime_type: 'image/png',
+                  parent_name: 'Desktop Backup',
+                  size_bytes: 1250000,
+                  modified_date: '2024-02-18T09:15:00.000Z',
+                  last_viewed_date: '2024-02-18T09:15:00.000Z',
+                  drive_link: 'https://drive.google.com',
+                  days_inactive: 208,
+                  freshness_level: 'stale',
+                  rot_types: ['trivial'],
+                  rot_reasons: ['screenshot'],
+                  details: ['Default screenshot naming pattern']
+                },
+                {
+                  file_id: 'rot6',
+                  file_name: 'Untitled document',
+                  mime_type: 'application/vnd.google-apps.document',
+                  parent_name: 'My Drive',
+                  size_bytes: 0,
+                  modified_date: '2023-09-10T16:00:00.000Z',
+                  last_viewed_date: '2023-09-10T16:00:00.000Z',
+                  drive_link: 'https://drive.google.com',
+                  days_inactive: 370,
+                  freshness_level: 'rotting',
+                  rot_types: ['trivial', 'obsolete'],
+                  rot_reasons: ['untitled', 'inactive_1yr'],
+                  details: ['Unlabelled default document name', 'Not accessed in 1.0 year']
+                },
+                {
+                  file_id: 'rot7',
+                  file_name: 'debug_output.log',
+                  mime_type: 'text/plain',
+                  parent_name: 'Development',
+                  size_bytes: 1240,
+                  modified_date: '2024-01-15T10:00:00.000Z',
+                  last_viewed_date: '2024-01-15T10:00:00.000Z',
+                  drive_link: 'https://drive.google.com',
+                  days_inactive: 242,
+                  freshness_level: 'stale',
+                  rot_types: ['trivial'],
+                  rot_reasons: ['tiny_stub'],
+                  details: ['Tiny placeholder / log file (1.2 KB)']
+                },
+                {
+                  file_id: 'rot8',
+                  file_name: 'Annual Report 2020 Final v2.pdf',
+                  mime_type: 'application/pdf',
+                  parent_name: 'Reports',
+                  size_bytes: 34000000,
+                  modified_date: '2021-02-10T10:00:00.000Z',
+                  last_viewed_date: '2021-03-01T15:00:00.000Z',
+                  drive_link: 'https://drive.google.com',
+                  days_inactive: 1290,
+                  freshness_level: 'decayed',
+                  rot_types: ['obsolete', 'redundant'],
+                  rot_reasons: ['decayed_2yr', 'superseded_version'],
+                  details: ['Untouched for 3.5 years', 'Multiple superseded versions exist']
+                }
+              ]
+            },
             recommendations: [
               {
                 priority: 'high',

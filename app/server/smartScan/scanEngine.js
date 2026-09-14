@@ -125,6 +125,7 @@ function runSmartScan(folderId, corpora) {
         empty_items: { count: 0, total_size_bytes: 0, items: [], category_name: 'Empty Items', category_type: 'empty_items' },
         temp_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Temporary Files', category_type: 'temp_files' },
         workspace_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Google Workspace Files', category_type: 'workspace_files', type_breakdown: {}, unused_breakdown: { six_months: 0, one_year: 0, two_years: 0 }, sharing_breakdown: { shared: 0, private: 0, unknown: 0 } },
+        rot_analysis: { count: 0, total_size_bytes: 0, category_name: 'Data ROT Analysis', category_type: 'rot_analysis', breakdown: { redundant: { count: 0, total_size_bytes: 0 }, obsolete: { count: 0, total_size_bytes: 0 }, trivial: { count: 0, total_size_bytes: 0 } }, clutter_index: { score: 0, target: 20, breakdown: { rot_ratio: 0, disorganization: 0, inertia: 0, data_gravity: 0 } }, hoarding_score: { total_score: 0, rating: { level: 'Minimal', color: 'green', icon: '✨' }, components: { clutter_volume: 0, disorganization: 0, accumulation: 0, attachment: 0 } }, freshness_distribution: { fresh: { count: 0, percentage: 0 }, aging: { count: 0, percentage: 0 }, stale: { count: 0, percentage: 0 }, rotting: { count: 0, percentage: 0 }, decayed: { count: 0, percentage: 0 } }, items: [] },
         recommendations: [],
         error: null
       };
@@ -152,6 +153,7 @@ function runSmartScan(folderId, corpora) {
         empty_items: { count: 0, total_size_bytes: 0, items: [], category_name: 'Empty Items', category_type: 'empty_items' },
         temp_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Temporary Files', category_type: 'temp_files' },
         workspace_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Google Workspace Files', category_type: 'workspace_files', type_breakdown: {}, unused_breakdown: { six_months: 0, one_year: 0, two_years: 0 }, sharing_breakdown: { shared: 0, private: 0, unknown: 0 } },
+        rot_analysis: { count: 0, total_size_bytes: 0, category_name: 'Data ROT Analysis', category_type: 'rot_analysis', breakdown: { redundant: { count: 0, total_size_bytes: 0 }, obsolete: { count: 0, total_size_bytes: 0 }, trivial: { count: 0, total_size_bytes: 0 } }, clutter_index: { score: 0, target: 20, breakdown: { rot_ratio: 0, disorganization: 0, inertia: 0, data_gravity: 0 } }, hoarding_score: { total_score: 0, rating: { level: 'Minimal', color: 'green', icon: '✨' }, components: { clutter_volume: 0, disorganization: 0, accumulation: 0, attachment: 0 } }, freshness_distribution: { fresh: { count: 0, percentage: 0 }, aging: { count: 0, percentage: 0 }, stale: { count: 0, percentage: 0 }, rotting: { count: 0, percentage: 0 }, decayed: { count: 0, percentage: 0 } }, items: [] },
         recommendations: [],
         error: null
       };
@@ -171,6 +173,8 @@ function runSmartScan(folderId, corpora) {
     const duplicatesResult = analyzeDuplicates(structuredFiles);
     // eslint-disable-next-line no-undef
     const workspaceFilesResult = analyzeWorkspaceFiles(structuredFiles);
+    // eslint-disable-next-line no-undef
+    const rotAnalysisResult = analyzeROT(structuredFiles);
 
     console.log('Analyzers complete');
     console.log(`- Large files: ${largeFilesResult.count}`);
@@ -179,6 +183,7 @@ function runSmartScan(folderId, corpora) {
     console.log(`- Temp files: ${tempFilesResult.count}`);
     console.log(`- Duplicates: ${duplicatesResult.count}`);
     console.log(`- Workspace files: ${workspaceFilesResult.count}`);
+    console.log(`- ROT items: ${rotAnalysisResult.count}`);
 
     // Calculate total space used
     const totalSpaceUsed = structuredFiles.reduce((sum, file) => sum + (file.size_bytes || 0), 0);
@@ -190,7 +195,8 @@ function runSmartScan(folderId, corpora) {
       duplicates: duplicatesResult,
       empty_items: emptyItemsResult,
       temp_files: tempFilesResult,
-      workspace_files: workspaceFilesResult
+      workspace_files: workspaceFilesResult,
+      rot_analysis: rotAnalysisResult
     };
 
     const totalSavings = calculateSpaceSavings_(categoryResults);
@@ -215,6 +221,7 @@ function runSmartScan(folderId, corpora) {
       empty_items: emptyItemsResult,
       temp_files: tempFilesResult,
       workspace_files: workspaceFilesResult,
+      rot_analysis: rotAnalysisResult,
       recommendations: recommendations,
       error: null
     };
@@ -242,6 +249,7 @@ function runSmartScan(folderId, corpora) {
       empty_items: { count: 0, total_size_bytes: 0, items: [], category_name: 'Empty Items', category_type: 'empty_items' },
       temp_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Temporary Files', category_type: 'temp_files' },
       workspace_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Google Workspace Files', category_type: 'workspace_files', type_breakdown: {}, unused_breakdown: { six_months: 0, one_year: 0, two_years: 0 }, sharing_breakdown: { shared: 0, private: 0, unknown: 0 } },
+      rot_analysis: { count: 0, total_size_bytes: 0, category_name: 'Data ROT Analysis', category_type: 'rot_analysis', breakdown: { redundant: { count: 0, total_size_bytes: 0 }, obsolete: { count: 0, total_size_bytes: 0 }, trivial: { count: 0, total_size_bytes: 0 } }, clutter_index: { score: 0, target: 20, breakdown: { rot_ratio: 0, disorganization: 0, inertia: 0, data_gravity: 0 } }, hoarding_score: { total_score: 0, rating: { level: 'Minimal', color: 'green', icon: '✨' }, components: { clutter_volume: 0, disorganization: 0, accumulation: 0, attachment: 0 } }, freshness_distribution: { fresh: { count: 0, percentage: 0 }, aging: { count: 0, percentage: 0 }, stale: { count: 0, percentage: 0 }, rotting: { count: 0, percentage: 0 }, decayed: { count: 0, percentage: 0 } }, items: [] },
       recommendations: [],
       error: error.message
     };
