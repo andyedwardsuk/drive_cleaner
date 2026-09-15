@@ -20,6 +20,7 @@ import GoogleWorkspaceView from './views/GoogleWorkspaceView'
 import RotAnalysisView from './views/RotAnalysisView'
 import CarbonFootprintView from './views/CarbonFootprintView'
 import DailyImpactView from './views/DailyImpactView'
+import KanbanLabelsView from './views/KanbanLabelsView'
 
 // Create root route
 const rootRoute = createRootRoute({
@@ -138,6 +139,12 @@ const settingsRoute = createRoute({
   component: SettingsView,
 })
 
+const kanbanLabelsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/kanban-labels',
+  component: KanbanLabelsView,
+})
+
 const aboutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/about',
@@ -161,6 +168,7 @@ const routeTree = rootRoute.addChildren([
   rotAnalysisRoute,
   sharedFilesRoute,
   bulkActionsRoute,
+  kanbanLabelsRoute,
   myFoldersRoute,
   historyRoute,
   settingsRoute,

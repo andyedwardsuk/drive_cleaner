@@ -35,8 +35,8 @@ export const FEATURE_FLAGS = {
   FEATURE_BULK_ACTIONS: true,
   FEATURE_FILE_PREVIEW: true,
 
-  // Phase 6 (v0.7.0) - Coming Soon
-  FEATURE_KANBAN_LABELS: false,
+  // Phase 6 (v0.7.0) - Now Available
+  FEATURE_KANBAN_LABELS: true,
 }
 
 /**

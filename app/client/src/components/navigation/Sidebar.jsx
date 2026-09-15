@@ -16,6 +16,7 @@ import {
   Layers,
   FolderHeart,
   History,
+  Kanban,
   Settings,
   Info,
   ChevronLeft,
@@ -128,6 +129,12 @@ export default function Sidebar() {
           flag: 'FEATURE_BULK_ACTIONS',
         },
         {
+          icon: Kanban,
+          label: 'Kanban Labels',
+          path: '/kanban-labels',
+          flag: 'FEATURE_KANBAN_LABELS',
+        },
+        {
           icon: FolderHeart,
           label: 'My Folders',
           path: '/my-folders',
@@ -195,7 +202,7 @@ export default function Sidebar() {
                 </div>
                 <div>
                   <h1 className="text-lg font-bold text-white">Drive Cleaner</h1>
-                  <p className="text-xs text-gray-400">v2.0.0</p>
+                  <p className="text-xs text-gray-400">v2.2.0</p>
                 </div>
               </motion.div>
             )}
