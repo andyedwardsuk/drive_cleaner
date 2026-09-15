@@ -3,6 +3,7 @@ import { Clock, Filter, RefreshCw, Calendar } from 'lucide-react'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { useSmartScan } from '@/hooks/useSmartScan'
+import { useSettings } from '@/hooks/useSettings'
 import {
   Table,
   TableBody,
@@ -129,7 +130,10 @@ function AgeSummary({ totalSize, fileCount, oldestAge }) {
  */
 export default function OldFilesView() {
   const { data, loading, error, runScan } = useSmartScan()
-  const [ageFilter, setAgeFilter] = useState('all') // 'all', '1yr', '2yr', '5yr'
+  const { thresholds } = useSettings()
+  const inactiveDays = thresholds?.oldFileInactiveDays || 365
+  const inactiveYears = inactiveDays / 365
+  const [ageFilter, setAgeFilter] = useState('all') // 'all', 'custom', '2yr', '5yr'
   const [typeFilter, setTypeFilter] = useState('all')
   const [sortBy, setSortBy] = useState('age') // 'age', 'name', 'size'
   const [sortOrder, setSortOrder] = useState('desc')
@@ -141,8 +145,8 @@ export default function OldFilesView() {
     let files = [...data.old_files.items]
 
     // Apply age filter
-    if (ageFilter === '1yr') {
-      files = files.filter(f => f.age_years >= 1)
+    if (ageFilter === 'custom' || ageFilter === '1yr') {
+      files = files.filter(f => f.age_years >= inactiveYears)
     } else if (ageFilter === '2yr') {
       files = files.filter(f => f.age_years >= 2)
     } else if (ageFilter === '5yr') {
@@ -328,9 +332,13 @@ export default function OldFilesView() {
             onClick={() => setAgeFilter('all')}
           />
           <AgeFilterChip
-            label=">1 Year"
-            active={ageFilter === '1yr'}
-            onClick={() => setAgeFilter('1yr')}
+            label={
+              inactiveDays >= 365
+                ? `>${Math.round(inactiveDays / 365)} Year${inactiveDays >= 730 ? 's' : ''}`
+                : `>${Math.round(inactiveDays / 30)} Months`
+            }
+            active={ageFilter === 'custom' || ageFilter === '1yr'}
+            onClick={() => setAgeFilter('custom')}
           />
           <AgeFilterChip
             label=">2 Years"

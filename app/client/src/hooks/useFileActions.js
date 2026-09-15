@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import fileActionsService from '@/services/fileActionsService'
 import { useDailyImpact } from './useDailyImpact'
 import { addHistoryEvent } from '@/lib/tracking/historyStorage'
+import { getSettings } from '@/lib/settings/settingsStorage'
 
 export function useFileActions() {
   const [selectedFileIds, setSelectedFileIds] = useState(new Set())
@@ -103,11 +104,13 @@ export function useFileActions() {
           })
         )
 
-        // Setup undo toast (15 second countdown)
+        // Setup undo toast with configured duration
+        const userSettings = getSettings()
+        const undoSeconds = userSettings?.safety?.undoTimeoutSeconds || 10
         if (timerRef.current) clearInterval(timerRef.current)
         setUndoToast({
           files: filesToTrash,
-          countdown: 15,
+          countdown: undoSeconds,
           totalBytes,
         })
 

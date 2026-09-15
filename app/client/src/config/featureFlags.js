@@ -14,7 +14,7 @@ export const FEATURE_FLAGS = {
   FEATURE_LARGE_FILES: true,
   FEATURE_OLD_FILES: true,
   FEATURE_SHARED_FILES: true,
-  FEATURE_SETTINGS: false,
+  FEATURE_SETTINGS: true,
 
   // Phase 2 (v0.3.0)
   FEATURE_STORAGE_ANALYTICS: true,

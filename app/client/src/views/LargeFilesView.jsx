@@ -3,6 +3,7 @@ import { HardDrive, Filter, RefreshCw, Folder, Download } from 'lucide-react'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { useSmartScan } from '@/hooks/useSmartScan'
+import { useSettings } from '@/hooks/useSettings'
 import {
   Table,
   TableBody,
@@ -116,7 +117,9 @@ function StorageSummary({ totalSize, fileCount }) {
  */
 export default function LargeFilesView() {
   const { data, loading, error, runScan } = useSmartScan()
-  const [sizeFilter, setSizeFilter] = useState('all') // 'all', '100mb', '500mb', '1gb'
+  const { thresholds } = useSettings()
+  const minMB = thresholds?.largeFileMinMB || 100
+  const [sizeFilter, setSizeFilter] = useState('all') // 'all', 'min', '500mb', '1gb'
   const [typeFilter, setTypeFilter] = useState('all') // 'all', 'video', 'image', 'audio', 'document', 'archive', 'other'
   const [sortBy, setSortBy] = useState('size') // 'size', 'name'
   const [sortOrder, setSortOrder] = useState('desc') // 'asc', 'desc'
@@ -128,8 +131,8 @@ export default function LargeFilesView() {
     let files = [...data.large_files.items]
 
     // Apply size filter
-    if (sizeFilter === '100mb') {
-      files = files.filter(f => f.size_bytes >= 100 * 1024 * 1024)
+    if (sizeFilter === 'min' || sizeFilter === '100mb') {
+      files = files.filter(f => f.size_bytes >= minMB * 1024 * 1024)
     } else if (sizeFilter === '500mb') {
       files = files.filter(f => f.size_bytes >= 500 * 1024 * 1024)
     } else if (sizeFilter === '1gb') {
@@ -308,9 +311,9 @@ export default function LargeFilesView() {
             onClick={() => setSizeFilter('all')}
           />
           <SizeFilterChip
-            label=">100 MB"
-            active={sizeFilter === '100mb'}
-            onClick={() => setSizeFilter('100mb')}
+            label={`>${minMB} MB`}
+            active={sizeFilter === 'min' || sizeFilter === '100mb'}
+            onClick={() => setSizeFilter('min')}
           />
           <SizeFilterChip
             label=">500 MB"
