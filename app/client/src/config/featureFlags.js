@@ -40,6 +40,9 @@ export const FEATURE_FLAGS = {
 
   // Phase 7 (v2.3.0) - Smart Auto-Archive Engine
   FEATURE_AUTO_ARCHIVE: true,
+
+  // Phase 8 (v2.4.0) - Scheduled Audit & Automation Triggers
+  FEATURE_AUTOMATION_TRIGGERS: true,
 }
 
 /**
@@ -96,6 +99,9 @@ export const getFeatureVersion = (flagName) => {
 
     // v2.3.0
     FEATURE_AUTO_ARCHIVE: 'v2.3.0',
+
+    // v2.4.0
+    FEATURE_AUTOMATION_TRIGGERS: 'v2.4.0',
   }
 
   return versionMap[flagName] || 'Future'

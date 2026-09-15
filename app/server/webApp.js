@@ -571,6 +571,82 @@ function unarchiveFiles(payload) {
   return DriveCleanerWebApp.unarchiveFiles(payload);
 }
 
+// ============================================
+// AUTOMATION & TIME-DRIVEN TRIGGERS API
+// ============================================
+
+/**
+ * Synchronize project triggers with automation config
+ * Called from React app via google.script.run
+ * @param {string|Object} config - Automation config
+ * @returns {Object} Result
+ */
+function syncAutomationTriggers(config) {
+  // eslint-disable-next-line no-undef
+  return typeof TriggerManager !== 'undefined'
+    ? TriggerManager.syncTriggers(config)
+    : { success: false, error: 'TriggerManager not loaded' };
+}
+
+/**
+ * Gets automation and active trigger status
+ * Called from React app via google.script.run
+ * @returns {Object} Status
+ */
+function getAutomationStatus() {
+  // eslint-disable-next-line no-undef
+  return typeof TriggerManager !== 'undefined'
+    ? TriggerManager.getAutomationStatus()
+    : { success: false, error: 'TriggerManager not loaded' };
+}
+
+/**
+ * Sends a test digest email immediately
+ * Called from React app via google.script.run
+ * @param {string} [recipientEmail] - Target email
+ * @returns {Object} Result
+ */
+function sendTestDigestEmail(recipientEmail) {
+  // eslint-disable-next-line no-undef
+  return typeof TriggerManager !== 'undefined'
+    ? TriggerManager.sendScheduledDigestEmail(recipientEmail)
+    : { success: false, error: 'TriggerManager not loaded' };
+}
+
+/**
+ * Runs a background audit immediately
+ * Called from React app via google.script.run
+ * @returns {Object} Result
+ */
+function runScheduledAuditNow() {
+  // eslint-disable-next-line no-undef
+  return typeof TriggerManager !== 'undefined'
+    ? TriggerManager.runScheduledAudit()
+    : { success: false, error: 'TriggerManager not loaded' };
+}
+
+/**
+ * Global trigger handler for Scheduled Background Audit
+ * Triggered automatically by Google Apps Script time-driven trigger
+ */
+function runScheduledAudit() {
+  // eslint-disable-next-line no-undef
+  if (typeof TriggerManager !== 'undefined') {
+    return TriggerManager.runScheduledAudit();
+  }
+}
+
+/**
+ * Global trigger handler for Weekly Email Digest
+ * Triggered automatically by Google Apps Script time-driven trigger
+ */
+function sendScheduledDigestEmail() {
+  // eslint-disable-next-line no-undef
+  if (typeof TriggerManager !== 'undefined') {
+    return TriggerManager.sendScheduledDigestEmail();
+  }
+}
+
 /**
  * Run this function in the Google Apps Script editor to authorize all Drive permissions!
  * Open editor: https://script.google.com/a/andyedwards.uk/d/1qkpaDFbdqq3OlpMCEdOUk68nr3svvVk3mmhhmHykRIbvaBUimsx2uN-G/edit

@@ -22,6 +22,7 @@ import CarbonFootprintView from './views/CarbonFootprintView'
 import DailyImpactView from './views/DailyImpactView'
 import KanbanLabelsView from './views/KanbanLabelsView'
 import AutoArchiveView from './views/AutoArchiveView'
+import AutomationTriggersView from './views/AutomationTriggersView'
 
 // Create root route
 const rootRoute = createRootRoute({
@@ -152,6 +153,12 @@ const autoArchiveRoute = createRoute({
   component: AutoArchiveView,
 })
 
+const automationRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/automation',
+  component: AutomationTriggersView,
+})
+
 const aboutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/about',
@@ -177,6 +184,7 @@ const routeTree = rootRoute.addChildren([
   bulkActionsRoute,
   kanbanLabelsRoute,
   autoArchiveRoute,
+  automationRoute,
   myFoldersRoute,
   historyRoute,
   settingsRoute,
