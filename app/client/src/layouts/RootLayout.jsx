@@ -1,5 +1,6 @@
 import { Outlet } from '@tanstack/react-router'
 import Sidebar from '@/components/navigation/Sidebar'
+import FilePreviewModal from '@/components/preview/FilePreviewModal'
 
 /**
  * RootLayout - Main layout with sidebar navigation
@@ -16,6 +17,9 @@ export default function RootLayout() {
           <Outlet />
         </div>
       </main>
+
+      {/* Global File Preview & Details Modal */}
+      <FilePreviewModal />
     </div>
   )
 }

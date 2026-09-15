@@ -16,7 +16,10 @@ import {
   FileText,
   FolderOpen,
   Trash2,
+  Eye,
 } from 'lucide-react'
+
+import { useFilePreview } from '@/hooks/useFilePreview'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -145,6 +148,8 @@ export default function FileTable({ data = [] }) {
     dismissUndo,
   } = useFileActions()
 
+  const { openPreview } = useFilePreview()
+
   // Track trashed & restored files via global events
   useEffect(() => {
     const handleTrashed = (e) => {
@@ -241,7 +246,14 @@ export default function FileTable({ data = [] }) {
         },
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
-            <span className="font-medium">{row.getValue('fileName')}</span>
+            <button
+              type="button"
+              onClick={() => openPreview(row.original, activeData)}
+              className="font-medium text-left text-white hover:text-blue-400 hover:underline transition-colors truncate max-w-xs sm:max-w-md cursor-pointer"
+              title="Click to preview & inspect file"
+            >
+              {row.getValue('fileName')}
+            </button>
             {row.original.starred && <span className="text-yellow-500">{row.original.starred}</span>}
           </div>
         ),
@@ -372,6 +384,11 @@ export default function FileTable({ data = [] }) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => openPreview(file, activeData)}>
+                  <Eye className="mr-2 h-4 w-4 text-blue-400" />
+                  Preview & Inspect
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => copyToClipboard(file.fileId)}>
                   <Copy className="mr-2 h-4 w-4" />
                   Copy File ID
