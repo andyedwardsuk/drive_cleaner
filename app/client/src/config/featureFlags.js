@@ -43,6 +43,9 @@ export const FEATURE_FLAGS = {
 
   // Phase 8 (v2.4.0) - Scheduled Audit & Automation Triggers
   FEATURE_AUTOMATION_TRIGGERS: true,
+
+  // Phase 9 (v2.5.0) - Smart Folder Reorganizer
+  FEATURE_SMART_REORGANIZER: true,
 }
 
 /**
@@ -102,6 +105,9 @@ export const getFeatureVersion = (flagName) => {
 
     // v2.4.0
     FEATURE_AUTOMATION_TRIGGERS: 'v2.4.0',
+
+    // v2.5.0
+    FEATURE_SMART_REORGANIZER: 'v2.5.0',
   }
 
   return versionMap[flagName] || 'Future'

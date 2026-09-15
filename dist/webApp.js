@@ -647,6 +647,49 @@ function sendScheduledDigestEmail() {
   }
 }
 
+// ============================================
+// SMART FOLDER REORGANIZER API
+// ============================================
+
+/**
+ * Analyzes Drive folder structure and computes hierarchy health score
+ * Called from React app via google.script.run
+ * @param {string} [rootFolderId] - Root folder ID
+ * @returns {Object} Report
+ */
+function analyzeFolderStructure(rootFolderId) {
+  // eslint-disable-next-line no-undef
+  return typeof FolderReorganizer !== 'undefined'
+    ? FolderReorganizer.analyzeStructure(rootFolderId)
+    : { success: false, error: 'FolderReorganizer not loaded' };
+}
+
+/**
+ * Executes a proposed folder reorganization plan
+ * Called from React app via google.script.run
+ * @param {string|Object} plan - Reorganization plan
+ * @returns {Object} Result
+ */
+function executeFolderReorganization(plan) {
+  // eslint-disable-next-line no-undef
+  return typeof FolderReorganizer !== 'undefined'
+    ? FolderReorganizer.executeReorganization(plan)
+    : { success: false, error: 'FolderReorganizer not loaded' };
+}
+
+/**
+ * Restores files to original folders from a reorganization restore point
+ * Called from React app via google.script.run
+ * @param {string} restorePointId - Restore point ID
+ * @returns {Object} Result
+ */
+function restoreFolderReorganization(restorePointId) {
+  // eslint-disable-next-line no-undef
+  return typeof FolderReorganizer !== 'undefined'
+    ? FolderReorganizer.restoreReorganization(restorePointId)
+    : { success: false, error: 'FolderReorganizer not loaded' };
+}
+
 /**
  * Run this function in the Google Apps Script editor to authorize all Drive permissions!
  * Open editor: https://script.google.com/a/andyedwards.uk/d/1qkpaDFbdqq3OlpMCEdOUk68nr3svvVk3mmhhmHykRIbvaBUimsx2uN-G/edit

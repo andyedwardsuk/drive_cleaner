@@ -23,6 +23,7 @@ import DailyImpactView from './views/DailyImpactView'
 import KanbanLabelsView from './views/KanbanLabelsView'
 import AutoArchiveView from './views/AutoArchiveView'
 import AutomationTriggersView from './views/AutomationTriggersView'
+import SmartReorganizerView from './views/SmartReorganizerView'
 
 // Create root route
 const rootRoute = createRootRoute({
@@ -159,6 +160,12 @@ const automationRoute = createRoute({
   component: AutomationTriggersView,
 })
 
+const smartReorganizerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/smart-reorganizer',
+  component: SmartReorganizerView,
+})
+
 const aboutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/about',
@@ -185,6 +192,7 @@ const routeTree = rootRoute.addChildren([
   kanbanLabelsRoute,
   autoArchiveRoute,
   automationRoute,
+  smartReorganizerRoute,
   myFoldersRoute,
   historyRoute,
   settingsRoute,
