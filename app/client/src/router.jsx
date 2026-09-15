@@ -21,6 +21,7 @@ import RotAnalysisView from './views/RotAnalysisView'
 import CarbonFootprintView from './views/CarbonFootprintView'
 import DailyImpactView from './views/DailyImpactView'
 import KanbanLabelsView from './views/KanbanLabelsView'
+import AutoArchiveView from './views/AutoArchiveView'
 
 // Create root route
 const rootRoute = createRootRoute({
@@ -145,6 +146,12 @@ const kanbanLabelsRoute = createRoute({
   component: KanbanLabelsView,
 })
 
+const autoArchiveRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/auto-archive',
+  component: AutoArchiveView,
+})
+
 const aboutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/about',
@@ -169,6 +176,7 @@ const routeTree = rootRoute.addChildren([
   sharedFilesRoute,
   bulkActionsRoute,
   kanbanLabelsRoute,
+  autoArchiveRoute,
   myFoldersRoute,
   historyRoute,
   settingsRoute,

@@ -37,6 +37,9 @@ export const FEATURE_FLAGS = {
 
   // Phase 6 (v0.7.0) - Now Available
   FEATURE_KANBAN_LABELS: true,
+
+  // Phase 7 (v2.3.0) - Smart Auto-Archive Engine
+  FEATURE_AUTO_ARCHIVE: true,
 }
 
 /**
@@ -90,6 +93,9 @@ export const getFeatureVersion = (flagName) => {
 
     // v0.7.0
     FEATURE_KANBAN_LABELS: 'v0.7.0',
+
+    // v2.3.0
+    FEATURE_AUTO_ARCHIVE: 'v2.3.0',
   }
 
   return versionMap[flagName] || 'Future'

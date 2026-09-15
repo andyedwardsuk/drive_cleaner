@@ -220,6 +220,159 @@ var DriveCleanerWebApp = (function () {
     };
   }
 
+  /**
+   * Moves a list of files to a designated Google Drive Archive folder
+   * Supports year-based partitioning (_DriveCleaner_Archive/YYYY/) and tracks original parents for undo.
+   * @param {string|Object} payload - JSON string or object { fileIds, targetFolderName, targetFolderId, organizeByYear }
+   * @returns {Object} Result {success, archivedCount, failedCount, archivedIds, targetFolderName, targetFolderId, targetFolderUrl, parentMappings, errors}
+   */
+  function archiveFiles(payload) {
+    try {
+      const options = typeof payload === 'string' ? JSON.parse(payload) : (payload || {});
+      const fileIds = options.fileIds || [];
+      const rootArchiveName = options.targetFolderName || '_DriveCleaner_Archive';
+      const organizeByYear = options.organizeByYear !== false; // default true
+
+      if (!fileIds || !Array.isArray(fileIds) || fileIds.length === 0) {
+        return { success: true, archivedCount: 0, failedCount: 0, archivedIds: [], errors: [] };
+      }
+
+      // 1. Resolve or create root archive folder
+      let archiveRootFolder;
+      if (options.targetFolderId) {
+        try {
+          archiveRootFolder = DriveApp.getFolderById(options.targetFolderId);
+        } catch (e) {
+          console.warn('Custom archive folder ID not found, using root archive folder:', e.message);
+        }
+      }
+
+      if (!archiveRootFolder) {
+        const rootFolders = DriveApp.getRootFolder().getFoldersByName(rootArchiveName);
+        if (rootFolders.hasNext()) {
+          archiveRootFolder = rootFolders.next();
+        } else {
+          archiveRootFolder = DriveApp.getRootFolder().createFolder(rootArchiveName);
+        }
+      }
+
+      // 2. Resolve or create year subfolder if requested
+      let destinationFolder = archiveRootFolder;
+      if (organizeByYear) {
+        const yearStr = String(new Date().getFullYear());
+        const yearFolders = archiveRootFolder.getFoldersByName(yearStr);
+        if (yearFolders.hasNext()) {
+          destinationFolder = yearFolders.next();
+        } else {
+          destinationFolder = archiveRootFolder.createFolder(yearStr);
+        }
+      }
+
+      const archived = [];
+      const failed = [];
+      const parentMappings = [];
+
+      // 3. Move files to target folder
+      for (let i = 0; i < fileIds.length; i++) {
+        const id = fileIds[i];
+        try {
+          const file = DriveApp.getFileById(id);
+          const parents = file.getParents();
+          const origParents = [];
+          while (parents.hasNext()) {
+            origParents.push(parents.next().getId());
+          }
+
+          // Move to archive folder
+          file.moveTo(destinationFolder);
+
+          archived.push(id);
+          parentMappings.push({
+            fileId: id,
+            originalParentId: origParents[0] || 'root',
+            allOriginalParents: origParents,
+            archivedParentId: destinationFolder.getId()
+          });
+        } catch (err) {
+          failed.push({ id: id, error: err.message });
+        }
+      }
+
+      return {
+        success: archived.length > 0 || (failed.length === 0 && fileIds.length === 0),
+        archivedCount: archived.length,
+        failedCount: failed.length,
+        archivedIds: archived,
+        targetFolderName: destinationFolder.getName(),
+        targetFolderId: destinationFolder.getId(),
+        targetFolderUrl: destinationFolder.getUrl(),
+        parentMappings: parentMappings,
+        errors: failed
+      };
+    } catch (error) {
+      console.error('Error in archiveFiles:', error);
+      return {
+        success: false,
+        error: 'Failed to archive files: ' + error.message
+      };
+    }
+  }
+
+  /**
+   * Restores previously archived files back to their original parent folders (Undo operation)
+   * @param {string|Object} payload - JSON string or object { items: [{ fileId, originalParentId }] }
+   * @returns {Object} Result {success, restoredCount, failedCount, restoredIds, errors}
+   */
+  function unarchiveFiles(payload) {
+    try {
+      const options = typeof payload === 'string' ? JSON.parse(payload) : (payload || {});
+      const items = options.items || [];
+
+      if (!items || !Array.isArray(items) || items.length === 0) {
+        return { success: true, restoredCount: 0, failedCount: 0, restoredIds: [], errors: [] };
+      }
+
+      const restored = [];
+      const failed = [];
+
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        const fileId = typeof item === 'string' ? item : item.fileId;
+        const targetParentId = item.originalParentId;
+
+        try {
+          const file = DriveApp.getFileById(fileId);
+          let targetFolder;
+
+          if (targetParentId && targetParentId !== 'root') {
+            targetFolder = DriveApp.getFolderById(targetParentId);
+          } else {
+            targetFolder = DriveApp.getRootFolder();
+          }
+
+          file.moveTo(targetFolder);
+          restored.push(fileId);
+        } catch (err) {
+          failed.push({ id: fileId, error: err.message });
+        }
+      }
+
+      return {
+        success: restored.length > 0 || (failed.length === 0 && items.length === 0),
+        restoredCount: restored.length,
+        failedCount: failed.length,
+        restoredIds: restored,
+        errors: failed
+      };
+    } catch (error) {
+      console.error('Error in unarchiveFiles:', error);
+      return {
+        success: false,
+        error: 'Failed to unarchive files: ' + error.message
+      };
+    }
+  }
+
   // ============================================
   // PRIVATE HELPER FUNCTIONS
   // ============================================
@@ -285,7 +438,9 @@ var DriveCleanerWebApp = (function () {
     getCachedFolderId: getCachedFolderId,
     getDriveQuota: getDriveQuota,
     trashFiles: trashFiles,
-    untrashFiles: untrashFiles
+    untrashFiles: untrashFiles,
+    archiveFiles: archiveFiles,
+    unarchiveFiles: unarchiveFiles
   };
 
 })();
@@ -394,6 +549,26 @@ function trashFiles(fileIds) {
  */
 function untrashFiles(fileIds) {
   return DriveCleanerWebApp.untrashFiles(fileIds);
+}
+
+/**
+ * Moves specified files to Google Drive Archive folder
+ * Called from React app via google.script.run
+ * @param {string|Object} payload - Archive payload
+ * @returns {Object} Result
+ */
+function archiveFiles(payload) {
+  return DriveCleanerWebApp.archiveFiles(payload);
+}
+
+/**
+ * Restores specified files back to their original parent folders from archive
+ * Called from React app via google.script.run
+ * @param {string|Object} payload - Unarchive payload
+ * @returns {Object} Result
+ */
+function unarchiveFiles(payload) {
+  return DriveCleanerWebApp.unarchiveFiles(payload);
 }
 
 /**

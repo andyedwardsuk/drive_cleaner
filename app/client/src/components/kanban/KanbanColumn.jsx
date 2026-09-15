@@ -7,10 +7,12 @@ import {
   MoreHorizontal,
   HardDrive,
   Plus,
+  Archive,
 } from 'lucide-react'
 import KanbanCard from './KanbanCard'
 import { useKanbanBoard } from '@/hooks/useKanbanBoard'
 import { useFileActions } from '@/hooks/useFileActions'
+import { useArchiveEngine } from '@/hooks/useArchiveEngine'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -54,6 +56,7 @@ function exportColumnAsCSV(cards, columnTitle) {
 export default function KanbanColumn({ column, cards = [] }) {
   const { moveCard, clearColumn } = useKanbanBoard()
   const { requestTrash } = useFileActions()
+  const { executeArchive, isArchiving } = useArchiveEngine()
   const [isOver, setIsOver] = useState(false)
 
   const totalBytes = cards.reduce((acc, c) => acc + (c.sizeBytes || 0), 0)
@@ -79,6 +82,14 @@ export default function KanbanColumn({ column, cards = [] }) {
   const handleBatchTrash = () => {
     if (cards.length === 0) return
     requestTrash(cards)
+  }
+
+  const handleBatchArchive = async () => {
+    if (cards.length === 0) return
+    const res = await executeArchive(cards)
+    if (res.success) {
+      clearColumn(column.id)
+    }
   }
 
   return (
@@ -152,14 +163,23 @@ export default function KanbanColumn({ column, cards = [] }) {
       )}
 
       {column.id === 'archive' && cards.length > 0 && (
-        <div className="mb-3">
+        <div className="mb-3 space-y-2">
+          <Button
+            size="sm"
+            disabled={isArchiving}
+            onClick={handleBatchArchive}
+            className="w-full gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-md shadow-indigo-900/20"
+          >
+            <Archive className="w-4 h-4" />
+            Archive to Drive ({cards.length})
+          </Button>
           <Button
             size="sm"
             variant="outline"
             onClick={() => exportColumnAsCSV(cards, 'Archive')}
-            className="w-full gap-2 border-amber-500/30 text-amber-300 hover:bg-amber-500/10 font-medium"
+            className="w-full gap-2 border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/10 font-medium text-xs"
           >
-            <Download className="w-4 h-4" />
+            <Download className="w-3.5 h-3.5" />
             Export Archive Manifest
           </Button>
         </div>
