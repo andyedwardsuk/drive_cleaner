@@ -65,7 +65,9 @@ function parseFileMetadata(driveFileObject, parentFolder) {
       // === Ownership & Sharing ===
       ownerNames: extractOwnerNames(driveFileObject.ownerNames),
       ownerFormatted: formatOwnerInfo(driveFileObject.owners),
+      owners: driveFileObject.owners || [],
       shared: driveFileObject.shared || false,
+      permissions: driveFileObject.permissions || [],
       // eslint-disable-next-line no-undef
       sharingStatus: formatSharingStatus(driveFileObject.shared, driveFileObject.permissions),
 

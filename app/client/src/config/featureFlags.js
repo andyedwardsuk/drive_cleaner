@@ -13,7 +13,7 @@ export const FEATURE_FLAGS = {
   FEATURE_SMART_SCAN: true,
   FEATURE_LARGE_FILES: true,
   FEATURE_OLD_FILES: true,
-  FEATURE_SHARED_FILES: false,
+  FEATURE_SHARED_FILES: true,
   FEATURE_SETTINGS: false,
 
   // Phase 2 (v0.3.0)

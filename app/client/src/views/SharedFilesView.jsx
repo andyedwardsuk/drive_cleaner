@@ -1,33 +1,336 @@
-import { Star } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import {
+  Users,
+  Globe,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Lock,
+  Search,
+  Sparkles,
+  ShieldAlert,
+} from 'lucide-react'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import FileTable from '@/components/FileTable'
+import { useSmartScan } from '@/hooks/useSmartScan'
+import { useNavigate } from '@tanstack/react-router'
+import SharingAuditorCard from '@/components/sharing/SharingAuditorCard'
+
+// Format bytes
+function formatBytes(bytes) {
+  if (!bytes || bytes === 0) return '0 B'
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return `${(bytes / Math.pow(k, i)).toFixed(1)} ${sizes[i]}`
+}
 
 export default function SharedFilesView() {
+  const navigate = useNavigate()
+  const { scanData, isScanning, startScan } = useSmartScan()
+  const [activeFilter, setActiveFilter] = useState('all') // 'all', 'public', 'by_me', 'with_me', 'private'
+
+  // Extract shared files from scanData or provide realistic sample data
+  const { allShared, publicFiles, sharedByMe, sharedWithMe, privateFiles } = useMemo(() => {
+    const rawFiles = scanData?.files || []
+
+    if (rawFiles.length === 0) {
+      // Realistic initial sample files for immediate testing
+      const sample = [
+        {
+          fileId: 'shared-pub-1',
+          fileName: 'Product_Roadmap_2024_Public_Deck.pdf',
+          fileSize: '14.8 MB',
+          fileSizeBytes: 15518924,
+          fileCategory: 'PDF',
+          modifiedDate: '2024-02-18',
+          ownerNames: 'Me',
+          sharingStatus: 'Public',
+          parentName: 'Product Strategy',
+          mimeType: 'application/pdf',
+          isPublic: true,
+          isSharedByMe: true,
+          isSharedWithMe: false,
+        },
+        {
+          fileId: 'shared-pub-2',
+          fileName: 'Brand_Assets_Logo_Pack.zip',
+          fileSize: '48.2 MB',
+          fileSizeBytes: 50541363,
+          fileCategory: 'Archive',
+          modifiedDate: '2023-11-05',
+          ownerNames: 'Me',
+          sharingStatus: 'Public',
+          parentName: 'Marketing Media',
+          mimeType: 'application/zip',
+          isPublic: true,
+          isSharedByMe: true,
+          isSharedWithMe: false,
+        },
+        {
+          fileId: 'shared-byme-1',
+          fileName: 'Q3_Financial_Projections.xlsx',
+          fileSize: '3.4 MB',
+          fileSizeBytes: 3565158,
+          fileCategory: 'Spreadsheet',
+          modifiedDate: '2024-01-22',
+          ownerNames: 'Me',
+          sharingStatus: 'Shared',
+          parentName: 'Finance',
+          mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          isPublic: false,
+          isSharedByMe: true,
+          isSharedWithMe: false,
+        },
+        {
+          fileId: 'shared-byme-2',
+          fileName: 'Client_Contract_NDA_Template.docx',
+          fileSize: '820 KB',
+          fileSizeBytes: 839680,
+          fileCategory: 'Document',
+          modifiedDate: '2023-09-14',
+          ownerNames: 'Me',
+          sharingStatus: 'Shared',
+          parentName: 'Legal',
+          mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          isPublic: false,
+          isSharedByMe: true,
+          isSharedWithMe: false,
+        },
+        {
+          fileId: 'shared-withme-1',
+          fileName: 'External_Consultant_Audit_Report.pdf',
+          fileSize: '22.1 MB',
+          fileSizeBytes: 23173529,
+          fileCategory: 'PDF',
+          modifiedDate: '2023-07-30',
+          ownerNames: 'Sarah Jenkins (external@consulting.co)',
+          sharingStatus: 'Shared',
+          parentName: 'Audits',
+          mimeType: 'application/pdf',
+          isPublic: false,
+          isSharedByMe: false,
+          isSharedWithMe: true,
+        },
+        {
+          fileId: 'shared-withme-2',
+          fileName: 'Vendor_Hardware_Quotes_2023.xlsx',
+          fileSize: '1.9 MB',
+          fileSizeBytes: 1992294,
+          fileCategory: 'Spreadsheet',
+          modifiedDate: '2023-05-12',
+          ownerNames: 'Procurement Vendor (orders@hardware-sys.com)',
+          sharingStatus: 'Shared',
+          parentName: 'IT Operations',
+          mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          isPublic: false,
+          isSharedByMe: false,
+          isSharedWithMe: true,
+        },
+        {
+          fileId: 'priv-1',
+          fileName: 'Personal_Notes_Draft.txt',
+          fileSize: '12 KB',
+          fileSizeBytes: 12288,
+          fileCategory: 'Text',
+          modifiedDate: '2024-03-01',
+          ownerNames: 'Me',
+          sharingStatus: 'Private',
+          parentName: 'Notes',
+          mimeType: 'text/plain',
+          isPublic: false,
+          isSharedByMe: false,
+          isSharedWithMe: false,
+        },
+      ]
+
+      const pub = sample.filter((f) => f.isPublic)
+      const byMe = sample.filter((f) => f.isSharedByMe)
+      const withMe = sample.filter((f) => f.isSharedWithMe)
+      const priv = sample.filter((f) => f.sharingStatus === 'Private')
+      const allSh = sample.filter((f) => f.sharingStatus !== 'Private')
+
+      return {
+        allShared: allSh,
+        publicFiles: pub,
+        sharedByMe: byMe,
+        sharedWithMe: withMe,
+        privateFiles: priv,
+      }
+    }
+
+    // Process actual files from scan
+    const pub = []
+    const byMe = []
+    const withMe = []
+    const priv = []
+    const allSh = []
+
+    rawFiles.forEach((file) => {
+      const isShared = file.shared || (file.sharingStatus && file.sharingStatus !== 'Private')
+      const isPublic = file.sharingStatus === 'Public'
+
+      // Check if user is owner
+      const isOwner =
+        !file.ownerNames ||
+        file.ownerNames.toLowerCase() === 'me' ||
+        file.ownerNames.includes('(me)') ||
+        !file.ownerNames.includes('@')
+
+      const enhancedFile = {
+        ...file,
+        isPublic,
+        isSharedByMe: isShared && isOwner,
+        isSharedWithMe: isShared && !isOwner,
+      }
+
+      if (isPublic) pub.push(enhancedFile)
+      if (enhancedFile.isSharedByMe) byMe.push(enhancedFile)
+      if (enhancedFile.isSharedWithMe) withMe.push(enhancedFile)
+      if (!isShared) priv.push(enhancedFile)
+      if (isShared) allSh.push(enhancedFile)
+    })
+
+    return {
+      allShared: allSh,
+      publicFiles: pub,
+      sharedByMe: byMe,
+      sharedWithMe: withMe,
+      privateFiles: priv,
+    }
+  }, [scanData])
+
+  // Filtered files for table display
+  const displayedFiles = useMemo(() => {
+    switch (activeFilter) {
+      case 'public':
+        return publicFiles
+      case 'by_me':
+        return sharedByMe
+      case 'with_me':
+        return sharedWithMe
+      case 'private':
+        return privateFiles
+      case 'all':
+      default:
+        return allShared
+    }
+  }, [activeFilter, allShared, publicFiles, sharedByMe, sharedWithMe, privateFiles])
+
+  // Aggregate bytes
+  const publicBytes = publicFiles.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0)
+  const sharedByMeBytes = sharedByMe.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0)
+  const sharedWithMeBytes = sharedWithMe.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0)
+  const totalSharedBytes = allShared.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0)
+
+  const filterTabs = [
+    { id: 'all', label: 'All Shared', count: allShared.length, icon: Users },
+    {
+      id: 'public',
+      label: 'Public Links',
+      count: publicFiles.length,
+      icon: Globe,
+      alert: publicFiles.length > 0,
+    },
+    { id: 'by_me', label: 'Shared by Me', count: sharedByMe.length, icon: ArrowUpRight },
+    { id: 'with_me', label: 'Shared with Me', count: sharedWithMe.length, icon: ArrowDownLeft },
+    { id: 'private', label: 'Private Only', count: privateFiles.length, icon: Lock },
+  ]
+
   return (
     <div className="space-y-6">
+      {/* Hero Header */}
       <Hero
-        icon={Star}
-        title="Shared Files"
-        subtitle="Manage files shared with you or by you"
-        badge="Coming Soon in v0.2.0"
-        illustration="⭐"
+        icon={Users}
+        title="Shared Files & Permission Auditor"
+        subtitle="Audit sharing exposure, detect public links, distinguish ownership, and clean up unneeded shared items"
+        badge="Active"
+        illustration="🌐"
         actions={
-          <Button size="lg" disabled>
-            View Shared Files
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => navigate({ to: '/smart-scan' })}
+              className="border-glass-border hover:bg-white/10"
+            >
+              <Search className="w-4 h-4 mr-2" />
+              Configure Folder
+            </Button>
+            <Button
+              size="lg"
+              onClick={startScan}
+              disabled={isScanning}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/20"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              {isScanning ? 'Scanning Drive...' : 'Re-Scan Drive'}
+            </Button>
+          </div>
         }
       />
 
-      <div className="p-8 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm text-center">
-        <p className="text-gray-400 mb-4">Shared Files management will include:</p>
-        <ul className="text-left max-w-md mx-auto space-y-2 text-gray-300">
-          <li>📥 Files shared with me</li>
-          <li>📤 Files shared by me</li>
-          <li>🌐 Publicly shared files</li>
-          <li>👥 Shared drive files</li>
-          <li>🔐 Permission level filter</li>
-          <li>🔧 Revoke sharing actions</li>
-        </ul>
+      {/* Sharing Overview Metric Cards */}
+      <SharingAuditorCard
+        publicCount={publicFiles.length}
+        publicBytes={publicBytes}
+        sharedByMeCount={sharedByMe.length}
+        sharedByMeBytes={sharedByMeBytes}
+        sharedWithMeCount={sharedWithMe.length}
+        sharedWithMeBytes={sharedWithMeBytes}
+        totalSharedCount={allShared.length}
+        totalSharedBytes={totalSharedBytes}
+        activeFilter={activeFilter}
+        onSelectFilter={setActiveFilter}
+      />
+
+      {/* Filter Tabs & Active Pool Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-card/40 border border-glass-border backdrop-blur-md">
+        <div className="flex flex-wrap items-center gap-2">
+          {filterTabs.map((tab) => {
+            const Icon = tab.icon
+            const isActive = activeFilter === tab.id
+
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveFilter(tab.id)}
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all duration-200 border ${
+                  isActive
+                    ? 'bg-primary text-primary-foreground border-primary shadow-md shadow-primary/20'
+                    : 'bg-card/60 text-gray-300 border-white/10 hover:bg-card/90 hover:text-white'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span>{tab.label}</span>
+                <span
+                  className={`px-1.5 py-0.5 rounded-full text-[10px] ${
+                    tab.alert
+                      ? 'bg-red-500 text-white font-bold'
+                      : isActive
+                      ? 'bg-white/20 text-white'
+                      : 'bg-white/10 text-gray-400'
+                  }`}
+                >
+                  {tab.count}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="text-xs text-gray-300 border-glass-border">
+            Showing {displayedFiles.length} files (
+            {formatBytes(displayedFiles.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0))})
+          </Badge>
+        </div>
+      </div>
+
+      {/* Candidate File Table with Row Selection & Safe Trash */}
+      <div className="p-4 rounded-2xl bg-card/30 border border-glass-border backdrop-blur-sm">
+        <FileTable data={displayedFiles} />
       </div>
     </div>
   )
