@@ -18,7 +18,7 @@ export const FEATURE_FLAGS = {
 
   // Phase 2 (v0.3.0)
   FEATURE_STORAGE_ANALYTICS: true,
-  FEATURE_HISTORY: false,
+  FEATURE_HISTORY: true,
 
   // Phase 3 (v0.4.0) - Coming Soon
   FEATURE_DUPLICATES: true,

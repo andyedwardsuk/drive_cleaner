@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { addHistoryEvent } from '@/lib/tracking/historyStorage'
 
 /**
  * Check if running inside Google Apps Script environment
@@ -565,6 +566,21 @@ export const useSmartScanStore = create((set, get) => ({
           },
           loading: false,
         })
+
+        // Log scan event in history
+        addHistoryEvent({
+          type: 'scan',
+          title: `Smart Scan Completed: ${resolvedName}`,
+          folderName: resolvedName,
+          filesCount: 156,
+          bytesAffected: 524288000,
+          status: 'success',
+          details: {
+            largeFilesFound: 3,
+            duplicatesFound: 8,
+            rotScore: 68,
+          },
+        })
       }, 2000)
       return
     }
@@ -575,6 +591,25 @@ export const useSmartScanStore = create((set, get) => ({
     google.script.run
       .withSuccessHandler((result) => {
         if (result && result.success) {
+          const folderName = get().targetFolder?.name || 'Drive Folder'
+          const filesCount = result.files?.length || result.total_files_scanned || 0
+          const savings = result.total_potential_savings_bytes || 0
+
+          // Log scan event in history
+          addHistoryEvent({
+            type: 'scan',
+            title: `Smart Scan Completed: ${folderName}`,
+            folderName: folderName,
+            filesCount: filesCount,
+            bytesAffected: savings,
+            status: 'success',
+            details: {
+              largeFilesFound: result.analyzers?.largeFiles?.items?.length || 0,
+              duplicatesFound: result.analyzers?.duplicates?.items?.length || 0,
+              rotScore: result.analyzers?.rotAnalysis?.score || 0,
+            },
+          })
+
           set({ data: result, loading: false })
         } else {
           set({ error: result?.error || 'Scan failed', data: null, loading: false })

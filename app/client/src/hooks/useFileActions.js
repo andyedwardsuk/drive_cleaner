@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import fileActionsService from '@/services/fileActionsService'
 import { useDailyImpact } from './useDailyImpact'
+import { addHistoryEvent } from '@/lib/tracking/historyStorage'
 
 export function useFileActions() {
   const [selectedFileIds, setSelectedFileIds] = useState(new Set())
@@ -74,6 +75,22 @@ export function useFileActions() {
           bytesSaved: totalBytes,
         })
 
+        // Log to persistent audit history
+        addHistoryEvent({
+          type: 'trash',
+          title: `Moved ${result.trashedCount} ${result.trashedCount === 1 ? 'file' : 'files'} to Trash`,
+          folderName: filesToTrash[0]?.parentName || 'Drive Folder',
+          filesCount: result.trashedCount,
+          bytesAffected: totalBytes,
+          files: filesToTrash.map((f) => ({
+            fileId: f.fileId,
+            fileName: f.fileName,
+            fileSize: f.fileSize,
+            sizeBytes: f.fileSizeBytes || 0,
+            mimeType: f.mimeType,
+          })),
+        })
+
         // Clear selection
         clearSelection()
         setConfirmModalOpen(false)
@@ -128,6 +145,22 @@ export function useFileActions() {
       if (result.success) {
         if (timerRef.current) clearInterval(timerRef.current)
         setUndoToast(null)
+
+        // Log restoration to audit history
+        addHistoryEvent({
+          type: 'restore',
+          title: `Restored ${result.restoredCount} ${result.restoredCount === 1 ? 'file' : 'files'} from Trash`,
+          folderName: filesToRestore[0]?.parentName || 'Drive Folder',
+          filesCount: result.restoredCount,
+          bytesAffected: undoToast.totalBytes || 0,
+          files: filesToRestore.map((f) => ({
+            fileId: f.fileId,
+            fileName: f.fileName,
+            fileSize: f.fileSize,
+            sizeBytes: f.fileSizeBytes || 0,
+            mimeType: f.mimeType,
+          })),
+        })
 
         // Notify app that files were restored
         window.dispatchEvent(
