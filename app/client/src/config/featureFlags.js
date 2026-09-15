@@ -46,6 +46,9 @@ export const FEATURE_FLAGS = {
 
   // Phase 9 (v2.5.0) - Smart Folder Reorganizer
   FEATURE_SMART_REORGANIZER: true,
+
+  // Phase 10 (v2.6.0) - Drive Labels & Taxonomy Hub
+  FEATURE_DRIVE_LABELS: true,
 }
 
 /**
@@ -108,6 +111,9 @@ export const getFeatureVersion = (flagName) => {
 
     // v2.5.0
     FEATURE_SMART_REORGANIZER: 'v2.5.0',
+
+    // v2.6.0
+    FEATURE_DRIVE_LABELS: 'v2.6.0',
   }
 
   return versionMap[flagName] || 'Future'

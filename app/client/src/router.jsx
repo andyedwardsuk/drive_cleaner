@@ -24,6 +24,7 @@ import KanbanLabelsView from './views/KanbanLabelsView'
 import AutoArchiveView from './views/AutoArchiveView'
 import AutomationTriggersView from './views/AutomationTriggersView'
 import SmartReorganizerView from './views/SmartReorganizerView'
+import DriveLabelsView from './views/DriveLabelsView'
 
 // Create root route
 const rootRoute = createRootRoute({
@@ -166,6 +167,12 @@ const smartReorganizerRoute = createRoute({
   component: SmartReorganizerView,
 })
 
+const labelsManagementRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/labels-management',
+  component: DriveLabelsView,
+})
+
 const aboutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/about',
@@ -193,6 +200,7 @@ const routeTree = rootRoute.addChildren([
   autoArchiveRoute,
   automationRoute,
   smartReorganizerRoute,
+  labelsManagementRoute,
   myFoldersRoute,
   historyRoute,
   settingsRoute,

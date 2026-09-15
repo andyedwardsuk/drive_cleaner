@@ -690,6 +690,61 @@ function restoreFolderReorganization(restorePointId) {
     : { success: false, error: 'FolderReorganizer not loaded' };
 }
 
+// ============================================
+// GOOGLE DRIVE LABELS & TAXONOMY API
+// ============================================
+
+/**
+ * Gets labels registry and file mappings
+ * Called from React app via google.script.run
+ * @returns {Object} Labels registry
+ */
+function getDriveLabelsRegistry() {
+  // eslint-disable-next-line no-undef
+  return typeof LabelsManager !== 'undefined'
+    ? LabelsManager.getRegistry()
+    : { success: false, error: 'LabelsManager not loaded' };
+}
+
+/**
+ * Applies a label to files
+ * Called from React app via google.script.run
+ * @param {string|Object} payload - { fileIds, labelId }
+ * @returns {Object} Result
+ */
+function applyDriveLabel(payload) {
+  // eslint-disable-next-line no-undef
+  return typeof LabelsManager !== 'undefined'
+    ? LabelsManager.applyLabel(payload)
+    : { success: false, error: 'LabelsManager not loaded' };
+}
+
+/**
+ * Removes a label from files
+ * Called from React app via google.script.run
+ * @param {string|Object} payload - { fileIds, labelId }
+ * @returns {Object} Result
+ */
+function removeDriveLabel(payload) {
+  // eslint-disable-next-line no-undef
+  return typeof LabelsManager !== 'undefined'
+    ? LabelsManager.removeLabel(payload)
+    : { success: false, error: 'LabelsManager not loaded' };
+}
+
+/**
+ * Saves a custom label definition
+ * Called from React app via google.script.run
+ * @param {string|Object} payload - Label object
+ * @returns {Object} Result
+ */
+function saveCustomDriveLabel(payload) {
+  // eslint-disable-next-line no-undef
+  return typeof LabelsManager !== 'undefined'
+    ? LabelsManager.saveCustomLabel(payload)
+    : { success: false, error: 'LabelsManager not loaded' };
+}
+
 /**
  * Run this function in the Google Apps Script editor to authorize all Drive permissions!
  * Open editor: https://script.google.com/a/andyedwards.uk/d/1qkpaDFbdqq3OlpMCEdOUk68nr3svvVk3mmhhmHykRIbvaBUimsx2uN-G/edit

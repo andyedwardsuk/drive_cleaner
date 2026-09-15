@@ -4,6 +4,18 @@ All notable changes to the Drive Cleaner project will be documented in this file
 
 ---
 
+## [2.6.0] - 2026-09-16
+### Added
+- **Google Drive Labels & Taxonomy Hub (`FEATURE_DRIVE_LABELS`)**:
+  - Full taxonomy tag management with pre-seeded standard labels (`Confidential`, `Finance`, `Legal`, `Project Alpha`, `Archive Candidate`, `Public`) and custom label creation modal.
+  - Interactive file classification table with real-time multi-select bulk tagging ("Apply Label" dropdown menu).
+  - Inline badge chips on file rows with 1-click removal button (`✕`).
+  - Google Apps Script backend (`labelsManager.js`) persisting taxonomy registry and file label mappings in `UserProperties`.
+  - Seamless Universal File Preview modal integration with live metadata and taxonomy badges.
+  - Full local Vite dev simulation and live Apps Script bridge (`getDriveLabelsRegistry`, `applyDriveLabel`, `removeDriveLabel`, `saveCustomDriveLabel`).
+
+---
+
 ## [2.5.0] - 2026-09-16
 ### Added
 - **Smart Folder Reorganizer & Hierarchy Architect (`FEATURE_SMART_REORGANIZER`)**:
