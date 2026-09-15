@@ -1,279 +1,88 @@
 # Drive Cleaner - Project Status
 
-**Last Updated**: 2024-11-20
-**Current Phase**: Sprint 2 (Active) - Fast Track (6 weeks)
-**Current Sprint**: Sprint 2, Week 1 - Cloud Carbon Footprint & Green Gamification
+**Last Updated**: 2026-09-16
+**Current Phase**: Phase 5 (Complete) - Production Hardening & Automation
+**Current Velocity**: 16 major releases deployed
+**Active Deployment**: v2.4.0 (@36)
+**Deployment URL**: https://script.google.com/a/macros/andyedwards.uk/s/AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w/exec
 
 ---
 
 ## 🎯 Quick Summary
 
-**Completed**: 11 major features ✅ (Sprint 0, Sprint 1, Sprint 2)
-**In Progress**: 0 major features 🔄
-**Planned**: 3 major features 📋 (Sprint 3 + Backlog)
-**Sprint Approach**: ⭐ Fast Track (6 weeks) - Sprints 1-3
-**Current Velocity**: 11 features completed (73% of core product)
+- **Core Product**: 100% Implemented & Deployed ✅
+- **Automation & Notifications (RemNotifLib)**: 100% Implemented & Deployed ✅
+- **Labels, Kanban & Auto-Archive**: 100% Implemented & Deployed ✅
+- **Interactive File Preview & Deep Inspector**: 100% Implemented & Deployed ✅
+- **Settings & Custom Thresholds Hub**: 100% Implemented & Deployed ✅
+- **ROT Analysis, Workspace & Carbon Tracker**: 100% Implemented & Deployed ✅
 
 ---
 
-## ✅ Completed Features (Sprint 0, 1 & 2)
+## ✅ Completed Major Releases (v2.0.0 - v2.4.0)
 
-| Feature | Type | Status | Deployed |
-|---------|------|--------|----------|
-| **#1: Enhanced Metadata Collection** | Backend | ✅ Complete | v1.0.0 |
-| **#2: Smart Scan (Analyzers Engine)** | Full Stack | ✅ Complete | v1.0.0 - v1.4.0 |
-| - Large Files Analyzer | Backend | ✅ Complete | v1.0.0 |
-| - Old Files Analyzer | Backend | ✅ Complete | v1.0.0 |
-| - Duplicates Detector | Backend | ✅ Complete | v1.0.0 |
-| - Empty Items Finder | Backend | ✅ Complete | v1.0.0 |
-| - Temp Files Identifier | Backend | ✅ Complete | v1.0.0 |
-| - Workspace Analyzer | Full Stack | ✅ Complete | v1.2.0 |
-| - ROT Analyzer & DHQ Engine | Full Stack | ✅ Complete | v1.3.0 |
-| - Carbon Footprint Analyzer | Full Stack | ✅ Complete | v1.4.0 |
-| **#7: Storage Analytics Dashboard** | Frontend | ✅ Complete | v1.1.0 |
-| **#3: Large Files View** | Frontend | ✅ Complete | v1.1.0 |
-| **Old Files View** | Frontend | ✅ Complete | v1.1.0 |
-| **Duplicates View** | Frontend | ✅ Complete | v1.1.0 |
-| **Empty Items View** | Frontend | ✅ Complete | v1.1.0 |
-| **Temp Files View** | Frontend | ✅ Complete | v1.1.0 |
-| **#10: Google Workspace Files View** | Full Stack | ✅ Complete | v1.2.0 |
-| **#11: Data ROT Analysis & Hoarding** | Full Stack | ✅ Complete | v1.3.0 |
-| **#12: Cloud Carbon Footprint** | Full Stack | ✅ Complete | v1.4.0 |
-| **Folder Attachment & Selector Hub** | Full Stack | ✅ Complete | v1.5.0 |
-| **#13: Daily Impact Tracker & Gamification** | Full Stack | ✅ Complete | v1.6.0 |
-
-**Total**: 13 major features (Enhanced Metadata + 8 analyzers + 10 category/analytics/gamification views)
-**Latest Deployment**: v1.6.0 (@24)
-**Deployment URL**: https://script.google.com/a/macros/andyedwards.uk/s/AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w/exec
+| Version | Feature | Type | Status | Deployment | Git Commit |
+|---|---|---|---|---|---|
+| **v2.4.0** | **Scheduled Audit & Automation Triggers** | Full Stack | ✅ Complete | `@36` | `24967ac` |
+| **v2.3.0** | **Smart Auto-Archive Engine** | Full Stack | ✅ Complete | `@35` | `8ca2390` |
+| **v2.2.0** | **Google Drive Labels & Kanban Board** | Full Stack | ✅ Complete | `@34` | `adfface` |
+| **v2.1.0** | **File Preview & Deep Metadata Inspector** | Full Stack | ✅ Complete | `@33` | `d06fb63` |
+| **v2.0.0** | **Settings & Custom Thresholds Hub** | Full Stack | ✅ Complete | `@32` | `130d958` |
 
 ---
 
-## 📋 Planned Features (Sprint Backlog)
+## 🚀 Complete Feature Catalog
 
-### Sprint 4 (Optional): Labels & Organization
+### 1. Automation & Infrastructure
+- **Time-Driven Triggers (`triggerManager.js`)**: Google Apps Script `ScriptApp` background project triggers for 24/7 background hygiene.
+- **Silent Background Audit (`runScheduledAudit`)**: Periodic quota checks and historical metrics tracking.
+- **Weekly Hygiene Digest Email (`sendScheduledDigestEmail`)**: Responsive HTML digest reports dispatched via `MailApp.sendEmail` to Gmail.
+- **Storage Quota Guard**: Configurable warning boundary alert system (75%–95%).
+- **Interactive Automation View (`/automation`)**: Live trigger status cards, frequency selectors, immediate audit execution, and HTML email digest preview.
 
-### Medium Priority (Enhanced Features)
+### 2. Archival & Organization
+- **Smart Auto-Archive Engine (`/auto-archive`)**: Reversible archival moving files into `_DriveCleaner_Archive/{YYYY}` with 1-click restore.
+- **Kanban Board (`/kanban-labels`)**: 4-column drag-and-drop review pipeline (*Needs Review*, *Keep / Retain*, *Archive*, *Pending Trash*) with CSV export and batch trash operations.
+- **My Folders Hub (`/my-folders`)**: Custom folder attachment and multi-folder scoping.
 
-| Issue | Feature | Sprint | Effort | Dependencies |
-|-------|---------|--------|--------|--------------|
-| #9 | Google Drive Labels Management | Sprint 4 | 10-15 days | None |
-| #4 | Kanban Labels View | Sprint 4 | 7-10 days | #9 |
+### 3. File Inspection & Bulk Cleanup
+- **File Preview Modal**: Embeds Google Drive iframes (Docs/Sheets/Slides/PDFs), image zoom viewers, deep metadata attributes, and keyboard navigation.
+- **Bulk Actions Hub (`/bulk-actions`)**: Multi-condition rule filtering and batch trash execution.
+- **Safe Trash & Undo Toast**: Reversible deletion with configurable 5s–30s countdown windows.
 
-**Optional Path**: Sprint 4 (+2 weeks)
+### 4. Smart Scan Analyzers
+- Large Files Analyzer (> 100 MB default, custom threshold configurable)
+- Old Files Analyzer (> 365 days default, custom threshold configurable)
+- Duplicates Detector (MD5 hash & exact title matching)
+- Empty Items Finder (0-byte files & empty directories)
+- Temporary Files Identifier (.tmp, .bak, autosaves)
+- Google Workspace Files Analyzer (Docs, Sheets, Slides, Forms, Drawings)
+- Data ROT Analyzer & Hoarding Score (Redundant, Obsolete, Trivial classification)
+- Cloud Carbon Footprint Estimator (cloud energy & kg CO2e savings)
 
-### Infrastructure (Optional)
-
-| Issue | Feature | Sprint | Effort | Dependencies |
-|-------|---------|--------|--------|--------------|
-| #14 | **RemNotifLib** (Notification Library) | Sprint 5 | 5-7 days | None |
-| #8 | UI/UX Polish Pass | Ongoing | Continuous | None |
-
-**Enhancement Path**: Sprint 5 (+2 weeks)
-
----
-
-## 📅 Sprint Roadmap
-
-### Sprint 1: Workspace Analysis & ROT Foundation
-**Duration**: 2 weeks (10 days)
-**Deliverables**:
-- ✅ Google Workspace Files View (#10)
-- 🔄 ROT Analysis Backend (#11) - 50%
-
-### Sprint 2: ROT Visualization & Carbon Footprint
-**Duration**: 2 weeks (10 days)
-**Deliverables**:
-- ✅ Data ROT Analysis UI (#11) - Complete
-- ✅ Carbon Footprint (#12)
-
-### Sprint 3: Daily Impact Tracker
-**Duration**: 2 weeks (10 days)
-**Deliverables**:
-- ✅ Daily Impact Tracker MVP (#13)
-- Gamification system
-- Progress tracking
-
-### Sprint 4 (Optional): Labels & Organization
-**Duration**: 2 weeks (10 days)
-**Deliverables**:
-- ✅ Labels Management (#9)
-- ✅ Kanban View (#4)
-
-### Sprint 5 (Optional): Notifications & Infrastructure
-**Duration**: 2 weeks (10 days)
-**Deliverables**:
-- ✅ RemNotifLib (#14)
-- Advanced notifications
-
-**Total Timeline**:
-- **Fast Track** (Core Features): 6 weeks
-- **Full Product** (All Features): 10 weeks
+### 5. Analytics & Gamification
+- Storage Analytics Dashboard (`/storage-analytics`)
+- Daily Impact Tracker & Green Gamification (`/daily-impact`): streaks, levels, and badges
+- Audit History Log (`/history`): Persistent timeline of cleanup and archival operations
 
 ---
 
-## 📊 Feature Documentation
+## 🎯 Milestones Status
 
-### Completed Plans
-- ✅ [Smart Scan Guide](docs/smart-scan-guide.md)
-- ✅ [Smart Scan Quick Reference](docs/smart-scan-quick-reference.md)
-- ✅ [Smart Scan Architecture](docs/smart-scan-architecture.md)
-
-### Feature Plans (Unimplemented)
-- 📋 [Google Workspace Files](docs/feature-plans/google-workspace-files-plan.md)
-- 📋 [Data ROT Analysis](docs/feature-plans/data-rot-analysis-plan.md)
-- 📋 [Carbon Footprint](docs/feature-plans/carbon-footprint-plan.md)
-- 📋 [Daily Impact Tracker](docs/feature-plans/daily-impact-tracker-plan.md)
-
-### Library Specifications
-- 📋 [RemNotifLib Spec](docs/libraries/RemNotifLib-spec.md)
-
-### Research
-- 📋 [Google Workspace Sizing Research](docs/research/google-workspace-sizing-research.md)
-
-### Checklists
-- 📋 [Daily Impact Tracker Checklist](DAILY_IMPACT_TRACKER_CHECKLIST.md)
-- 📋 [Sprint Roadmap](SPRINT_ROADMAP.md)
+- **Milestone 1: Smart Analysis & Metadata Engine**: ✅ COMPLETE (v1.0.0 - v1.4.0)
+- **Milestone 2: Data Quality, ROT & Carbon Footprint**: ✅ COMPLETE (v1.4.0)
+- **Milestone 3: Engagement & Daily Impact Gamification**: ✅ COMPLETE (v1.6.0)
+- **Milestone 4: Labels, Kanban Board & Auto-Archive**: ✅ COMPLETE (v2.2.0 - v2.3.0)
+- **Milestone 5: RemNotifLib, Triggers & Universal Preview**: ✅ COMPLETE (v2.0.0, v2.1.0, v2.4.0)
 
 ---
 
-## 🚀 Deployment History
+## 🚀 Deployment History (Recent)
 
 | Version | Date | Features | Deployment ID |
 |---------|------|----------|---------------|
-| v1.1.0 | 2024-11-18 | Accessibility improvements | AKfycbxHYe9ekHig... |
-| v1.0.0 | 2024-11-18 | Smart Scan + Enhanced Metadata | AKfycbxHMahDp_Jx... |
-| v0.9.0 | 2024-11-17 | Initial deployment | AKfycbzCH1EyM9ZW... |
-
----
-
-## 🎯 Milestones
-
-### Milestone 1: Smart Analysis ✅ COMPLETE
-- Enhanced metadata collection
-- 5-category Smart Scan
-- Visual analytics dashboards
-
-**Achieved**: Nov 2024
-
-### Milestone 2: Data Quality 🔄 IN PROGRESS (Sprint 1-2)
-**Target**: 4 weeks from start
-**Features**:
-- Google Workspace analysis
-- ROT scoring and heatmap
-- Carbon footprint calculation
-
-### Milestone 3: Engagement & Retention ⏳ PLANNED (Sprint 3)
-**Target**: 6 weeks from start
-**Features**:
-- Daily progress tracking
-- Gamification (streaks, achievements, XP)
-- OCT King leaderboard
-
-### Milestone 4: Organization ⏳ OPTIONAL (Sprint 4)
-**Target**: 8 weeks from start
-**Features**:
-- Labels management
-- Kanban board
-- Export control compliance
-
-### Milestone 5: Infrastructure ⏳ OPTIONAL (Sprint 5)
-**Target**: 10 weeks from start
-**Features**:
-- RemNotifLib library
-- Email reminders
-- Browser notifications
-
----
-
-## 📈 Metrics & Success Criteria
-
-### Current Metrics (v1.1.0)
-- **Features Deployed**: 8/15 (53%) - Sprint 0 complete
-- **Sprint Progress**: 1/3 complete (33%) - Fast Track approach
-- **Documentation**: 100% for completed features
-- **Test Coverage**: Not measured yet
-- **Sprint 0 Velocity**: 4 features/week
-- **Estimated Completion**: 4 weeks remaining (Sprint 1-3)
-
-### Target Metrics (Post-Sprint 3)
-- **Core Features**: 100% (Sprint 1-3 complete)
-- **User Retention**: 20% improvement (via Daily Impact Tracker)
-- **Engagement**: 50% daily active users
-- **Performance**: <2s dashboard load time
-
----
-
-## 🔧 Technical Stack
-
-**Frontend**:
-- React 18 + Vite
-- Tailwind CSS
-- shadcn/ui components
-- Recharts (for visualizations)
-
-**Backend**:
-- Google Apps Script (V8 runtime)
-- Google Drive API v2
-- External Libraries:
-  - RegProjUsrLib (user registration)
-  - LoggerLib (logging)
-  - CacheManagerLib (caching)
-  - DataWranglerLib (data manipulation)
-  - RemNotifLib (notifications - planned)
-
-**Deployment**:
-- clasp (Apps Script CLI)
-- GitHub Actions (future CI/CD)
-
----
-
-## 🎯 Decisions Made
-
-### Sprint Approach: ✅ **FAST TRACK (6 weeks)**
-- **Chosen**: Fast Track - Sprints 1-3
-- **Timeline**: 6 weeks total (4 weeks remaining)
-- **Deliverables**: Workspace Files, ROT Analysis, Carbon Footprint, Daily Impact Tracker
-- **Rationale**: Quickest path to production-ready app with full analytics and gamification
-
-### RemNotifLib Strategy: ✅ **INLINE FIRST**
-- **Chosen**: Inline implementation in Sprint 3
-- **Extract Later**: Optional Sprint 6 (if needed)
-- **Rationale**: Faster to MVP, no dependency on external library
-
-### Roadmap Consolidation: ✅ **COMPLETE**
-- **Primary Roadmap**: SPRINT_ROADMAP.md
-- **Reference**: PRODUCT_VISION.md (long-term vision)
-- **Removed**: DEVELOPMENT_ROADMAP.md (redundant)
-- **Status**: Single source of truth established
-
----
-
-## 📝 Current Actions
-
-### Roadmap Consolidation: ✅ COMPLETE
-1. ✅ Review and approve sprint roadmap
-2. ✅ Choose sprint approach (Fast Track - 6 weeks)
-3. ✅ Consolidate roadmap files (SPRINT_ROADMAP.md as primary)
-4. ✅ Update PROJECT_STATUS.md with accurate metrics
-5. ⏳ Commit roadmap consolidation changes
-
-### Sprint 1 In Progress: 🔄 ACTIVE
-- [x] Review Sprint 1 goals and tasks
-- [x] Set up development environment
-- [x] Day 1-2: Create `workspaceAnalyzer.js` ✅ Complete
-- [x] Day 3-4: Create `GoogleWorkspaceView.jsx` ✅ Complete
-- [x] Day 5: Integration & testing (Phase A & B) ✅ Complete
-- [ ] Day 6-7: Create `rotAnalyzer.js` ⬅️ **NEXT**
-- [ ] Day 8-9: Implement Digital Hoarding Questionnaire
-- [ ] Day 10: Sprint testing and documentation
-
----
-
-**Status**: 🚀 Sprint 1 ACTIVE - Google Workspace Files View Complete
-**Current Task**: Sprint 1, Day 6-7 - ROT Analysis Backend (`rotAnalyzer.js`)
-**Next Milestone**: Sprint 1 complete (ROT Analysis & Hoarding Assessment)
-**Team**: 1 developer
-**Capacity**: 10 days/sprint
-**Progress**: 9/15 features complete (60%)
-
-**🚀 Google Workspace Files View is built, tested, and integrated into Smart Scan!**
+| v2.4.0 | 2026-09-16 | Scheduled Audit & Automation Triggers | AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w (@36) |
+| v2.3.0 | 2026-09-16 | Smart Auto-Archive Engine | AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w (@35) |
+| v2.2.0 | 2026-09-16 | Google Drive Labels & Kanban Board | AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w (@34) |
+| v2.1.0 | 2026-09-16 | File Preview & Deep Metadata Inspector | AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w (@33) |
+| v2.0.0 | 2026-09-16 | Settings & Custom Thresholds Hub | AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w (@32) |
