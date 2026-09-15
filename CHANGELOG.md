@@ -4,6 +4,18 @@ All notable changes to the Drive Cleaner project will be documented in this file
 
 ---
 
+## [2.5.0] - 2026-09-16
+### Added
+- **Smart Folder Reorganizer & Hierarchy Architect (`FEATURE_SMART_REORGANIZER`)**:
+  - "Marie Kondo for Google Drive" — intelligent structure analyzer detecting root clutter, deep nesting, generic folder names, and duplicate concepts.
+  - Structure Health Score gauge (0–100) and depth health metrics.
+  - Interactive **Hierarchy Architect (Before vs After)** comparison tree visualizer.
+  - **Smart File Clusters**: Auto-detection of natural file groupings based on client keywords, projects, file types, and date ranges.
+  - Reversible bulk reorganization engine in Apps Script with 1-click **Revert Locations** restore point support.
+  - Floating undo countdown toast.
+
+---
+
 ## [2.4.0] - 2026-09-16
 ### Added
 - **Scheduled Audit & Automation Triggers (`FEATURE_AUTOMATION_TRIGGERS`)**:
