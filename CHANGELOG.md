@@ -4,6 +4,21 @@ All notable changes to the Drive Cleaner project will be documented in this file
 
 ---
 
+## [2.7.0] - 2026-09-16
+### Added
+- **Shared Drives (Team Drive) Hygiene Hub (`FEATURE_SHARED_DRIVES_HUB`)**:
+  - Google Workspace Shared Drives discovery and hygiene governance dashboard.
+  - Server-side `SharedDrivesManager` (`sharedDrivesManager.js`) auditing domain repositories, external exposure risks, and dormant drives.
+  - Portfolio summary metrics: Total Shared Drives, Organization Storage Consumption, High Risk Drives, and Dormant Repositories (> 180 days inactive).
+  - Search and filter pills (All Drives, High Risk, Dormant, Healthy).
+  - Deep hygiene audit inspector with 0–100 Hygiene Health Score meter and action recommendation badges.
+  - Dual risk tabs: **External Exposure Files** (public links and external collaborator shares) and **Stale Large Files** (> 50MB untouched > 180 days).
+  - 1-click **Scope Scan Here** action targeting Smart Scan and cleanup tools directly to team drives.
+  - Downloadable CSV audit manifest export.
+  - Universal File Preview modal integration across all flagged items.
+
+---
+
 ## [2.6.0] - 2026-09-16
 ### Added
 - **Google Drive Labels & Taxonomy Hub (`FEATURE_DRIVE_LABELS`)**:

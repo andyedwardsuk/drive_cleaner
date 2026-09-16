@@ -49,6 +49,9 @@ export const FEATURE_FLAGS = {
 
   // Phase 10 (v2.6.0) - Drive Labels & Taxonomy Hub
   FEATURE_DRIVE_LABELS: true,
+
+  // Phase 11 (v2.7.0) - Shared Drives Hygiene Hub
+  FEATURE_SHARED_DRIVES_HUB: true,
 }
 
 /**
@@ -114,6 +117,9 @@ export const getFeatureVersion = (flagName) => {
 
     // v2.6.0
     FEATURE_DRIVE_LABELS: 'v2.6.0',
+
+    // v2.7.0
+    FEATURE_SHARED_DRIVES_HUB: 'v2.7.0',
   }
 
   return versionMap[flagName] || 'Future'

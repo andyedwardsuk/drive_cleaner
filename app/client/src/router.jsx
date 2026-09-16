@@ -25,6 +25,7 @@ import AutoArchiveView from './views/AutoArchiveView'
 import AutomationTriggersView from './views/AutomationTriggersView'
 import SmartReorganizerView from './views/SmartReorganizerView'
 import DriveLabelsView from './views/DriveLabelsView'
+import SharedDrivesView from './views/SharedDrivesView'
 
 // Create root route
 const rootRoute = createRootRoute({
@@ -173,6 +174,12 @@ const labelsManagementRoute = createRoute({
   component: DriveLabelsView,
 })
 
+const sharedDrivesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/shared-drives',
+  component: SharedDrivesView,
+})
+
 const aboutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/about',
@@ -201,6 +208,7 @@ const routeTree = rootRoute.addChildren([
   automationRoute,
   smartReorganizerRoute,
   labelsManagementRoute,
+  sharedDrivesRoute,
   myFoldersRoute,
   historyRoute,
   settingsRoute,

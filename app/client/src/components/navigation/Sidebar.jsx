@@ -21,6 +21,7 @@ import {
   Zap,
   FolderTree,
   Tag,
+  Users,
   Settings,
   Info,
   ChevronLeft,
@@ -163,6 +164,12 @@ export default function Sidebar() {
           flag: 'FEATURE_DRIVE_LABELS',
         },
         {
+          icon: Users,
+          label: 'Shared Drives',
+          path: '/shared-drives',
+          flag: 'FEATURE_SHARED_DRIVES_HUB',
+        },
+        {
           icon: FolderHeart,
           label: 'My Folders',
           path: '/my-folders',
@@ -230,7 +237,7 @@ export default function Sidebar() {
                 </div>
                 <div>
                   <h1 className="text-lg font-bold text-white">Drive Cleaner</h1>
-                  <p className="text-xs text-gray-400">v2.6.0</p>
+                  <p className="text-xs text-gray-400">v2.7.0</p>
                 </div>
               </motion.div>
             )}

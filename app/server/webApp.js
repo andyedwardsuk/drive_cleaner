@@ -746,6 +746,31 @@ function saveCustomDriveLabel(payload) {
 }
 
 /**
+ * Gets list of accessible Google Workspace Shared Drives
+ * Called from React app via google.script.run
+ * @returns {Object} List of Shared Drives
+ */
+function getSharedDrivesList() {
+  // eslint-disable-next-line no-undef
+  return typeof SharedDrivesManager !== 'undefined'
+    ? SharedDrivesManager.getSharedDrivesList()
+    : { success: false, error: 'SharedDrivesManager not loaded' };
+}
+
+/**
+ * Runs deep hygiene audit on a Shared Drive
+ * Called from React app via google.script.run
+ * @param {string} driveId - The Shared Drive ID
+ * @returns {Object} Detailed audit report
+ */
+function auditSharedDrive(driveId) {
+  // eslint-disable-next-line no-undef
+  return typeof SharedDrivesManager !== 'undefined'
+    ? SharedDrivesManager.auditSharedDrive(driveId)
+    : { success: false, error: 'SharedDrivesManager not loaded' };
+}
+
+/**
  * Run this function in the Google Apps Script editor to authorize all Drive permissions!
  * Open editor: https://script.google.com/a/andyedwards.uk/d/1qkpaDFbdqq3OlpMCEdOUk68nr3svvVk3mmhhmHykRIbvaBUimsx2uN-G/edit
  * Select 'authorizeDriveCleaner' in the function dropdown at top, then click 'Run'.
