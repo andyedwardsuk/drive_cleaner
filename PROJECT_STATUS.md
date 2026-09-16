@@ -26,7 +26,7 @@
 
 | Version | Feature | Type | Status | Deployment | Git Commit |
 |---|---|---|---|---|---|
-| **v2.7.0** | **Shared Drives (Team Drive) Hygiene Hub** | Full Stack | ✅ Complete | `@39` | Pending |
+| **v2.7.0** | **Shared Drives (Team Drive) Hygiene Hub** | Full Stack | ✅ Complete | `@39` | `0e85aee` |
 | **v2.6.0** | **Google Drive Labels & Taxonomy Hub** | Full Stack | ✅ Complete | `@38` | `88a7261` |
 | **v2.5.0** | **Smart Folder Reorganizer & Hierarchy Architect** | Full Stack | ✅ Complete | `@37` | `413b9e9` |
 | **v2.4.0** | **Scheduled Audit & Automation Triggers** | Full Stack | ✅ Complete | `@36` | `24967ac` |
