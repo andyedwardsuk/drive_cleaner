@@ -26,6 +26,7 @@ import AutomationTriggersView from './views/AutomationTriggersView'
 import SmartReorganizerView from './views/SmartReorganizerView'
 import DriveLabelsView from './views/DriveLabelsView'
 import SharedDrivesView from './views/SharedDrivesView'
+import MediaOptimizerView from './views/MediaOptimizerView'
 
 // Create root route
 const rootRoute = createRootRoute({
@@ -180,6 +181,12 @@ const sharedDrivesRoute = createRoute({
   component: SharedDrivesView,
 })
 
+const mediaOptimizerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/media-optimizer',
+  component: MediaOptimizerView,
+})
+
 const aboutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/about',
@@ -209,6 +216,7 @@ const routeTree = rootRoute.addChildren([
   smartReorganizerRoute,
   labelsManagementRoute,
   sharedDrivesRoute,
+  mediaOptimizerRoute,
   myFoldersRoute,
   historyRoute,
   settingsRoute,

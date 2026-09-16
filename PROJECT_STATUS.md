@@ -2,8 +2,8 @@
 
 **Last Updated**: 2026-09-16
 **Current Phase**: Phase 5 (Complete) - Production Hardening & Automation
-**Current Velocity**: 18 major releases deployed
-**Active Deployment**: v2.7.0 (@39)
+**Current Velocity**: 19 major releases deployed
+**Active Deployment**: v2.8.0 (@40)
 **Deployment URL**: https://script.google.com/a/macros/andyedwards.uk/s/AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w/exec
 
 ---
@@ -11,6 +11,7 @@
 ## 🎯 Quick Summary
 
 - **Core Product**: 100% Implemented & Deployed ✅
+- **Google Photos & Media Optimization Center**: 100% Implemented & Deployed ✅
 - **Shared Drives (Team Drive) Hygiene Hub**: 100% Implemented & Deployed ✅
 - **Google Drive Labels & Taxonomy Hub**: 100% Implemented & Deployed ✅
 - **Smart Folder Reorganizer & Hierarchy Architect**: 100% Implemented & Deployed ✅
@@ -22,10 +23,11 @@
 
 ---
 
-## ✅ Completed Major Releases (v2.0.0 - v2.7.0)
+## ✅ Completed Major Releases (v2.0.0 - v2.8.0)
 
 | Version | Feature | Type | Status | Deployment | Git Commit |
 |---|---|---|---|---|---|
+| **v2.8.0** | **Google Photos & Media Optimization Center** | Full Stack | ✅ Complete | `@40` | Working Tree |
 | **v2.7.0** | **Shared Drives (Team Drive) Hygiene Hub** | Full Stack | ✅ Complete | `@39` | `0e85aee` |
 | **v2.6.0** | **Google Drive Labels & Taxonomy Hub** | Full Stack | ✅ Complete | `@38` | `88a7261` |
 | **v2.5.0** | **Smart Folder Reorganizer & Hierarchy Architect** | Full Stack | ✅ Complete | `@37` | `413b9e9` |
@@ -71,6 +73,15 @@
 - Daily Impact Tracker & Green Gamification (`/daily-impact`): streaks, levels, and badges
 - Audit History Log (`/history`): Persistent timeline of cleanup and archival operations
 
+### 6. Media Optimization & Storage Reclaim
+- Google Photos & Media Optimization Center (`/media-optimizer`)
+- Video duration, resolution (`4K UHD`, `1080p FHD`), and bitrate analysis (> 35 Mbps hog detection)
+- Photo burst detection & near-duplicate clustering with auto-pinned "Best Shot" designation
+- 1-click burst tailings selection and stage-for-cleanup pipeline
+- Cloud space compression recommendations (RAW -> WebP, ProRes -> H.265, WAV -> AAC) with up to 85% reclaim
+- Exportable Media Optimization Manifest (CSV)
+- Interactive Media Triage Grid & Table with universal playable preview
+
 ---
 
 ## 🎯 Milestones Status
@@ -87,8 +98,8 @@
 
 | Version | Date | Features | Deployment ID |
 |---------|------|----------|---------------|
+| v2.8.0 | 2026-09-16 | Google Photos & Media Optimization Center | AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w (@40) |
+| v2.7.0 | 2026-09-16 | Shared Drives (Team Drive) Hygiene Hub | AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w (@39) |
+| v2.6.0 | 2026-09-16 | Google Drive Labels & Taxonomy Hub | AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w (@38) |
+| v2.5.0 | 2026-09-16 | Smart Folder Reorganizer & Hierarchy Architect | AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w (@37) |
 | v2.4.0 | 2026-09-16 | Scheduled Audit & Automation Triggers | AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w (@36) |
-| v2.3.0 | 2026-09-16 | Smart Auto-Archive Engine | AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w (@35) |
-| v2.2.0 | 2026-09-16 | Google Drive Labels & Kanban Board | AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w (@34) |
-| v2.1.0 | 2026-09-16 | File Preview & Deep Metadata Inspector | AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w (@33) |
-| v2.0.0 | 2026-09-16 | Settings & Custom Thresholds Hub | AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w (@32) |

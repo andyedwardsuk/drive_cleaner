@@ -52,6 +52,9 @@ export const FEATURE_FLAGS = {
 
   // Phase 11 (v2.7.0) - Shared Drives Hygiene Hub
   FEATURE_SHARED_DRIVES_HUB: true,
+
+  // Phase 12 (v2.8.0) - Google Photos & Media Optimization Center
+  FEATURE_MEDIA_OPTIMIZER: true,
 }
 
 /**
@@ -120,6 +123,9 @@ export const getFeatureVersion = (flagName) => {
 
     // v2.7.0
     FEATURE_SHARED_DRIVES_HUB: 'v2.7.0',
+
+    // v2.8.0
+    FEATURE_MEDIA_OPTIMIZER: 'v2.8.0',
   }
 
   return versionMap[flagName] || 'Future'

@@ -771,6 +771,35 @@ function auditSharedDrive(driveId) {
 }
 
 /**
+ * Analyzes video, audio, and photos for storage, bursts, and compression
+ * Called from React app via google.script.run
+ * @param {string|Object} payload - { rootFolderId, corpora } or JSON string
+ * @returns {Object} Detailed media optimization report
+ */
+function analyzeMediaFiles(payload) {
+  try {
+    var params = payload;
+    if (typeof payload === 'string') {
+      try {
+        params = JSON.parse(payload);
+      } catch (e) {
+        params = { rootFolderId: payload, corpora: 'user' };
+      }
+    }
+    var rootFolderId = (params && params.rootFolderId) || 'root';
+    var corpora = (params && params.corpora) || 'user';
+
+    // eslint-disable-next-line no-undef
+    return typeof MediaOptimizer !== 'undefined'
+      ? MediaOptimizer.analyzeMediaFiles(rootFolderId, corpora)
+      : { success: false, error: 'MediaOptimizer not loaded' };
+  } catch (err) {
+    console.error('Error in analyzeMediaFiles:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
  * Run this function in the Google Apps Script editor to authorize all Drive permissions!
  * Open editor: https://script.google.com/a/andyedwards.uk/d/1qkpaDFbdqq3OlpMCEdOUk68nr3svvVk3mmhhmHykRIbvaBUimsx2uN-G/edit
  * Select 'authorizeDriveCleaner' in the function dropdown at top, then click 'Run'.

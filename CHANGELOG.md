@@ -4,6 +4,30 @@ All notable changes to the Drive Cleaner project will be documented in this file
 
 ---
 
+## [2.8.0] - 2026-09-16
+### Added
+- **Google Photos & Media Optimization Center (`FEATURE_MEDIA_OPTIMIZER`)**:
+  - Deep video duration, resolution, and bitrate storage consumer analysis:
+    - Automatically categorizes video assets into `4K UHD`, `1440p QHD`, `1080p FHD`, `720p HD`, and `SD`.
+    - Calculates linear bitrates (Mbps) and flags excessive intra-frame/video storage hogs (> 35 Mbps).
+    - Formats duration (`MM:SS` / `HH:MM:SS`) and ranks video consumers by storage footprint.
+  - Photo burst detection & near-duplicate image grouping:
+    - Clusters rapid consecutive shots captured within seconds by the same camera/mobile device or matching sequential filename patterns.
+    - Automatically designates and pins the **"Best Shot"** based on resolution, sharpness, and quality.
+    - 1-click **"Select All Burst Tailings"** action to stage non-best duplicate shots for cleanup or archival.
+  - Cloud space compression recommendations & projections:
+    - Identifies heavy/uncompressed formats: RAW camera photos (`.CR2`, `.NEF`, `.ARW`, `.DNG`), heavy mobile HEIC/HEIF, uncompressed audio (`.WAV`, `.AIFF`, `.FLAC`), and ProRes/QuickTime videos.
+    - Computes real-world projected compression space savings (~82% for RAW → WebP, ~85% for WAV → AAC, ~70% for ProRes → H.265/AV1).
+    - Transformation guidance cards and before/after size comparisons.
+  - Interactive media triage grid & dense table:
+    - Responsive card grid with high-resolution visual previews, overlay badges (Resolution, Bitrate, Duration, Best Shot, Format tag).
+    - Toggleable Dense Table view with structured columns for granular media audit.
+    - Multi-select batch action toolbar with "Stage for Archive", "Move to Trash" (safe undo toast), and 1-click selection helpers.
+    - Exportable Media Optimization Manifest (`.csv`) with full metadata and recommended formats.
+    - Seamless 1-click integration with the universal `FilePreviewModal` for playable video/audio and high-res image zoom.
+
+---
+
 ## [2.7.0] - 2026-09-16
 ### Added
 - **Shared Drives (Team Drive) Hygiene Hub (`FEATURE_SHARED_DRIVES_HUB`)**:
