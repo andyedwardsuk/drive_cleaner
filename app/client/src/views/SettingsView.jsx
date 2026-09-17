@@ -305,7 +305,7 @@ export default function SettingsView() {
                 Scan & Search Preferences
               </h2>
               <p className="text-sm text-slate-400 mt-1">
-                Configure default target storage scopes and analyzer behaviors.
+                Configure default target storage scopes and analyser behaviours.
               </p>
             </div>
 
@@ -366,7 +366,7 @@ export default function SettingsView() {
                   Include Google Workspace Files Analysis
                 </div>
                 <div className="text-xs text-slate-400">
-                  Analyze Docs, Sheets, and Slides for unused drafts and sharing sprawl during Smart Scan.
+                  Analyse Docs, Sheets, and Slides for unused drafts and sharing sprawl during Smart Scan.
                 </div>
               </div>
               <button
@@ -432,18 +432,18 @@ export default function SettingsView() {
                 Appearance & Theme
               </h2>
               <p className="text-sm text-slate-400 mt-1">
-                Customize Drive Cleaner's visual layout and color mode.
+                Customise Drive Cleaner's visual layout and colour mode.
               </p>
             </div>
 
             {/* Theme Mode */}
             <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-3">
               <label className="text-base font-medium text-slate-200">
-                Color Mode
+                Colour Mode
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {[
-                  { id: 'dark', label: 'Dark Mode', icon: Moon, desc: 'Optimized for low-light' },
+                  { id: 'dark', label: 'Dark Mode', icon: Moon, desc: 'Optimised for low-light' },
                   { id: 'light', label: 'Light Mode', icon: Sun, desc: 'High contrast clean' },
                   { id: 'system', label: 'System Theme', icon: Monitor, desc: 'Matches device setting' },
                 ].map((item) => {

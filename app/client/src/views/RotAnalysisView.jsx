@@ -305,7 +305,7 @@ export default function RotAnalysisView() {
         />
         <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
           <RefreshCw className="w-8 h-8 animate-spin text-rose-500 mx-auto mb-3" />
-          <p className="text-slate-300 font-medium">Analyzing file decay and digital clutter...</p>
+          <p className="text-slate-300 font-medium">Analysing file decay and digital clutter...</p>
         </div>
       </div>
     )

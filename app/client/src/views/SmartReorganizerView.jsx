@@ -95,7 +95,7 @@ export default function SmartReorganizerView() {
     if (res.success) {
       setConfirmModalOpen(false)
       setPendingPlan(null)
-      setSuccessBanner(`Successfully reorganized files into "${res.record.targetFolder}"!`)
+      setSuccessBanner(`Successfully reorganised files into "${res.record.targetFolder}"!`)
       setTimeout(() => setSuccessBanner(''), 5000)
     }
   }
@@ -103,7 +103,7 @@ export default function SmartReorganizerView() {
   return (
     <div className="space-y-8 pb-16">
       <Hero
-        title="Smart Folder Reorganizer & Hierarchy Architect"
+        title="Smart Folder Reorganiser & Hierarchy Architect"
         subtitle="Transform chaotic folder structures into intelligent, maintainable hierarchies using AI pattern recognition, category clustering, and 1-click reversible moves."
         icon={FolderTree}
       />
@@ -243,7 +243,7 @@ export default function SmartReorganizerView() {
           className="gap-1.5 text-xs text-muted-foreground hover:text-foreground"
         >
           <RotateCcw className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')} />
-          Re-Analyze Drive
+          Re-Analyse Drive
         </Button>
       </div>
 

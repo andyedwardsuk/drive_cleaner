@@ -241,14 +241,14 @@ export default function GoogleWorkspaceView() {
         <Hero
           icon={FileSpreadsheet}
           title="Google Workspace Files"
-          subtitle="Analyze your Docs, Sheets, Slides, Forms, and native Google files"
+          subtitle="Analyse your Docs, Sheets, Slides, Forms, and native Google files"
           illustration="📝"
         />
         <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
           <FileSpreadsheet className="w-16 h-16 text-blue-400 mx-auto mb-4 opacity-70" />
           <h3 className="text-lg font-semibold text-slate-200 mb-2">No Scan Data Found</h3>
           <p className="text-slate-400 mb-6 max-w-md mx-auto">
-            Run a Smart Scan to inspect and categorize all Google Workspace files across your Drive.
+            Run a Smart Scan to inspect and categorise all Google Workspace files across your Drive.
           </p>
           <Button onClick={() => runScan('root', 'user')} size="lg" className="rounded-xl">
             <RefreshCw className="w-4 h-4 mr-2" />
@@ -266,12 +266,12 @@ export default function GoogleWorkspaceView() {
         <Hero
           icon={FileSpreadsheet}
           title="Google Workspace Files"
-          subtitle="Analyzing Google Workspace files..."
+          subtitle="Analysing Google Workspace files..."
           illustration="⏳"
         />
         <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
           <RefreshCw className="w-8 h-8 text-blue-400 animate-spin mx-auto mb-4" />
-          <p className="text-slate-300">Scanning and categorizing Workspace files...</p>
+          <p className="text-slate-300">Scanning and categorising Workspace files...</p>
         </div>
       </div>
     )

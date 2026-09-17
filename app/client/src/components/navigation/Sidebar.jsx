@@ -117,15 +117,15 @@ export default function Sidebar() {
           },
           {
             icon: Film,
-            label: 'Media Optimizer',
+            label: 'Media Optimiser',
             path: '/media-optimizer',
             flag: 'FEATURE_MEDIA_OPTIMIZER',
           },
         ],
       },
       {
-        id: 'organization',
-        title: 'Organization',
+        id: 'organisation',
+        title: 'Organisation',
         collapsible: true,
         items: [
           {
@@ -136,7 +136,7 @@ export default function Sidebar() {
           },
           {
             icon: FolderTree,
-            label: 'Folder Reorganizer',
+            label: 'Folder Reorganiser',
             path: '/smart-reorganizer',
             flag: 'FEATURE_SMART_REORGANIZER',
           },
@@ -266,7 +266,7 @@ export default function Sidebar() {
   const [openSections, setOpenSections] = useState(() => {
     const initial = {
       cleanup: true,
-      organization: false,
+      organisation: false,
       security: false,
       insights: false,
       operations: false,

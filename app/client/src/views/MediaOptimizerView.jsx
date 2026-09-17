@@ -89,8 +89,8 @@ export default function MediaOptimizerView() {
     <div className="space-y-8 pb-16">
       {/* Hero Header */}
       <Hero
-        title="Google Photos & Media Optimization Center"
-        subtitle="Analyze heavy 4K videos, cluster rapid photo bursts, identify uncompressed RAW/ProRes assets, and reclaim cloud storage."
+        title="Google Photos & Media Optimisation Centre"
+        subtitle="Analyse heavy 4K videos, cluster rapid photo bursts, identify uncompressed RAW/ProRes assets, and reclaim cloud storage."
         icon={Film}
       >
         <div className="flex flex-wrap items-center gap-3 mt-4">
@@ -111,7 +111,7 @@ export default function MediaOptimizerView() {
             className="h-11 px-4 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white"
           >
             <Download className="w-4 h-4 mr-2" />
-            Export Optimization Manifest (CSV)
+            Export Optimisation Manifest (CSV)
           </Button>
         </div>
       </Hero>
@@ -201,7 +201,7 @@ export default function MediaOptimizerView() {
               {formatBytes(summary.videoTotalBytes || 0)}
             </div>
             <div className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
-              <span>{summary.videoCount || 0} video assets analyzed</span>
+              <span>{summary.videoCount || 0} video assets analysed</span>
             </div>
           </div>
         </div>

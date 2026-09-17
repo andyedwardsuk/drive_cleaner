@@ -296,7 +296,7 @@ export default function SmartScanView() {
         <Hero
           icon={Scan}
           title="Smart Scan"
-          subtitle={`Analyzed ${data.folder_name || targetLabel}`}
+          subtitle={`Analysed ${data.folder_name || targetLabel}`}
           illustration="✅"
           actions={
             <div className="flex items-center gap-2">
@@ -360,9 +360,9 @@ export default function SmartScanView() {
       {loading && (
         <div className="p-12 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
           <div className="animate-pulse">
-            <p className="text-slate-200 font-medium mb-2">Analyzing files in {targetLabel}...</p>
+            <p className="text-slate-200 font-medium mb-2">Analysing files in {targetLabel}...</p>
             <p className="text-xs text-slate-400">
-              Analyzing size distribution, duplicates, staleness, Google Workspace files, and carbon footprint.
+              Analysing size distribution, duplicates, staleness, Google Workspace files, and carbon footprint.
             </p>
           </div>
         </div>
@@ -386,7 +386,7 @@ export default function SmartScanView() {
       {!loading && !error && (
         <div className="p-8 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
           <p className="text-slate-300 mb-4 text-sm">
-            Smart Scan will comprehensively analyze <strong className="text-white">{targetLabel}</strong> for:
+            Smart Scan will comprehensively analyse <strong className="text-white">{targetLabel}</strong> for:
           </p>
           <ul className="text-left max-w-md mx-auto space-y-2 text-slate-300 text-xs">
             <li>✓ Duplicate files (byte-exact and name matches)</li>

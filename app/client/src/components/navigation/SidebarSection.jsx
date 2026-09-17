@@ -42,35 +42,37 @@ export default function SidebarSection({
           onClick={onToggle}
           aria-expanded={isOpen}
           className={cn(
-            'w-full flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors select-none group',
+            'w-full flex items-center justify-between px-3 py-1.5 rounded-xl text-left transition-colors select-none group',
             hasActiveItem && !isOpen
               ? 'text-blue-300 bg-blue-500/10'
               : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
           )}
         >
-          <span className="flex items-center gap-1.5">
-            <span>{title}</span>
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-xs font-semibold tracking-normal truncate text-slate-400 group-hover:text-slate-200">
+              {title}
+            </span>
             {count !== undefined && (
-              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-normal bg-slate-800/90 text-slate-400 group-hover:text-slate-300">
+              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-slate-800/90 text-slate-400 group-hover:text-slate-300 shrink-0">
                 {count}
               </span>
             )}
             {hasActiveItem && !isOpen && (
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0 animate-pulse" />
             )}
-          </span>
+          </div>
           <ChevronDown
             className={cn(
-              'w-3.5 h-3.5 text-slate-400 group-hover:text-slate-200 transition-transform duration-200 ease-in-out',
+              'w-3.5 h-3.5 text-slate-400 group-hover:text-slate-200 shrink-0 transition-transform duration-200 ease-in-out ml-1',
               isOpen && 'rotate-180 text-slate-300'
             )}
           />
         </button>
       ) : (
-        <div className="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center justify-between">
-          <span>{title}</span>
+        <div className="px-3 py-1 text-xs font-semibold tracking-normal text-slate-400 flex items-center justify-between">
+          <span className="truncate">{title}</span>
           {count !== undefined && (
-            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-normal bg-slate-800/90 text-slate-400">
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-slate-800/90 text-slate-400 shrink-0">
               {count}
             </span>
           )}

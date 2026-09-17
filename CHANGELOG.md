@@ -4,6 +4,22 @@ All notable changes to the Drive Cleaner project will be documented in this file
 
 ---
 
+## [3.2.2] - 2026-09-17
+### Changed
+- **Standard Clean Sidebar Headers & UK English Harmonisation**:
+  - **Standard Sidebar Header Styling**:
+    - Replaced aggressive uppercase all-caps text with clean, standard Title Case: `Cleanup Tools`, `Organisation`, `Security & Governance`, `Insights & Impact`, `Operations & Settings`.
+    - Added explicit `text-left` and `min-w-0 truncate` constraints to prevent awkward centered line-breaks.
+    - Integrated refined count badges (`bg-slate-800/90 text-slate-400 rounded-full text-[10px]`) and right-aligned chevrons with smooth CSS transitions.
+  - **Comprehensive UK English Harmonisation**:
+    - Upgraded navigation: `Organisation` (was `Organization`), `Folder Reorganiser` (was `Folder Reorganizer`), and `Media Optimiser` (was `Media Optimizer`).
+    - Upgraded Media Optimiser Hub: `Google Photos & Media Optimisation Centre`, `Export Optimisation Manifest`, `Analyse heavy 4K videos`, and `video assets analysed`.
+    - Upgraded Smart Reorganiser Hub: `Smart Folder Reorganiser & Hierarchy Architect`, `Re-Analyse Drive`, and `Successfully reorganised files`.
+    - Upgraded Settings Hub: `Colour Mode`, `Customise Drive Cleaner's visual layout and colour mode`, `analyser behaviours`, and `Optimised for low-light`.
+    - Upgraded Smart Scan & Google Workspace views: `Analysed`, `Analysing`, `analyse`, and `categorise`.
+
+---
+
 ## [3.2.1] - 2026-09-17
 ### Added
 - **Succinct Collapsible Navigation & Quick Tool Filter (`Sidebar.jsx`)**:

@@ -651,7 +651,7 @@ export default function DriveLabelsView() {
                     onChange={(e) => setNewLabelCategory(e.target.value)}
                     className="w-full h-9 rounded-lg border border-border bg-muted/30 px-3 text-xs text-foreground focus:ring-1 focus:ring-primary"
                   >
-                    <option value="general">General Organization</option>
+                    <option value="general">General Organisation</option>
                     <option value="security">Security & Confidentiality</option>
                     <option value="compliance">Legal & Compliance Hold</option>
                     <option value="lifecycle">Lifecycle & Archival</option>
