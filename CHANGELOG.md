@@ -4,6 +4,23 @@ All notable changes to the Drive Cleaner project will be documented in this file
 
 ---
 
+## [3.2.1] - 2026-09-17
+### Added
+- **Succinct Collapsible Navigation & Quick Tool Filter (`Sidebar.jsx`)**:
+  - **Categorized Accordion Architecture**: Reorganized 27+ individual routes into 6 concise, logical groups:
+    1. **Core** (Always visible): Dashboard, Smart Scan
+    2. **Cleanup Tools** (8 items, collapsible with count badge)
+    3. **Organization & Drives** (6 items, collapsible with count badge)
+    4. **Security & Governance** (4 items, collapsible with count badge)
+    5. **Insights & Impact** (3 items, collapsible with count badge)
+    6. **Operations & Settings** (5 items, collapsible with count badge)
+  - **Auto-Expansion on Route Change**: When navigating to any page, its parent accordion automatically expands while keeping others compact.
+  - **Active State Indicator**: Collapsed accordions displaying a pulsating blue dot indicator when the currently active route is inside.
+  - **Real-Time Tool Filter**: Added a sleek embedded search input (`Filter tools...`) that instantly searches across all navigation items and automatically reveals matching sections.
+  - **Compact Item Geometry**: Refined NavItem padding to `px-3 py-2 rounded-xl` with high-contrast slate hover and active glowing pills, reducing vertical height by >60%.
+
+---
+
 ## [3.2.0] - 2026-09-17
 ### Changed
 - **Comprehensive Visual Polish, Token Unification & Design System Overhaul**:

@@ -2,8 +2,8 @@
 
 **Last Updated**: 2026-09-17
 **Current Phase**: Phase 5 (Complete) - Production Hardening & Automation
-**Current Velocity**: 24 major releases deployed
-**Active Deployment**: v3.2.0 (@46)
+**Current Velocity**: 25 major releases deployed
+**Active Deployment**: v3.2.1 (@47)
 **Deployment URL**: https://script.google.com/a/macros/andyedwards.uk/s/AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w/exec
 
 ---
@@ -11,6 +11,7 @@
 ## 🎯 Quick Summary
 
 - **Core Product**: 100% Implemented & Deployed ✅
+- **Succinct Collapsible Navigation & Quick Tool Filter**: 100% Implemented & Deployed ✅
 - **Design System Polish & Token Unification**: 100% Implemented & Deployed ✅
 - **Cloud Trash Lifecycle & Permanent Purge Governance**: 100% Implemented & Deployed ✅
 - **UI Color Scheme Overhaul & WCAG A11y Modernization**: 100% Implemented & Deployed ✅
@@ -28,11 +29,12 @@
 
 ---
 
-## ✅ Completed Major Releases (v2.0.0 - v3.2.0)
+## ✅ Completed Major Releases (v2.0.0 - v3.2.1)
 
 | Version | Feature | Type | Status | Deployment | Git Commit |
 |---|---|---|---|---|---|
-| **v3.2.0** | **Complete Visual Polish & Design System Unification** | Frontend/A11y | ✅ Complete | `@46` | `HEAD` |
+| **v3.2.1** | **Succinct Collapsible Nav & Tool Filter** | Frontend/UX | ✅ Complete | `@47` | `HEAD` |
+| **v3.2.0** | **Complete Visual Polish & Design System Unification** | Frontend/A11y | ✅ Complete | `@46` | `8cabbac` |
 | **v3.1.0** | **Cloud Trash Lifecycle & Permanent Purge Hub** | Full Stack | ✅ Complete | `@45` | `bb56338` |
 | **v3.0.1** | **UI Theme Overhaul & Accessibility Modernization** | Frontend/Theme | ✅ Complete | `@43` | `c337f99` |
 | **v3.0.0** | **Incremental Sync & Drive Changes API Engine** | Full Stack | ✅ Complete | `@42` | `8943e43` |

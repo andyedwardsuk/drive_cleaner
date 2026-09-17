@@ -3,7 +3,7 @@
  * Auto-generated build timestamp for cache debugging
  */
 
-export const APP_VERSION = '3.2.0'
+export const APP_VERSION = '3.2.1'
 export const BUILD_TIMESTAMP = new Date().toISOString()
 export const FEATURES = [
   'Smart Scan',
@@ -19,6 +19,7 @@ export const FEATURES = [
   'UI Theme Overhaul & Accessibility Modernization',
   'Cloud Trash Lifecycle & Permanent Purge Governance',
   'Complete Design System Polish & WCAG AA Unification',
+  'Succinct Collapsible Navigation & Quick Tool Filter',
 ]
 
 /**
