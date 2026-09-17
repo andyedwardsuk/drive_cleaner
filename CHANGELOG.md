@@ -4,6 +4,25 @@ All notable changes to the Drive Cleaner project will be documented in this file
 
 ---
 
+## [3.1.0] - 2026-09-17
+### Added
+- **Cloud Trash Lifecycle & Permanent Purge Governance Hub (`FEATURE_TRASH_GOVERNANCE`)**:
+  - **Trapped Storage Quota Audit**: Quantifies storage trapped in Google Drive Trash consuming Google account quotas.
+  - **Google Apps Script Backend Utility**: Implemented `TrashGovernanceManager` (`trashGovernanceManager.js`) auditing trashed files using Drive API v2 `Drive.Files.list({ q: "trashed = true" })` with fallback to `DriveApp.getTrashedFiles()`.
+  - **30-Day Auto-Purge Countdown Tracker**: Categorizes trashed items by days remaining before Google's automatic permanent deletion:
+    - Critical (`< 7 days` left)
+    - Approaching (`7–14 days` left)
+    - Midway (`15–21 days` left)
+    - Fresh (`> 21 days` left / recently trashed)
+  - **Accidental Deletion Recovery Engine**: Detects recent deletions of large or important documents and provides 1-click **Restore to Drive** (`Drive.Files.untrash`).
+  - **Selective Permanent Purge**: Permanently and irreversibly removes individual or selected files from trash (`Drive.Files.remove`) without wiping the entire trash bin.
+  - **Empty Entire Trash with Double-Confirmation Safeguards**: Implements strict data loss prevention requiring users to type `"PURGE"` before executing irreversible total trash purges (`Drive.Files.emptyTrash()`).
+  - **Trash Manifest CSV Export**: Generates exportable CSV audit records of all trashed items, sizes, remaining days, and Drive links.
+  - **Universal File Preview Integration**: Seamlessly inspects trashed files in universal preview modals before deciding to restore or purge.
+  - **Theme & Control Alignment**: Grounded in obsidian midnight palette (`#070b14` / `#0b1329`) with unified `h-11` controls and WCAG AA contrast.
+
+---
+
 ## [3.0.1] - 2026-09-17
 ### Changed
 - **UI Color Scheme Overhaul & Accessibility Modernization**:

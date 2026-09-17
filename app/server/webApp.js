@@ -934,6 +934,82 @@ function syncIncrementalChanges(payload) {
 }
 
 /**
+ * Retrieves comprehensive trash lifecycle audit overview
+ * Called from React app via google.script.run
+ * @returns {Object} Trash lifecycle data
+ */
+function getTrashGovernanceOverview() {
+  // eslint-disable-next-line no-undef
+  return typeof TrashGovernanceManager !== 'undefined'
+    ? TrashGovernanceManager.getTrashOverview()
+    : { success: false, error: 'TrashGovernanceManager not loaded' };
+}
+
+/**
+ * Restores a list of files from Google Drive Trash
+ * Called from React app via google.script.run
+ * @param {Array<string>|string} payload - Array of file IDs or JSON string
+ * @returns {Object} Restoration result
+ */
+function restoreTrashFiles(payload) {
+  try {
+    var fileIds = payload;
+    if (typeof payload === 'string') {
+      try {
+        fileIds = JSON.parse(payload);
+      } catch (e) {
+        fileIds = [payload];
+      }
+    }
+    // eslint-disable-next-line no-undef
+    return typeof TrashGovernanceManager !== 'undefined'
+      ? TrashGovernanceManager.restoreTrashFiles(fileIds)
+      : { success: false, error: 'TrashGovernanceManager not loaded' };
+  } catch (err) {
+    console.error('Error in restoreTrashFiles:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Permanently and irreversibly purges a list of files from Google Drive Trash
+ * Called from React app via google.script.run
+ * @param {Array<string>|string} payload - Array of file IDs or JSON string
+ * @returns {Object} Permanent purge result
+ */
+function purgeTrashFilesPermanently(payload) {
+  try {
+    var fileIds = payload;
+    if (typeof payload === 'string') {
+      try {
+        fileIds = JSON.parse(payload);
+      } catch (e) {
+        fileIds = [payload];
+      }
+    }
+    // eslint-disable-next-line no-undef
+    return typeof TrashGovernanceManager !== 'undefined'
+      ? TrashGovernanceManager.purgeTrashFilesPermanently(fileIds)
+      : { success: false, error: 'TrashGovernanceManager not loaded' };
+  } catch (err) {
+    console.error('Error in purgeTrashFilesPermanently:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Permanently and irreversibly empties all Google Drive Trash
+ * Called from React app via google.script.run
+ * @returns {Object} Empty trash result
+ */
+function emptyDriveTrashPermanently() {
+  // eslint-disable-next-line no-undef
+  return typeof TrashGovernanceManager !== 'undefined'
+    ? TrashGovernanceManager.emptyDriveTrashPermanently()
+    : { success: false, error: 'TrashGovernanceManager not loaded' };
+}
+
+/**
  * Run this function in the Google Apps Script editor to authorize all Drive permissions!
  * Open editor: https://script.google.com/a/andyedwards.uk/d/1qkpaDFbdqq3OlpMCEdOUk68nr3svvVk3mmhhmHykRIbvaBUimsx2uN-G/edit
  * Select 'authorizeDriveCleaner' in the function dropdown at top, then click 'Run'.

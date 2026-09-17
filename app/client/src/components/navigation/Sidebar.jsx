@@ -25,6 +25,7 @@ import {
   Film,
   ShieldAlert,
   Activity,
+  ArchiveRestore,
   Settings,
   Info,
   ChevronLeft,
@@ -190,6 +191,12 @@ export default function Sidebar() {
           label: 'Incremental Sync',
           path: '/incremental-sync',
           flag: 'FEATURE_INCREMENTAL_SYNC',
+        },
+        {
+          icon: ArchiveRestore,
+          label: 'Trash Governance',
+          path: '/trash-governance',
+          flag: 'FEATURE_TRASH_GOVERNANCE',
         },
         {
           icon: FolderHeart,

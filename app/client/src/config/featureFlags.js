@@ -61,6 +61,9 @@ export const FEATURE_FLAGS = {
 
   // Phase 14 (v3.0.0) - Incremental Sync & Drive Changes API Engine
   FEATURE_INCREMENTAL_SYNC: true,
+
+  // Phase 15 (v3.1.0) - Cloud Trash Lifecycle & Permanent Purge Governance Hub
+  FEATURE_TRASH_GOVERNANCE: true,
 }
 
 /**
@@ -138,6 +141,9 @@ export const getFeatureVersion = (flagName) => {
 
     // v3.0.0
     FEATURE_INCREMENTAL_SYNC: 'v3.0.0',
+
+    // v3.1.0
+    FEATURE_TRASH_GOVERNANCE: 'v3.1.0',
   }
 
   return versionMap[flagName] || 'Future'
