@@ -186,10 +186,10 @@ export default function FilePreviewModal() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
           transition={{ duration: 0.2 }}
-          className="relative z-10 w-full max-w-5xl max-h-[92vh] flex flex-col rounded-2xl bg-slate-900/95 border border-glass-border shadow-2xl overflow-hidden backdrop-blur-xl"
+          className="relative z-10 w-full max-w-5xl max-h-[92vh] flex flex-col rounded-2xl bg-slate-900/95 border border-slate-800 shadow-2xl overflow-hidden backdrop-blur-xl"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-3.5 border-b border-glass-border bg-slate-900/80">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-800 bg-slate-900/80">
             <div className="flex items-center gap-3 min-w-0 pr-4">
               <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400 flex-shrink-0">
                 <IconComponent className="w-5 h-5" />
@@ -206,7 +206,7 @@ export default function FilePreviewModal() {
                     <Star className="w-4 h-4 text-amber-400 fill-amber-400 flex-shrink-0" />
                   )}
                 </div>
-                <div className="text-xs text-gray-400 flex items-center gap-2 mt-0.5">
+                <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
                   <span>{formatBytes(activeFile.sizeBytes)}</span>
                   <span>•</span>
                   <span>{activeFile.parentName}</span>
@@ -217,17 +217,17 @@ export default function FilePreviewModal() {
             {/* Pagination Controls & Close */}
             <div className="flex items-center gap-2 flex-shrink-0">
               {fileList.length > 1 && (
-                <div className="flex items-center gap-1 bg-slate-800/80 rounded-lg p-1 border border-glass-border mr-2">
+                <div className="flex items-center gap-1 bg-slate-800/80 rounded-lg p-1 border border-slate-800 mr-2">
                   <button
                     type="button"
                     onClick={prevFile}
                     disabled={!hasPrev}
                     aria-label="Previous file"
-                    className="p-1 rounded text-gray-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    className="p-1 rounded text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
-                  <span className="text-xs text-gray-400 px-1 font-mono">
+                  <span className="text-xs text-slate-400 px-1 font-mono">
                     {currentIndex + 1}/{fileList.length}
                   </span>
                   <button
@@ -235,7 +235,7 @@ export default function FilePreviewModal() {
                     onClick={nextFile}
                     disabled={!hasNext}
                     aria-label="Next file"
-                    className="p-1 rounded text-gray-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    className="p-1 rounded text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
@@ -246,7 +246,7 @@ export default function FilePreviewModal() {
                 type="button"
                 onClick={closePreview}
                 aria-label="Close preview"
-                className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-slate-800 transition-colors"
+                className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -271,18 +271,18 @@ export default function FilePreviewModal() {
                   <button
                     type="button"
                     onClick={() => setIsZoomed(!isZoomed)}
-                    className="absolute bottom-3 right-3 p-1.5 rounded-lg bg-black/60 text-gray-300 hover:text-white backdrop-blur-sm border border-glass-border"
+                    className="absolute bottom-3 right-3 p-1.5 rounded-lg bg-black/60 text-slate-300 hover:text-white backdrop-blur-sm border border-slate-800"
                     title={isZoomed ? 'Zoom out' : 'Zoom in'}
                   >
                     {isZoomed ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
                   </button>
                 </div>
               ) : canEmbed && activeFile.previewLink ? (
-                <div className="w-full h-full min-h-[380px] flex flex-col rounded-xl overflow-hidden border border-glass-border bg-slate-900/80 relative">
+                <div className="w-full h-full min-h-[380px] flex flex-col rounded-xl overflow-hidden border border-slate-800 bg-slate-900/80 relative">
                   {!iframeLoaded && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/90 z-10">
                       <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin mb-3" />
-                      <p className="text-xs text-gray-400">Loading document preview...</p>
+                      <p className="text-xs text-slate-400">Loading document preview...</p>
                     </div>
                   )}
                   <iframe
@@ -302,7 +302,7 @@ export default function FilePreviewModal() {
                   <h3 className="text-lg font-semibold text-white mb-1">
                     {activeFile.fileName}
                   </h3>
-                  <p className="text-sm text-gray-400 mb-6">
+                  <p className="text-sm text-slate-400 mb-6">
                     Direct in-app stream not available for this file type. You can inspect all metadata on the right or view directly in Google Drive.
                   </p>
                   <Button
@@ -320,32 +320,32 @@ export default function FilePreviewModal() {
             <div className="md:col-span-5 p-5 sm:p-6 flex flex-col justify-between bg-slate-900/70 space-y-6">
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3 flex items-center gap-1.5">
+                  <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
                     <HardDrive className="w-4 h-4 text-blue-400" />
                     Storage & Location
                   </h3>
                   <div className="space-y-2.5 text-sm">
-                    <div className="flex justify-between items-center py-1 border-b border-glass-border">
-                      <span className="text-gray-400">File Size</span>
+                    <div className="flex justify-between items-center py-1 border-b border-slate-800">
+                      <span className="text-slate-400">File Size</span>
                       <span className="font-semibold text-white">
                         {formatBytes(activeFile.sizeBytes)}{' '}
-                        <span className="text-xs text-gray-400 font-normal">
+                        <span className="text-xs text-slate-400 font-normal">
                           ({activeFile.sizeBytes.toLocaleString()} bytes)
                         </span>
                       </span>
                     </div>
 
-                    <div className="flex justify-between items-center py-1 border-b border-glass-border">
-                      <span className="text-gray-400">Folder</span>
-                      <span className="text-gray-200 flex items-center gap-1.5 truncate max-w-[200px]" title={activeFile.parentName}>
+                    <div className="flex justify-between items-center py-1 border-b border-slate-800">
+                      <span className="text-slate-400">Folder</span>
+                      <span className="text-slate-200 flex items-center gap-1.5 truncate max-w-[200px]" title={activeFile.parentName}>
                         <Folder className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
                         <span className="truncate">{activeFile.parentName}</span>
                       </span>
                     </div>
 
-                    <div className="flex justify-between items-center py-1 border-b border-glass-border">
-                      <span className="text-gray-400">MIME Type</span>
-                      <span className="text-gray-300 font-mono text-xs truncate max-w-[210px]" title={activeFile.mimeType}>
+                    <div className="flex justify-between items-center py-1 border-b border-slate-800">
+                      <span className="text-slate-400">MIME Type</span>
+                      <span className="text-slate-300 font-mono text-xs truncate max-w-[210px]" title={activeFile.mimeType}>
                         {activeFile.mimeType}
                       </span>
                     </div>
@@ -354,15 +354,15 @@ export default function FilePreviewModal() {
 
                 {/* Timeline & Lifecycle */}
                 <div>
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3 flex items-center gap-1.5">
+                  <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
                     <Clock className="w-4 h-4 text-amber-400" />
                     Timeline & Activity
                   </h3>
                   <div className="space-y-2.5 text-sm">
-                    <div className="flex justify-between items-center py-1 border-b border-glass-border">
-                      <span className="text-gray-400">Last Modified</span>
+                    <div className="flex justify-between items-center py-1 border-b border-slate-800">
+                      <span className="text-slate-400">Last Modified</span>
                       <div className="text-right">
-                        <div className="text-gray-200">{formatDate(activeFile.modifiedDate)}</div>
+                        <div className="text-slate-200">{formatDate(activeFile.modifiedDate)}</div>
                         <div className="text-xs text-amber-400 font-medium">
                           {formatRelativeTime(activeFile.modifiedDate)}
                         </div>
@@ -370,18 +370,18 @@ export default function FilePreviewModal() {
                     </div>
 
                     {activeFile.createdDate && (
-                      <div className="flex justify-between items-center py-1 border-b border-glass-border">
-                        <span className="text-gray-400">Created</span>
-                        <div className="text-gray-200">{formatDate(activeFile.createdDate)}</div>
+                      <div className="flex justify-between items-center py-1 border-b border-slate-800">
+                        <span className="text-slate-400">Created</span>
+                        <div className="text-slate-200">{formatDate(activeFile.createdDate)}</div>
                       </div>
                     )}
 
                     {activeFile.lastViewedDate && (
-                      <div className="flex justify-between items-center py-1 border-b border-glass-border">
-                        <span className="text-gray-400">Last Viewed</span>
+                      <div className="flex justify-between items-center py-1 border-b border-slate-800">
+                        <span className="text-slate-400">Last Viewed</span>
                         <div className="text-right">
-                          <div className="text-gray-200">{formatDate(activeFile.lastViewedDate)}</div>
-                          <div className="text-xs text-gray-400">
+                          <div className="text-slate-200">{formatDate(activeFile.lastViewedDate)}</div>
+                          <div className="text-xs text-slate-400">
                             {formatRelativeTime(activeFile.lastViewedDate)}
                           </div>
                         </div>
@@ -392,21 +392,21 @@ export default function FilePreviewModal() {
 
                 {/* Access & Sharing */}
                 <div>
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3 flex items-center gap-1.5">
+                  <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
                     <Users className="w-4 h-4 text-emerald-400" />
                     Access & Ownership
                   </h3>
                   <div className="space-y-2.5 text-sm">
-                    <div className="flex justify-between items-center py-1 border-b border-glass-border">
-                      <span className="text-gray-400">Owner</span>
-                      <span className="text-gray-200 flex items-center gap-1.5 truncate max-w-[200px]" title={activeFile.ownerNames}>
+                    <div className="flex justify-between items-center py-1 border-b border-slate-800">
+                      <span className="text-slate-400">Owner</span>
+                      <span className="text-slate-200 flex items-center gap-1.5 truncate max-w-[200px]" title={activeFile.ownerNames}>
                         <User className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
                         <span className="truncate">{activeFile.ownerNames}</span>
                       </span>
                     </div>
 
-                    <div className="flex justify-between items-center py-1 border-b border-glass-border">
-                      <span className="text-gray-400">Sharing Status</span>
+                    <div className="flex justify-between items-center py-1 border-b border-slate-800">
+                      <span className="text-slate-400">Sharing Status</span>
                       <Badge
                         variant={
                           activeFile.sharingStatus === 'Private'
@@ -424,16 +424,16 @@ export default function FilePreviewModal() {
                 </div>
 
                 {/* Drive File ID */}
-                <div className="p-3 rounded-xl bg-slate-950/60 border border-glass-border flex items-center justify-between">
+                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
                   <div className="min-w-0 pr-2">
-                    <div className="text-xs text-gray-400 font-mono truncate">
+                    <div className="text-xs text-slate-400 font-mono truncate">
                       ID: {activeFile.fileId}
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={handleCopyId}
-                    className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-slate-800 transition-colors flex-shrink-0"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors flex-shrink-0"
                     title="Copy File ID"
                   >
                     {copiedId ? (
@@ -446,13 +446,13 @@ export default function FilePreviewModal() {
               </div>
 
               {/* Action Bar */}
-              <div className="pt-4 border-t border-glass-border space-y-2">
+              <div className="pt-4 border-t border-slate-800 space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => window.open(activeFile.driveLink, '_blank')}
-                    className="gap-1.5 text-xs text-gray-200 hover:text-white"
+                    className="gap-1.5 text-xs text-slate-200 hover:text-white border-slate-800 hover:bg-slate-800"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     Open in Drive
@@ -462,7 +462,7 @@ export default function FilePreviewModal() {
                     variant="outline"
                     size="sm"
                     onClick={handleCopyLink}
-                    className="gap-1.5 text-xs text-gray-200 hover:text-white"
+                    className="gap-1.5 text-xs text-slate-200 hover:text-white border-slate-800 hover:bg-slate-800"
                   >
                     {copiedLink ? (
                       <>

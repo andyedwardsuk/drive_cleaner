@@ -23,9 +23,9 @@ export default function LevelProgressCard({ profile }) {
   const unlockedBadges = new Set(profile?.badges_unlocked || ['first_clean', 'streak_3'])
 
   return (
-    <div className="p-6 border rounded-xl bg-card/60 border-glass-border backdrop-blur-md space-y-5">
+    <div className="p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm space-y-5">
       {/* Header with Level Badge */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-glass-border">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-lg bg-primary/10 text-primary">
             <Shield className="w-6 h-6" />
@@ -37,27 +37,27 @@ export default function LevelProgressCard({ profile }) {
                 Rank {level}
               </Badge>
             </div>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="text-xs text-slate-400 mt-0.5">
               Keep cleaning and completing challenges to unlock higher ranks
             </p>
           </div>
         </div>
 
         <div className="text-right">
-          <p className="text-xs text-muted-foreground">Level Progress</p>
+          <p className="text-xs text-slate-400">Level Progress</p>
           <p className="text-sm font-bold text-white font-mono">{xp} / {xpNext} XP</p>
         </div>
       </div>
 
       {/* Progress Bar */}
       <div className="space-y-1.5">
-        <div className="w-full h-3 rounded-full bg-card/60 border border-glass-border overflow-hidden p-0.5">
+        <div className="w-full h-3 rounded-full bg-slate-950/70 border border-slate-800 overflow-hidden p-0.5">
           <div
             className="h-full rounded-full bg-gradient-to-r from-primary to-emerald-400 transition-all duration-500 shadow-sm"
             style={{ width: `${percent}%` }}
           />
         </div>
-        <div className="flex justify-between text-[11px] text-muted-foreground">
+        <div className="flex justify-between text-[11px] text-slate-400">
           <span>{percent}% to Level {level + 1}</span>
           <span>{xpNext - xp} XP needed</span>
         </div>
@@ -65,24 +65,24 @@ export default function LevelProgressCard({ profile }) {
 
       {/* Lifetime Stats */}
       <div className="grid grid-cols-3 gap-3 pt-2">
-        <div className="p-3 rounded-lg bg-card/30 border border-glass-border text-center">
-          <div className="flex items-center justify-center gap-1 text-[11px] text-muted-foreground mb-0.5">
+        <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-center">
+          <div className="flex items-center justify-center gap-1 text-[11px] text-slate-400 mb-0.5">
             <Trash2 className="w-3 h-3 text-rose-400" />
             <span>Lifetime Cleaned</span>
           </div>
           <p className="text-base font-bold text-white">{lifetimeFiles}</p>
         </div>
 
-        <div className="p-3 rounded-lg bg-card/30 border border-glass-border text-center">
-          <div className="flex items-center justify-center gap-1 text-[11px] text-muted-foreground mb-0.5">
+        <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-center">
+          <div className="flex items-center justify-center gap-1 text-[11px] text-slate-400 mb-0.5">
             <HardDrive className="w-3 h-3 text-blue-400" />
             <span>Lifetime Saved</span>
           </div>
           <p className="text-base font-bold text-white">{formatBytes(lifetimeBytes)}</p>
         </div>
 
-        <div className="p-3 rounded-lg bg-card/30 border border-glass-border text-center">
-          <div className="flex items-center justify-center gap-1 text-[11px] text-muted-foreground mb-0.5">
+        <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-center">
+          <div className="flex items-center justify-center gap-1 text-[11px] text-slate-400 mb-0.5">
             <Leaf className="w-3 h-3 text-emerald-400" />
             <span>CO₂ Prevented</span>
           </div>
@@ -91,8 +91,8 @@ export default function LevelProgressCard({ profile }) {
       </div>
 
       {/* Badges Earned */}
-      <div className="pt-2 border-t border-glass-border space-y-2">
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+      <div className="pt-2 border-t border-slate-800/80 space-y-2">
+        <div className="flex items-center gap-1.5 text-xs text-slate-400">
           <Award className="w-3.5 h-3.5 text-amber-400" />
           <span>Cleaner Badges & Achievements:</span>
         </div>
@@ -106,7 +106,7 @@ export default function LevelProgressCard({ profile }) {
                 className={`p-2.5 rounded-lg border text-center transition-all ${
                   isUnlocked
                     ? 'bg-primary/10 border-primary/30 text-white'
-                    : 'bg-card/20 border-glass-border/50 text-muted-foreground opacity-50'
+                    : 'bg-slate-950/40 border-slate-800/50 text-slate-400 opacity-50'
                 }`}
               >
                 <span className="text-xl block mb-1">{badge.icon}</span>

@@ -251,18 +251,16 @@ export default function SharedFilesView() {
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              size="lg"
               onClick={() => navigate({ to: '/smart-scan' })}
-              className="border-glass-border hover:bg-white/10"
+              className="h-11 px-4 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 text-xs font-semibold"
             >
               <Search className="w-4 h-4 mr-2" />
               Configure Folder
             </Button>
             <Button
-              size="lg"
               onClick={startScan}
               disabled={isScanning}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/20"
+              className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-900/40 text-xs"
             >
               <Sparkles className="w-4 h-4 mr-2" />
               {isScanning ? 'Scanning Drive...' : 'Re-Scan Drive'}
@@ -286,7 +284,7 @@ export default function SharedFilesView() {
       />
 
       {/* Filter Tabs & Active Pool Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-card/40 border border-glass-border backdrop-blur-md">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm shadow-xl">
         <div className="flex flex-wrap items-center gap-2">
           {filterTabs.map((tab) => {
             const Icon = tab.icon
@@ -298,8 +296,8 @@ export default function SharedFilesView() {
                 onClick={() => setActiveFilter(tab.id)}
                 className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all duration-200 border ${
                   isActive
-                    ? 'bg-primary text-primary-foreground border-primary shadow-md shadow-primary/20'
-                    : 'bg-card/60 text-gray-300 border-white/10 hover:bg-card/90 hover:text-white'
+                    ? 'bg-blue-600 text-white border-blue-500 shadow-md shadow-blue-900/30'
+                    : 'bg-slate-900/60 text-slate-300 border-slate-800 hover:bg-slate-800 hover:text-white'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -310,7 +308,7 @@ export default function SharedFilesView() {
                       ? 'bg-red-500 text-white font-bold'
                       : isActive
                       ? 'bg-white/20 text-white'
-                      : 'bg-white/10 text-gray-400'
+                      : 'bg-slate-800 text-slate-400'
                   }`}
                 >
                   {tab.count}
@@ -321,7 +319,7 @@ export default function SharedFilesView() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-xs text-gray-300 border-glass-border">
+          <Badge variant="outline" className="text-xs text-slate-300 border-slate-800 bg-slate-950 px-3 py-1 rounded-lg">
             Showing {displayedFiles.length} files (
             {formatBytes(displayedFiles.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0))})
           </Badge>
@@ -329,7 +327,7 @@ export default function SharedFilesView() {
       </div>
 
       {/* Candidate File Table with Row Selection & Safe Trash */}
-      <div className="p-4 rounded-2xl bg-card/30 border border-glass-border backdrop-blur-sm">
+      <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm shadow-xl">
         <FileTable data={displayedFiles} />
       </div>
     </div>

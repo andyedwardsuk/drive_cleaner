@@ -98,14 +98,14 @@ export default function KanbanColumn({ column, cards = [] }) {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={cn(
-        'flex flex-col h-[740px] rounded-2xl border bg-slate-900/40 backdrop-blur-md p-4 transition-all duration-200',
+        'flex flex-col h-[740px] rounded-2xl border bg-slate-900/60 backdrop-blur-sm p-4 transition-all duration-200',
         isOver
           ? 'border-blue-500 bg-blue-500/10 ring-2 ring-blue-500/30 shadow-xl'
-          : 'border-glass-border shadow-md'
+          : 'border-slate-800/80 shadow-md'
       )}
     >
       {/* Column Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-glass-border mb-3">
+      <div className="flex items-center justify-between pb-3 border-b border-slate-800/80 mb-3">
         <div className="flex items-center gap-2 min-w-0">
           <span className="text-xl">{column.icon}</span>
           <div>
@@ -115,14 +115,14 @@ export default function KanbanColumn({ column, cards = [] }) {
                 {cards.length}
               </Badge>
             </div>
-            <div className="text-xs text-gray-400 mt-0.5">{formatBytes(totalBytes)}</div>
+            <div className="text-xs text-slate-400 mt-0.5">{formatBytes(totalBytes)}</div>
           </div>
         </div>
 
         {/* Column Actions */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-400 hover:text-white">
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-slate-400 hover:text-white">
               <MoreHorizontal className="w-4 h-4" />
             </Button>
           </DropdownMenuTrigger>

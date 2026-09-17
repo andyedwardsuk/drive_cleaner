@@ -26,7 +26,7 @@ export function TrashConfirmationModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in-0">
-      <div className="relative w-full max-w-xl p-6 overflow-hidden border rounded-2xl bg-card/95 border-glass-border shadow-2xl backdrop-blur-xl">
+      <div className="relative w-full max-w-xl p-6 overflow-hidden border rounded-2xl bg-slate-900/95 border-slate-800 shadow-2xl backdrop-blur-xl">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
           <div className="p-3 text-red-400 rounded-xl bg-red-500/10 border border-red-500/20">

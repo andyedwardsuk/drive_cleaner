@@ -67,28 +67,28 @@ export default function ImpactTrendsChart({ dailyLogs = [] }) {
   const totalCleaned = lastPoint ? lastPoint[metric] : 0
 
   return (
-    <div className="p-6 border rounded-xl bg-card/60 border-glass-border backdrop-blur-md space-y-5">
+    <div className="p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm space-y-5">
       {/* Header and Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-glass-border">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
         <div className="flex items-center gap-2.5">
           <div className="p-2 rounded-lg bg-primary/10 text-primary">
             <TrendingUp className="w-5 h-5" />
           </div>
           <div>
             <h3 className="text-base font-semibold text-white">30-Day Impact Trends</h3>
-            <p className="text-xs text-muted-foreground">Cumulative cleanup momentum over the last month</p>
+            <p className="text-xs text-slate-400">Cumulative cleanup momentum over the last month</p>
           </div>
         </div>
 
         {/* Metric Selector Pills */}
-        <div className="inline-flex rounded-lg bg-background/50 p-1 border border-glass-border">
+        <div className="inline-flex rounded-xl bg-slate-950/70 p-1 border border-slate-800">
           <button
             type="button"
             onClick={() => setMetric('storage')}
-            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center gap-1.5 ${
               metric === 'storage'
                 ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             <HardDrive className="w-3.5 h-3.5" />
@@ -97,10 +97,10 @@ export default function ImpactTrendsChart({ dailyLogs = [] }) {
           <button
             type="button"
             onClick={() => setMetric('co2')}
-            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center gap-1.5 ${
               metric === 'co2'
                 ? 'bg-emerald-500 text-white shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             <Leaf className="w-3.5 h-3.5" />
@@ -109,10 +109,10 @@ export default function ImpactTrendsChart({ dailyLogs = [] }) {
           <button
             type="button"
             onClick={() => setMetric('files')}
-            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center gap-1.5 ${
               metric === 'files'
                 ? 'bg-rose-500 text-white shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             <Trash2 className="w-3.5 h-3.5" />

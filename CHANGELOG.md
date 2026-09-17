@@ -4,6 +4,28 @@ All notable changes to the Drive Cleaner project will be documented in this file
 
 ---
 
+## [3.2.0] - 2026-09-17
+### Changed
+- **Comprehensive Visual Polish, Token Unification & Design System Overhaul**:
+  - **Complete Token Cleanup Across All 20+ Views & Components**:
+    - Completely eradicated all legacy `border-glass-border`, `bg-card/*`, and uncontrasted `text-gray-400` tokens across the entire codebase.
+    - Unified container cards to obsidian midnight glass styling: `p-5 md:p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm`.
+    - Standardized sub-cards and detail panels to `rounded-xl bg-slate-950/60 border border-slate-800`.
+  - **Input & Control Alignment Sprint**:
+    - Standardized all search inputs, dropdown filters, preset selectors, and action buttons to a unified `h-11 rounded-xl` height and border radius.
+    - Standardized search inputs to `pl-9 h-11 rounded-xl bg-slate-950/70 border-slate-800 text-white placeholder:text-slate-500 text-sm focus-visible:ring-primary/40`.
+    - Harmonized solid primary buttons (`h-11 px-4 rounded-xl bg-blue-600 shadow-lg shadow-blue-500/20`) and outline buttons (`h-11 px-4 rounded-xl border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800`).
+  - **100% WCAG AA Accessibility Contrast Compliance**:
+    - Upgraded typography contrast across all views: pure white (`text-white`) for primary headings, high-contrast slate (`text-slate-200`) for item titles, readable body text (`text-slate-300`), and descriptive metadata (`text-slate-400`).
+    - Standardized table design across all list views: `thead` with `bg-slate-950/80 border-b border-slate-800/80 text-slate-400 font-semibold`, `tbody` rows with `divide-y divide-slate-800/60 text-slate-200 hover:bg-slate-800/40`.
+  - **Universal File Preview Integration**:
+    - Fully wired `FilePreviewModal`, `useFilePreview`, and preview actions across all file-bearing views including Security Audit, Media Optimizer, Kanban Labels, Shared Drives, and Trash Governance.
+    - Fixed duplicate action bar fragments in `FilePreviewModal.jsx` with full obsidian dark button styling.
+  - **Branding Verification**:
+    - Re-verified complete elimination of third-party assistant attribution (`Made with Claude Code`) across the entire repository.
+
+---
+
 ## [3.1.0] - 2026-09-17
 ### Added
 - **Cloud Trash Lifecycle & Permanent Purge Governance Hub (`FEATURE_TRASH_GOVERNANCE`)**:

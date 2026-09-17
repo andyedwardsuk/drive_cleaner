@@ -176,7 +176,7 @@ export default function SharedDrivesView() {
             variant="outline"
             size="sm"
             onClick={refresh}
-            className="border-glass-border hover:bg-slate-800 text-slate-200"
+            className="border-slate-800 hover:bg-slate-800 text-slate-200 rounded-xl"
           >
             <RefreshCw className="w-4 h-4 mr-2" />
             Refresh
@@ -185,7 +185,7 @@ export default function SharedDrivesView() {
             size="sm"
             onClick={handleExportCSV}
             disabled={!selectedDrive || !auditReport}
-            className="bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/30"
+            className="bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/30 rounded-xl"
           >
             <Download className="w-4 h-4 mr-2" />
             Export Audit CSV
@@ -194,7 +194,7 @@ export default function SharedDrivesView() {
       </Hero>
 
       {/* Workspace Context Notice */}
-      <div className="flex items-center gap-3 px-5 py-3.5 rounded-xl border border-blue-500/20 bg-blue-500/10 backdrop-blur-md text-sm text-blue-300">
+      <div className="flex items-center gap-3 px-5 py-3.5 rounded-2xl border border-blue-500/20 bg-blue-500/10 backdrop-blur-md text-sm text-blue-300">
         <Info className="w-5 h-5 text-blue-400 flex-shrink-0" />
         <div className="flex-1">
           <span className="font-semibold text-white">Google Workspace Shared Drives Mode:</span>{' '}
@@ -207,7 +207,7 @@ export default function SharedDrivesView() {
 
       {/* Portfolio Metrics Banner */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
-        <div className="p-5 rounded-2xl border border-glass-border bg-slate-900/60 backdrop-blur-xl flex items-center justify-between">
+        <div className="p-5 rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-xl flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Shared Drives</p>
             <h3 className="text-2xl font-bold text-white mt-1">{portfolioMetrics.totalDrives}</h3>
@@ -218,7 +218,7 @@ export default function SharedDrivesView() {
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl border border-glass-border bg-slate-900/60 backdrop-blur-xl flex items-center justify-between">
+        <div className="p-5 rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-xl flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Shared Storage</p>
             <h3 className="text-2xl font-bold text-white mt-1">
@@ -231,7 +231,7 @@ export default function SharedDrivesView() {
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl border border-glass-border bg-slate-900/60 backdrop-blur-xl flex items-center justify-between">
+        <div className="p-5 rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-xl flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">High Risk Drives</p>
             <h3 className="text-2xl font-bold text-rose-400 mt-1">{portfolioMetrics.highRiskCount}</h3>
@@ -242,7 +242,7 @@ export default function SharedDrivesView() {
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl border border-glass-border bg-slate-900/60 backdrop-blur-xl flex items-center justify-between">
+        <div className="p-5 rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-xl flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Dormant Repositories</p>
             <h3 className="text-2xl font-bold text-amber-400 mt-1">{portfolioMetrics.dormantCount}</h3>
@@ -260,12 +260,12 @@ export default function SharedDrivesView() {
         <div className="lg:col-span-5 space-y-4">
           <div className="flex items-center justify-between gap-4">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
+              <Search className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
               <Input
                 placeholder="Search Shared Drives..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-slate-900/60 border-glass-border text-white text-sm"
+                className="pl-9 bg-slate-900/60 border-slate-800 text-white text-sm h-11 rounded-xl"
               />
             </div>
           </div>
@@ -282,10 +282,10 @@ export default function SharedDrivesView() {
                 key={tab.id}
                 onClick={() => setFilterType(tab.id)}
                 className={cn(
-                  'px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
+                  'px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all',
                   filterType === tab.id
                     ? 'bg-blue-600 text-white shadow-md'
-                    : 'bg-slate-900/60 text-slate-400 hover:text-white border border-glass-border'
+                    : 'bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800'
                 )}
               >
                 {tab.label}
@@ -296,7 +296,7 @@ export default function SharedDrivesView() {
           {/* Drives Cards List */}
           <div className="space-y-3 max-h-[640px] overflow-y-auto pr-1 custom-scrollbar">
             {filteredDrives.length === 0 ? (
-              <div className="p-8 text-center rounded-2xl border border-glass-border bg-slate-900/40 text-slate-400">
+              <div className="p-8 text-center rounded-2xl border border-slate-800/80 bg-slate-900/40 text-slate-400">
                 No Shared Drives match your criteria.
               </div>
             ) : (
@@ -314,7 +314,7 @@ export default function SharedDrivesView() {
                       'p-4 rounded-2xl border transition-all cursor-pointer relative',
                       isSelected
                         ? 'border-blue-500/60 bg-blue-950/30 shadow-lg shadow-blue-500/10'
-                        : 'border-glass-border bg-slate-900/60 hover:bg-slate-800/40'
+                        : 'border-slate-800/80 bg-slate-900/60 hover:bg-slate-800/40'
                     )}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -373,22 +373,22 @@ export default function SharedDrivesView() {
         {/* Right: Deep Audit Inspector (7 cols) */}
         <div className="lg:col-span-7">
           {!selectedDrive ? (
-            <div className="p-12 text-center rounded-2xl border border-glass-border bg-slate-900/40 text-slate-400">
+            <div className="p-12 text-center rounded-2xl border border-slate-800/80 bg-slate-900/40 text-slate-400">
               Select a Shared Drive on the left to view its deep hygiene audit.
             </div>
           ) : auditLoading ? (
-            <div className="p-12 text-center rounded-2xl border border-glass-border bg-slate-900/40 text-slate-400 flex flex-col items-center justify-center gap-3">
+            <div className="p-12 text-center rounded-2xl border border-slate-800/80 bg-slate-900/40 text-slate-400 flex flex-col items-center justify-center gap-3">
               <RefreshCw className="w-6 h-6 animate-spin text-blue-400" />
               <span>Auditing repository {selectedDrive.name}...</span>
             </div>
           ) : !auditReport ? (
-            <div className="p-12 text-center rounded-2xl border border-glass-border bg-slate-900/40 text-slate-400">
+            <div className="p-12 text-center rounded-2xl border border-slate-800/80 bg-slate-900/40 text-slate-400">
               No audit report available.
             </div>
           ) : (
-            <div className="p-6 rounded-2xl border border-glass-border bg-slate-900/60 backdrop-blur-xl space-y-6">
+            <div className="p-6 rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-xl space-y-6">
               {/* Drive Header Banner */}
-              <div className="flex items-start justify-between gap-4 border-b border-glass-border pb-5">
+              <div className="flex items-start justify-between gap-4 border-b border-slate-800/80 pb-5">
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-lg font-bold text-white">{selectedDrive.name}</h3>
@@ -413,7 +413,7 @@ export default function SharedDrivesView() {
                     onClick={() => {
                       showToast(`Scoping active scan to ${selectedDrive.name}`)
                     }}
-                    className="border-blue-500/40 hover:bg-blue-600/20 text-blue-300 text-xs"
+                    className="border-blue-500/40 hover:bg-blue-600/20 text-blue-300 text-xs rounded-xl"
                   >
                     <ArrowUpRight className="w-3.5 h-3.5 mr-1" />
                     Scope Scan Here
@@ -422,7 +422,7 @@ export default function SharedDrivesView() {
               </div>
 
               {/* Hygiene Health Meter */}
-              <div className="p-4 rounded-xl border border-glass-border bg-slate-950/60 flex items-center justify-between gap-4">
+              <div className="p-4 rounded-xl border border-slate-800/80 bg-slate-950/60 flex items-center justify-between gap-4">
                 <div>
                   <span className="text-xs font-semibold uppercase text-slate-400">Hygiene Health Rating</span>
                   <div className="flex items-center gap-3 mt-1">
@@ -466,11 +466,11 @@ export default function SharedDrivesView() {
 
               {/* Tabs: External Exposure vs Stale Files */}
               <div className="space-y-4">
-                <div className="flex items-center gap-2 border-b border-glass-border pb-2">
+                <div className="flex items-center gap-2 border-b border-slate-800/80 pb-2">
                   <button
                     onClick={() => setActiveTab('external')}
                     className={cn(
-                      'px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2',
+                      'px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
                       activeTab === 'external'
                         ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
                         : 'text-slate-400 hover:text-white'
@@ -482,7 +482,7 @@ export default function SharedDrivesView() {
                   <button
                     onClick={() => setActiveTab('stale')}
                     className={cn(
-                      'px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-2',
+                      'px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
                       activeTab === 'stale'
                         ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
                         : 'text-slate-400 hover:text-white'
@@ -497,7 +497,7 @@ export default function SharedDrivesView() {
                 {activeTab === 'external' && (
                   <div className="space-y-2">
                     {(!auditReport.externalExposureFiles || auditReport.externalExposureFiles.length === 0) ? (
-                      <div className="p-8 text-center rounded-xl border border-glass-border bg-slate-950/40 text-slate-400 text-xs">
+                      <div className="p-8 text-center rounded-xl border border-slate-800/80 bg-slate-950/40 text-slate-400 text-xs">
                         <ShieldCheck className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
                         No external or public exposure detected in this Shared Drive!
                       </div>
@@ -558,7 +558,7 @@ export default function SharedDrivesView() {
                 {activeTab === 'stale' && (
                   <div className="space-y-2">
                     {(!auditReport.staleLargeFiles || auditReport.staleLargeFiles.length === 0) ? (
-                      <div className="p-8 text-center rounded-xl border border-glass-border bg-slate-950/40 text-slate-400 text-xs">
+                      <div className="p-8 text-center rounded-xl border border-slate-800/80 bg-slate-950/40 text-slate-400 text-xs">
                         <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
                         No large stale files (&gt;50MB untouched for &gt;180 days) found!
                       </div>

@@ -1,23 +1,20 @@
-import { BarChart3, HardDrive, Database, Trash2, RefreshCw } from 'lucide-react'
+import { BarChart3, HardDrive, Database, Trash2, RefreshCw, ArrowRight } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts'
 import Hero from '@/components/Hero'
+import { Button } from '@/components/ui/button'
 import { useQuota } from '@/hooks/useQuota'
+import { useNavigate } from '@tanstack/react-router'
+import { cn } from '@/lib/utils'
 
 /**
  * Format bytes to human readable string
- * @param {number} bytes - Bytes to format
- * @param {number} decimals - Number of decimal places
- * @returns {string} Formatted string
  */
 function formatBytes(bytes, decimals = 2) {
-  if (bytes === 0) return '0 Bytes'
-
+  if (!bytes || bytes === 0) return '0 Bytes'
   const k = 1024
   const dm = decimals < 0 ? 0 : decimals
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
-
   const i = Math.floor(Math.log(bytes) / Math.log(k))
-
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
@@ -26,23 +23,25 @@ function formatBytes(bytes, decimals = 2) {
  */
 function MetricCard({ icon: Icon, label, value, subValue, color = 'blue' }) {
   const colorClasses = {
-    blue: 'text-blue-400',
-    green: 'text-green-400',
-    orange: 'text-orange-400',
-    red: 'text-red-400',
-    purple: 'text-purple-400',
+    blue: { text: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20' },
+    green: { text: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
+    orange: { text: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/20' },
+    red: { text: 'text-red-400', bg: 'bg-red-500/10 border-red-500/20' },
+    purple: { text: 'text-indigo-400', bg: 'bg-indigo-500/10 border-indigo-500/20' },
   }
 
+  const theme = colorClasses[color] || colorClasses.blue
+
   return (
-    <div className="p-6 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm">
+    <div className="p-6 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm shadow-lg">
       <div className="flex items-start gap-4">
-        <div className={`p-3 rounded-lg bg-${color}-500/10`}>
-          <Icon className={`w-6 h-6 ${colorClasses[color]}`} />
+        <div className={`p-3.5 rounded-xl border ${theme.bg}`}>
+          <Icon className={`w-6 h-6 ${theme.text}`} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-gray-400 mb-1">{label}</p>
-          <p className="text-2xl font-semibold text-gray-100 mb-1">{value}</p>
-          {subValue && <p className="text-sm text-gray-500">{subValue}</p>}
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">{label}</p>
+          <p className="text-2xl font-bold text-white tracking-tight mb-1">{value}</p>
+          {subValue && <p className="text-xs text-slate-400">{subValue}</p>}
         </div>
       </div>
     </div>
@@ -53,6 +52,7 @@ function MetricCard({ icon: Icon, label, value, subValue, color = 'blue' }) {
  * Storage Analytics View Component
  */
 export default function StorageAnalyticsView() {
+  const navigate = useNavigate()
   const { data, loading, error, fetchQuota } = useQuota()
 
   if (loading) {
@@ -64,11 +64,9 @@ export default function StorageAnalyticsView() {
           subtitle="Visual breakdown of your Drive storage usage"
           illustration="📊"
         />
-        <div className="p-12 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm text-center">
-          <div className="flex items-center justify-center gap-3">
-            <RefreshCw className="w-6 h-6 animate-spin text-blue-400" />
-            <p className="text-gray-300">Loading storage analytics...</p>
-          </div>
+        <div className="p-16 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
+          <RefreshCw className="w-8 h-8 animate-spin text-blue-400 mx-auto mb-4" />
+          <p className="text-slate-300 text-sm">Loading Google Drive storage metrics...</p>
         </div>
       </div>
     )
@@ -83,15 +81,15 @@ export default function StorageAnalyticsView() {
           subtitle="Visual breakdown of your Drive storage usage"
           illustration="📊"
         />
-        <div className="p-8 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm text-center">
-          <p className="text-red-400 mb-4">Error loading storage analytics</p>
-          <p className="text-gray-400 mb-4">{error}</p>
-          <button
+        <div className="p-10 border border-red-500/30 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
+          <p className="text-red-400 font-bold mb-2">Error loading storage analytics</p>
+          <p className="text-slate-400 text-sm mb-6">{error}</p>
+          <Button
             onClick={fetchQuota}
-            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+            className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold"
           >
             Retry
-          </button>
+          </Button>
         </div>
       </div>
     )
@@ -106,8 +104,8 @@ export default function StorageAnalyticsView() {
           subtitle="Visual breakdown of your Drive storage usage"
           illustration="📊"
         />
-        <div className="p-8 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm text-center">
-          <p className="text-gray-400">No storage data available</p>
+        <div className="p-12 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
+          <p className="text-slate-400 text-sm">No storage quota data available</p>
         </div>
       </div>
     )
@@ -115,22 +113,20 @@ export default function StorageAnalyticsView() {
 
   const quota = data.data
 
-  // Prepare chart data
   const usedData = quota.usage || 0
   const availableData = quota.available || 0
   const limitData = quota.limit || 0
 
   const chartData = [
-    { name: 'Used', value: usedData, color: '#3b82f6' },
-    { name: 'Available', value: availableData, color: '#22c55e' },
+    { name: 'Used Storage', value: usedData, color: '#3b82f6' },
+    { name: 'Available Space', value: availableData, color: '#10b981' },
   ]
 
   const driveBreakdownData = [
-    { name: 'Drive Files', value: quota.usageInDrive || 0, color: '#3b82f6' },
-    { name: 'Trash', value: quota.usageInDriveTrash || 0, color: '#f59e0b' },
+    { name: 'Active Files', value: quota.usageInDrive || 0, color: '#3b82f6' },
+    { name: 'Trash Bin', value: quota.usageInDriveTrash || 0, color: '#f59e0b' },
   ]
 
-  // Custom label for pie chart
   const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5
     const x = cx + radius * Math.cos(-midAngle * (Math.PI / 180))
@@ -145,7 +141,7 @@ export default function StorageAnalyticsView() {
         fill="white"
         textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
-        className="text-sm font-medium"
+        className="text-xs font-bold"
       >
         {`${(percent * 100).toFixed(0)}%`}
       </text>
@@ -157,36 +153,45 @@ export default function StorageAnalyticsView() {
       <Hero
         icon={BarChart3}
         title="Storage Analytics"
-        subtitle="Visual breakdown of your Drive storage usage"
+        subtitle="Visual breakdown of your Google Drive storage quota and allocation"
         illustration="📊"
+        actions={
+          <Button
+            onClick={fetchQuota}
+            className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-lg shadow-blue-900/40"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Refresh Quota
+          </Button>
+        }
       />
 
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           icon={HardDrive}
-          label="Total Storage"
+          label="Total Google Storage"
           value={formatBytes(limitData)}
           color="blue"
         />
         <MetricCard
           icon={Database}
-          label="Used Storage"
+          label="Used Space"
           value={formatBytes(usedData)}
           subValue={`${quota.percentUsed}% of total`}
           color={quota.percentUsed > 80 ? 'red' : quota.percentUsed > 60 ? 'orange' : 'green'}
         />
         <MetricCard
           icon={HardDrive}
-          label="Available Storage"
+          label="Available Space"
           value={formatBytes(availableData)}
           color="green"
         />
         <MetricCard
           icon={Database}
-          label="Drive Files"
+          label="Active Drive Files"
           value={formatBytes(quota.usageInDrive)}
-          subValue={quota.usageInDriveTrash > 0 ? `${formatBytes(quota.usageInDriveTrash)} in trash` : 'No items in trash'}
+          subValue={quota.usageInDriveTrash > 0 ? `${formatBytes(quota.usageInDriveTrash)} in trash` : 'Trash is empty'}
           color="purple"
         />
       </div>
@@ -194,8 +199,8 @@ export default function StorageAnalyticsView() {
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Overall Storage Chart */}
-        <div className="p-6 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm">
-          <h3 className="text-lg font-semibold text-gray-100 mb-4">Overall Storage Usage</h3>
+        <div className="p-6 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm shadow-xl">
+          <h3 className="text-base font-semibold text-white mb-4">Overall Storage Allocation</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -216,15 +221,15 @@ export default function StorageAnalyticsView() {
                 <Tooltip
                   formatter={(value) => formatBytes(value)}
                   contentStyle={{
-                    backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '8px',
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    border: '1px solid rgba(148, 163, 184, 0.2)',
+                    borderRadius: '12px',
                     color: '#fff',
                   }}
                 />
                 <Legend
                   formatter={(value, entry) => `${value}: ${formatBytes(entry.payload.value)}`}
-                  wrapperStyle={{ color: '#9ca3af' }}
+                  wrapperStyle={{ color: '#94a3b8', fontSize: '12px' }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -232,8 +237,21 @@ export default function StorageAnalyticsView() {
         </div>
 
         {/* Drive Breakdown Chart */}
-        <div className="p-6 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm">
-          <h3 className="text-lg font-semibold text-gray-100 mb-4">Drive Storage Breakdown</h3>
+        <div className="p-6 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm shadow-xl">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-semibold text-white">Active vs Trash Space</h3>
+            {quota.usageInDriveTrash > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate({ to: '/trash-governance' })}
+                className="h-8 px-2.5 rounded-lg text-amber-400 hover:text-amber-300 hover:bg-amber-950/40 text-xs"
+              >
+                <span>Govern Trash</span>
+                <ArrowRight className="h-3 w-3 ml-1" />
+              </Button>
+            )}
+          </div>
           <div className="h-64">
             {quota.usageInDriveTrash > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -255,24 +273,24 @@ export default function StorageAnalyticsView() {
                   <Tooltip
                     formatter={(value) => formatBytes(value)}
                     contentStyle={{
-                      backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      borderRadius: '8px',
+                      backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                      border: '1px solid rgba(148, 163, 184, 0.2)',
+                      borderRadius: '12px',
                       color: '#fff',
                     }}
                   />
                   <Legend
                     formatter={(value, entry) => `${value}: ${formatBytes(entry.payload.value)}`}
-                    wrapperStyle={{ color: '#9ca3af' }}
+                    wrapperStyle={{ color: '#94a3b8', fontSize: '12px' }}
                   />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
               <div className="flex items-center justify-center h-full text-center">
                 <div>
-                  <Trash2 className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-                  <p className="text-gray-400">No items in trash</p>
-                  <p className="text-sm text-gray-500 mt-2">All your Drive storage is active files</p>
+                  <Trash2 className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                  <p className="text-slate-300 font-medium">No items in trash</p>
+                  <p className="text-xs text-slate-500 mt-1">All your Drive storage is allocated to active files</p>
                 </div>
               </div>
             )}
@@ -280,60 +298,49 @@ export default function StorageAnalyticsView() {
         </div>
       </div>
 
-      {/* Additional Info */}
-      <div className="p-6 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm">
-        <h3 className="text-lg font-semibold text-gray-100 mb-4">Storage Tips</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex gap-3">
-            <div className="text-2xl">💡</div>
+      {/* Additional Info / Storage Tips */}
+      <div className="p-6 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm shadow-xl">
+        <h3 className="text-base font-semibold text-white mb-4">Storage Optimization Tips</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div className="flex gap-3 p-4 rounded-xl bg-slate-950/50 border border-slate-800/60">
+            <div className="text-xl">💡</div>
             <div>
-              <h4 className="font-medium text-gray-200 mb-1">Find Large Files</h4>
-              <p className="text-sm text-gray-400">
-                Use Smart Scan to identify large files that may be consuming significant storage space.
+              <h4 className="font-semibold text-slate-200 mb-0.5">Find Large Files</h4>
+              <p className="text-slate-400 leading-relaxed">
+                Use Smart Scan to identify massive video recordings, archives, and datasets consuming quota.
               </p>
             </div>
           </div>
-          <div className="flex gap-3">
-            <div className="text-2xl">🗑️</div>
+          <div className="flex gap-3 p-4 rounded-xl bg-slate-950/50 border border-slate-800/60">
+            <div className="text-xl">🗑️</div>
             <div>
-              <h4 className="font-medium text-gray-200 mb-1">Empty Your Trash</h4>
-              <p className="text-sm text-gray-400">
+              <h4 className="font-semibold text-slate-200 mb-0.5">Govern Trash Lifecycle</h4>
+              <p className="text-slate-400 leading-relaxed">
                 {quota.usageInDriveTrash > 0
-                  ? `You have ${formatBytes(quota.usageInDriveTrash)} in your trash. Emptying it will free up space.`
-                  : 'Your trash is empty. Good job keeping your Drive clean!'}
+                  ? `You have ${formatBytes(quota.usageInDriveTrash)} trapped in trash. Emptying it immediately frees storage.`
+                  : 'Your trash bin is empty. Excellent job keeping your storage footprint tidy!'}
               </p>
             </div>
           </div>
-          <div className="flex gap-3">
-            <div className="text-2xl">📦</div>
+          <div className="flex gap-3 p-4 rounded-xl bg-slate-950/50 border border-slate-800/60">
+            <div className="text-xl">📦</div>
             <div>
-              <h4 className="font-medium text-gray-200 mb-1">Remove Duplicates</h4>
-              <p className="text-sm text-gray-400">
-                Duplicate files can waste storage. Use Smart Scan to find and remove duplicates.
+              <h4 className="font-semibold text-slate-200 mb-0.5">Purge Redundant Duplicates</h4>
+              <p className="text-slate-400 leading-relaxed">
+                Duplicate files waste precious cloud space. Run a Duplicates Scan to eliminate redundant copies.
               </p>
             </div>
           </div>
-          <div className="flex gap-3">
-            <div className="text-2xl">⏰</div>
+          <div className="flex gap-3 p-4 rounded-xl bg-slate-950/50 border border-slate-800/60">
+            <div className="text-xl">⏰</div>
             <div>
-              <h4 className="font-medium text-gray-200 mb-1">Archive Old Files</h4>
-              <p className="text-sm text-gray-400">
-                Files you haven't accessed in years may be good candidates for archiving or deletion.
+              <h4 className="font-semibold text-slate-200 mb-0.5">Archive Inactive Documents</h4>
+              <p className="text-slate-400 leading-relaxed">
+                Move files unused for over 1-2 years into organized year-based archives using the Auto-Archive Engine.
               </p>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Refresh Button */}
-      <div className="flex justify-center">
-        <button
-          onClick={fetchQuota}
-          className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors flex items-center gap-2"
-        >
-          <RefreshCw className="w-4 h-4" />
-          Refresh Storage Data
-        </button>
       </div>
     </div>
   )

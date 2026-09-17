@@ -80,7 +80,7 @@ export function HistoryEventCard({ event }) {
   const hasDetails = (event.files && event.files.length > 0) || event.details
 
   return (
-    <div className="rounded-2xl border border-glass-border bg-card/40 backdrop-blur-md overflow-hidden transition-all duration-200 hover:bg-card/70 hover:border-white/20">
+    <div className="rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-sm overflow-hidden transition-all duration-200 hover:bg-slate-850 hover:border-slate-700">
       {/* Main card row */}
       <div className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-start sm:items-center gap-3.5">
@@ -94,9 +94,9 @@ export function HistoryEventCard({ event }) {
                 {iconConfig.tag}
               </Badge>
             </div>
-            <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
               {event.folderName && (
-                <span className="flex items-center gap-1 text-gray-300">
+                <span className="flex items-center gap-1 text-slate-300">
                   <FolderOpen className="w-3 h-3 text-blue-400" />
                   {event.folderName}
                 </span>
@@ -104,7 +104,7 @@ export function HistoryEventCard({ event }) {
               <span>•</span>
               <span>{formatRelativeTime(event.timestamp)}</span>
               <span>•</span>
-              <span className="text-gray-500">{new Date(event.timestamp).toLocaleString()}</span>
+              <span className="text-slate-500">{new Date(event.timestamp).toLocaleString()}</span>
             </div>
           </div>
         </div>

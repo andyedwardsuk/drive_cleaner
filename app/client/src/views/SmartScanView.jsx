@@ -36,21 +36,21 @@ function CategoryCard({ icon: Icon, title, count, size, color = 'blue', onClick 
 
   return (
     <div
-      className="p-6 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm hover:bg-card/70 hover:border-primary/40 transition-all cursor-pointer group"
+      className="p-6 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm hover:bg-slate-800/50 hover:border-blue-500/40 transition-all cursor-pointer group shadow-lg"
       onClick={onClick}
     >
       <div className="flex items-start justify-between mb-4">
-        <div className={`p-3 rounded-lg ${classes.bg}`}>
+        <div className={`p-3 rounded-xl ${classes.bg}`}>
           <Icon className={`w-6 h-6 ${classes.icon}`} />
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="secondary">{count}</Badge>
-          <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-gray-300 group-hover:translate-x-0.5 transition-all" />
+          <Badge variant="secondary" className="bg-slate-800 text-slate-300 border-slate-700">{count}</Badge>
+          <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-slate-300 group-hover:translate-x-0.5 transition-all" />
         </div>
       </div>
-      <h3 className="font-semibold text-lg mb-1 text-white">{title}</h3>
+      <h3 className="font-semibold text-base mb-1 text-white">{title}</h3>
       {size !== undefined && (
-        <p className="text-sm text-gray-400">{formatBytes(size)}</p>
+        <p className="text-xs text-slate-400">{formatBytes(size)}</p>
       )}
     </div>
   )
@@ -131,11 +131,11 @@ function ScanResults({ data }) {
   return (
     <div className="space-y-6">
       {/* Summary Stats & Target Folder Banner */}
-      <div className="p-6 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm">
+      <div className="p-6 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm shadow-xl">
         {/* Scanned Folder Details Header */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-glass-border">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-primary/10 text-primary">
+            <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
               <span className="text-xl">📁</span>
             </div>
             <div>
@@ -144,15 +144,15 @@ function ScanResults({ data }) {
                   {data.folder_name || 'My Drive'}
                 </h3>
                 {data.folder_id && data.folder_id !== 'root' && (
-                  <Badge variant="outline" className="text-xs font-mono text-muted-foreground border-glass-border">
+                  <Badge variant="outline" className="text-xs font-mono text-slate-400 border-slate-800 bg-slate-950">
                     ID: {data.folder_id}
                   </Badge>
                 )}
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="secondary" className="text-xs bg-slate-800 text-slate-300">
                   {data.folder_id === 'root' ? 'Entire Drive' : 'Attached Folder'}
                 </Badge>
               </div>
-              <p className="text-xs text-muted-foreground mt-0.5">
+              <p className="text-xs text-slate-400 mt-0.5">
                 Target: {data.folder_name || 'Selected Folder'}
               </p>
             </div>
@@ -163,7 +163,7 @@ function ScanResults({ data }) {
               href={getDriveFolderUrl(data.folder_id)}
               target="_blank"
               rel="noreferrer"
-              className="text-xs text-primary hover:underline flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-all"
+              className="text-xs text-blue-400 hover:underline flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 hover:bg-blue-500/20 transition-all"
             >
               <span>Open in Drive</span>
               <ExternalLink className="w-3.5 h-3.5" />
@@ -172,27 +172,27 @@ function ScanResults({ data }) {
         </div>
 
         <div className="flex items-center gap-2 mb-4">
-          <CheckCircle className="w-5 h-5 text-green-500" />
-          <h2 className="text-xl font-semibold">Scan Complete</h2>
+          <CheckCircle className="w-5 h-5 text-emerald-400" />
+          <h2 className="text-xl font-bold text-white">Scan Complete</h2>
         </div>
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <p className="text-sm text-gray-400">Files Scanned</p>
-            <p className="text-2xl font-bold">{totalFiles.toLocaleString()}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800/60">
+            <p className="text-xs text-slate-400 uppercase font-semibold">Files Scanned</p>
+            <p className="text-2xl font-bold text-white mt-1">{totalFiles.toLocaleString()}</p>
           </div>
-          <div>
-            <p className="text-sm text-gray-400">Total Space</p>
-            <p className="text-2xl font-bold">{formatBytes(totalSpace)}</p>
+          <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800/60">
+            <p className="text-xs text-slate-400 uppercase font-semibold">Total Space</p>
+            <p className="text-2xl font-bold text-white mt-1">{formatBytes(totalSpace)}</p>
           </div>
-          <div>
-            <p className="text-sm text-gray-400">Potential Savings</p>
-            <p className="text-2xl font-bold text-green-500">
+          <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800/60">
+            <p className="text-xs text-slate-400 uppercase font-semibold">Potential Savings</p>
+            <p className="text-2xl font-bold text-emerald-400 mt-1">
               {formatBytes(potentialSavings)}
             </p>
           </div>
         </div>
         {data.scan_date && (
-          <p className="text-xs text-gray-400 mt-4">
+          <p className="text-xs text-slate-500 mt-4">
             Scanned: {new Date(data.scan_date).toLocaleString()}
           </p>
         )}
@@ -200,10 +200,10 @@ function ScanResults({ data }) {
         {data.carbon_footprint && (
           <div
             onClick={() => navigate({ to: '/carbon-footprint' })}
-            className="mt-4 pt-4 border-t border-glass-border flex flex-col sm:flex-row sm:items-center justify-between gap-2 cursor-pointer group hover:opacity-95 transition-opacity"
+            className="mt-4 pt-4 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 cursor-pointer group hover:opacity-95 transition-opacity"
           >
-            <div className="flex items-center gap-2 text-xs text-gray-300">
-              <span className="p-1.5 rounded-md bg-emerald-500/10 text-emerald-400">
+            <div className="flex items-center gap-2 text-xs text-slate-300">
+              <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                 <Leaf className="w-4 h-4" />
               </span>
               <span>
@@ -231,13 +231,13 @@ function ScanResults({ data }) {
 
       {/* Recommendations */}
       {data.recommendations && data.recommendations.length > 0 && (
-        <div className="p-6 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm">
-          <h3 className="text-lg font-semibold mb-4">Recommendations</h3>
+        <div className="p-6 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm shadow-xl">
+          <h3 className="text-base font-semibold text-white mb-4">Actionable Recommendations</h3>
           <div className="space-y-3">
             {data.recommendations.map((rec, index) => (
               <div
                 key={index}
-                className="flex items-start gap-3 p-4 rounded-lg bg-card/30"
+                className="flex items-start gap-3 p-4 rounded-xl bg-slate-950/60 border border-slate-800/60"
               >
                 <Badge
                   variant={
@@ -247,14 +247,15 @@ function ScanResults({ data }) {
                       ? 'default'
                       : 'secondary'
                   }
+                  className="mt-0.5 uppercase text-[10px]"
                 >
                   {rec.priority}
                 </Badge>
                 <div className="flex-1">
-                  <p className="text-sm">{rec.message}</p>
+                  <p className="text-sm text-slate-200">{rec.message}</p>
                   {rec.space_savings_bytes > 0 && (
-                    <p className="text-xs text-gray-400 mt-1">
-                      Savings: {formatBytes(rec.space_savings_bytes)}
+                    <p className="text-xs text-emerald-400 font-medium mt-1">
+                      Reclaimable: {formatBytes(rec.space_savings_bytes)}
                     </p>
                   )}
                 </div>
@@ -299,11 +300,18 @@ export default function SmartScanView() {
           illustration="✅"
           actions={
             <div className="flex items-center gap-2">
-              <Button onClick={handleNewScan} variant="outline" size="lg" className="border-glass-border">
+              <Button
+                onClick={handleNewScan}
+                variant="outline"
+                className="h-11 px-4 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 text-xs font-semibold"
+              >
                 <FolderSearch className="mr-2 h-4 w-4" />
                 Change Folder
               </Button>
-              <Button onClick={handleStartScan} size="lg">
+              <Button
+                onClick={handleStartScan}
+                className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-900/40 text-xs"
+              >
                 <RotateCcw className="mr-2 h-4 w-4" />
                 Scan Again
               </Button>
@@ -326,9 +334,8 @@ export default function SmartScanView() {
         actions={
           <Button
             onClick={handleStartScan}
-            size="lg"
             disabled={loading || !isTargetReady}
-            className="shadow-lg shadow-primary/20"
+            className="h-11 px-6 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-lg shadow-blue-900/40"
           >
             {loading ? (
               <>
@@ -351,10 +358,10 @@ export default function SmartScanView() {
       />
 
       {loading && (
-        <div className="p-8 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm text-center">
+        <div className="p-12 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
           <div className="animate-pulse">
-            <p className="text-gray-300 font-medium mb-2">Analyzing files in {targetLabel}...</p>
-            <p className="text-sm text-gray-400">
+            <p className="text-slate-200 font-medium mb-2">Analyzing files in {targetLabel}...</p>
+            <p className="text-xs text-slate-400">
               Analyzing size distribution, duplicates, staleness, Google Workspace files, and carbon footprint.
             </p>
           </div>
@@ -362,13 +369,13 @@ export default function SmartScanView() {
       )}
 
       {error && (
-        <div className="p-6 border rounded-xl bg-red-500/10 border-red-500/20 backdrop-blur-sm">
+        <div className="p-6 border border-red-500/30 rounded-2xl bg-red-950/20 backdrop-blur-sm">
           <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
+            <AlertCircle className="w-5 h-5 text-red-400 mt-0.5 shrink-0" />
             <div>
-              <h3 className="font-semibold text-red-500 mb-1">Scan Failed</h3>
-              <p className="text-sm text-red-400 mb-2">{error}</p>
-              <p className="text-xs text-muted-foreground">
+              <h3 className="font-semibold text-red-400 mb-1 text-sm">Scan Failed</h3>
+              <p className="text-xs text-red-300 mb-2">{error}</p>
+              <p className="text-xs text-slate-400">
                 Tip: Ensure you have read access to the specified folder ID or URL, and that the folder is not in the trash.
               </p>
             </div>
@@ -377,11 +384,11 @@ export default function SmartScanView() {
       )}
 
       {!loading && !error && (
-        <div className="p-8 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm text-center">
-          <p className="text-gray-400 mb-4">
+        <div className="p-8 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
+          <p className="text-slate-300 mb-4 text-sm">
             Smart Scan will comprehensively analyze <strong className="text-white">{targetLabel}</strong> for:
           </p>
-          <ul className="text-left max-w-md mx-auto space-y-2 text-gray-300">
+          <ul className="text-left max-w-md mx-auto space-y-2 text-slate-300 text-xs">
             <li>✓ Duplicate files (byte-exact and name matches)</li>
             <li>✓ Large files (&gt;100MB, &gt;500MB, &gt;1GB)</li>
             <li>✓ Old & abandoned files (&gt;1 year, &gt;2 years, &gt;5 years)</li>

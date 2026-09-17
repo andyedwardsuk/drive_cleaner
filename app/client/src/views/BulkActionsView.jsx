@@ -287,18 +287,16 @@ export default function BulkActionsView() {
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              size="lg"
               onClick={() => navigate({ to: '/smart-scan' })}
-              className="border-glass-border hover:bg-white/10"
+              className="h-11 px-4 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 text-xs font-semibold"
             >
               <Search className="w-4 h-4 mr-2" />
               Configure Folder
             </Button>
             <Button
-              size="lg"
               onClick={startScan}
               disabled={isScanning}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg shadow-primary/20"
+              className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs shadow-lg shadow-blue-900/40"
             >
               <Sparkles className="w-4 h-4 mr-2" />
               {isScanning ? 'Scanning Drive...' : 'Re-Scan Drive'}
@@ -317,10 +315,10 @@ export default function BulkActionsView() {
             <button
               key={preset.id}
               onClick={() => setActiveCategory(preset.id)}
-              className={`text-left p-4 rounded-2xl border transition-all duration-200 relative overflow-hidden backdrop-blur-md ${
+              className={`text-left p-4 rounded-2xl border transition-all duration-200 relative overflow-hidden backdrop-blur-sm shadow-md ${
                 isActive
-                  ? 'bg-card/90 border-primary shadow-lg shadow-primary/10 ring-2 ring-primary/30'
-                  : 'bg-card/40 border-glass-border hover:bg-card/70 hover:border-white/20'
+                  ? 'bg-slate-900 border-blue-500 ring-2 ring-blue-500/30 shadow-blue-950/40'
+                  : 'bg-slate-900/60 border-slate-800/80 hover:bg-slate-800/60 hover:border-slate-700'
               }`}
             >
               <div className="flex items-center justify-between mb-3">
@@ -328,15 +326,15 @@ export default function BulkActionsView() {
                   <Icon className="w-5 h-5" />
                 </div>
                 {isActive && (
-                  <CheckCircle2 className="w-4 h-4 text-primary animate-in zoom-in-50" />
+                  <CheckCircle2 className="w-4 h-4 text-blue-400 animate-in zoom-in-50" />
                 )}
               </div>
               <div className="space-y-1">
                 <h3 className="text-sm font-semibold text-white truncate">{preset.title}</h3>
                 <div className="flex items-center gap-1.5 text-xs">
-                  <span className="font-bold text-gray-200">{preset.count}</span>
-                  <span className="text-gray-400">files</span>
-                  <span className="text-gray-500">•</span>
+                  <span className="font-bold text-slate-200">{preset.count}</span>
+                  <span className="text-slate-400">files</span>
+                  <span className="text-slate-500">•</span>
                   <span className="text-emerald-400 font-medium">{preset.size}</span>
                 </div>
               </div>
@@ -346,29 +344,29 @@ export default function BulkActionsView() {
       </div>
 
       {/* Active Pool Summary */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-card/40 border border-glass-border backdrop-blur-md">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm shadow-xl">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-white">
+            <h2 className="text-base font-bold text-white">
               {presetCards.find((p) => p.id === activeCategory)?.title || 'Selected Candidates'}
             </h2>
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="secondary" className="text-xs bg-slate-800 text-slate-300 border-slate-700">
               {displayedFiles.length} candidate items
             </Badge>
           </div>
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="text-xs text-slate-400 mt-0.5">
             Select specific items or use the table header checkbox to bulk select and trash.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300 font-medium">
+          <div className="px-3.5 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300 font-semibold">
             Potential Savings: <strong className="text-emerald-400">{formatBytes(totalBytes)}</strong>
           </div>
         </div>
       </div>
 
       {/* Interactive Candidate File Table */}
-      <div className="p-4 rounded-2xl bg-card/30 border border-glass-border backdrop-blur-sm">
+      <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm shadow-xl">
         <FileTable data={displayedFiles} />
       </div>
     </div>

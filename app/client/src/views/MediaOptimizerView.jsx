@@ -96,10 +96,9 @@ export default function MediaOptimizerView() {
         <div className="flex flex-wrap items-center gap-3 mt-4">
           <Button
             variant="outline"
-            size="sm"
             onClick={refresh}
             disabled={loading}
-            className="border-glass-border hover:bg-slate-800 text-gray-200"
+            className="h-11 px-4 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white"
           >
             <RefreshCw className={cn('w-4 h-4 mr-2', loading && 'animate-spin')} />
             Refresh Media Audit
@@ -107,10 +106,9 @@ export default function MediaOptimizerView() {
 
           <Button
             variant="outline"
-            size="sm"
             onClick={handleExportManifest}
             disabled={loading || allMedia.length === 0}
-            className="border-glass-border hover:bg-slate-800 text-gray-200"
+            className="h-11 px-4 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white"
           >
             <Download className="w-4 h-4 mr-2" />
             Export Optimization Manifest (CSV)
@@ -136,9 +134,9 @@ export default function MediaOptimizerView() {
       {/* KPI Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Media Storage */}
-        <div className="p-5 rounded-2xl bg-card/60 border border-glass-border backdrop-blur-md relative overflow-hidden">
+        <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium uppercase tracking-wider text-gray-400">Total Media Storage</span>
+            <span className="text-xs font-medium uppercase tracking-wider text-slate-400">Total Media Storage</span>
             <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400">
               <HardDrive className="w-5 h-5" />
             </div>
@@ -147,16 +145,16 @@ export default function MediaOptimizerView() {
             <div className="text-2xl font-bold text-white tracking-tight">
               {formatBytes(summary.totalMediaBytes || 0)}
             </div>
-            <div className="text-xs text-gray-400 mt-1 flex items-center gap-1.5">
+            <div className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
               <span>{summary.totalMediaCount || 0} media files scanned</span>
             </div>
           </div>
         </div>
 
         {/* Potential Compression Savings */}
-        <div className="p-5 rounded-2xl bg-card/60 border border-glass-border backdrop-blur-md relative overflow-hidden">
+        <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium uppercase tracking-wider text-gray-400">Reclaimable Space</span>
+            <span className="text-xs font-medium uppercase tracking-wider text-slate-400">Reclaimable Space</span>
             <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
               <TrendingDown className="w-5 h-5" />
             </div>
@@ -173,9 +171,9 @@ export default function MediaOptimizerView() {
         </div>
 
         {/* Photo Bursts */}
-        <div className="p-5 rounded-2xl bg-card/60 border border-glass-border backdrop-blur-md relative overflow-hidden">
+        <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium uppercase tracking-wider text-gray-400">Photo Bursts</span>
+            <span className="text-xs font-medium uppercase tracking-wider text-slate-400">Photo Bursts</span>
             <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
               <Layers className="w-5 h-5" />
             </div>
@@ -184,16 +182,16 @@ export default function MediaOptimizerView() {
             <div className="text-2xl font-bold text-amber-300 tracking-tight">
               {summary.burstGroupCount || 0} Bursts
             </div>
-            <div className="text-xs text-gray-400 mt-1 flex items-center gap-1.5">
+            <div className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
               <span>{summary.burstTailingsCount || 0} duplicate tailings eligible</span>
             </div>
           </div>
         </div>
 
         {/* Video Consumers */}
-        <div className="p-5 rounded-2xl bg-card/60 border border-glass-border backdrop-blur-md relative overflow-hidden">
+        <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium uppercase tracking-wider text-gray-400">Video Storage</span>
+            <span className="text-xs font-medium uppercase tracking-wider text-slate-400">Video Storage</span>
             <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400">
               <Film className="w-5 h-5" />
             </div>
@@ -202,7 +200,7 @@ export default function MediaOptimizerView() {
             <div className="text-2xl font-bold text-purple-300 tracking-tight">
               {formatBytes(summary.videoTotalBytes || 0)}
             </div>
-            <div className="text-xs text-gray-400 mt-1 flex items-center gap-1.5">
+            <div className="text-xs text-slate-400 mt-1 flex items-center gap-1.5">
               <span>{summary.videoCount || 0} video assets analyzed</span>
             </div>
           </div>
@@ -210,20 +208,20 @@ export default function MediaOptimizerView() {
       </div>
 
       {/* Filter Tabs & View Controls */}
-      <div className="p-4 rounded-2xl bg-card/40 border border-glass-border backdrop-blur-md flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+      <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
         {/* Filter Pills */}
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setFilterMode('all')}
             className={cn(
-              'px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
+              'px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
               filterMode === 'all'
                 ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                : 'bg-slate-800/60 text-gray-400 hover:text-gray-200 hover:bg-slate-800'
+                : 'bg-slate-900/60 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700'
             )}
           >
             <span>All Media</span>
-            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-900/60 text-gray-300">
+            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-950/70 text-slate-300">
               {allMedia.length}
             </Badge>
           </button>
@@ -231,15 +229,15 @@ export default function MediaOptimizerView() {
           <button
             onClick={() => setFilterMode('videos')}
             className={cn(
-              'px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
+              'px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
               filterMode === 'videos'
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20'
-                : 'bg-slate-800/60 text-gray-400 hover:text-gray-200 hover:bg-slate-800'
+                : 'bg-slate-900/60 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700'
             )}
           >
             <Film className="w-3.5 h-3.5" />
             <span>Video Consumers</span>
-            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-900/60 text-gray-300">
+            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-950/70 text-slate-300">
               {videos.length}
             </Badge>
           </button>
@@ -247,15 +245,15 @@ export default function MediaOptimizerView() {
           <button
             onClick={() => setFilterMode('bursts')}
             className={cn(
-              'px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
+              'px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
               filterMode === 'bursts'
                 ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/20'
-                : 'bg-slate-800/60 text-gray-400 hover:text-gray-200 hover:bg-slate-800'
+                : 'bg-slate-900/60 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700'
             )}
           >
             <Layers className="w-3.5 h-3.5" />
             <span>Photo Bursts & Duplicates</span>
-            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-900/60 text-gray-300">
+            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-950/70 text-slate-300">
               {photoBursts.length}
             </Badge>
           </button>
@@ -263,15 +261,15 @@ export default function MediaOptimizerView() {
           <button
             onClick={() => setFilterMode('compression')}
             className={cn(
-              'px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
+              'px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
               filterMode === 'compression'
                 ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
-                : 'bg-slate-800/60 text-gray-400 hover:text-gray-200 hover:bg-slate-800'
+                : 'bg-slate-900/60 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700'
             )}
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>Compression Candidates</span>
-            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-900/60 text-gray-300">
+            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-950/70 text-slate-300">
               {compressionCandidates.length}
             </Badge>
           </button>
@@ -279,15 +277,15 @@ export default function MediaOptimizerView() {
           <button
             onClick={() => setFilterMode('audio')}
             className={cn(
-              'px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
+              'px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
               filterMode === 'audio'
                 ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/20'
-                : 'bg-slate-800/60 text-gray-400 hover:text-gray-200 hover:bg-slate-800'
+                : 'bg-slate-900/60 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700'
             )}
           >
             <Music className="w-3.5 h-3.5" />
             <span>Audio</span>
-            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-900/60 text-gray-300">
+            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-950/70 text-slate-300">
               {allMedia.filter((m) => m.mediaType === 'audio').length}
             </Badge>
           </button>
@@ -296,22 +294,22 @@ export default function MediaOptimizerView() {
         {/* Search & Layout Toggles */}
         <div className="flex items-center gap-3">
           <div className="relative min-w-[200px] flex-1 md:flex-initial">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <Input
               type="text"
               placeholder="Search camera, format, title..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 bg-slate-900/60 border-glass-border h-9 text-xs rounded-xl focus-visible:ring-primary/40 text-gray-200"
+              className="pl-9 h-11 rounded-xl bg-slate-950/70 border-slate-800 text-white placeholder:text-slate-500 text-sm focus-visible:ring-primary/40"
             />
           </div>
 
-          <div className="flex items-center p-1 rounded-xl bg-slate-900/60 border border-glass-border">
+          <div className="flex items-center p-1 rounded-xl bg-slate-950/70 border border-slate-800">
             <button
               onClick={() => setLayoutMode('grid')}
               className={cn(
-                'p-1.5 rounded-lg transition-colors',
-                layoutMode === 'grid' ? 'bg-primary/20 text-primary' : 'text-gray-400 hover:text-gray-200'
+                'p-2 rounded-lg transition-colors',
+                layoutMode === 'grid' ? 'bg-primary/20 text-primary' : 'text-slate-400 hover:text-white'
               )}
               title="Grid View"
             >
@@ -320,8 +318,8 @@ export default function MediaOptimizerView() {
             <button
               onClick={() => setLayoutMode('table')}
               className={cn(
-                'p-1.5 rounded-lg transition-colors',
-                layoutMode === 'table' ? 'bg-primary/20 text-primary' : 'text-gray-400 hover:text-gray-200'
+                'p-2 rounded-lg transition-colors',
+                layoutMode === 'table' ? 'bg-primary/20 text-primary' : 'text-slate-400 hover:text-white'
               )}
               title="Table View"
             >
@@ -358,9 +356,9 @@ export default function MediaOptimizerView() {
             {photoBursts.map((burst) => (
               <div
                 key={burst.groupId}
-                className="p-5 rounded-2xl bg-card/50 border border-glass-border backdrop-blur-md space-y-4"
+                className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm space-y-4"
               >
-                <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-glass-border">
+                <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
                       <ImageIcon className="w-4 h-4" />
@@ -372,7 +370,7 @@ export default function MediaOptimizerView() {
                           {burst.cameraModel}
                         </Badge>
                       </h4>
-                      <div className="text-xs text-gray-400 mt-0.5">
+                      <div className="text-xs text-slate-400 mt-0.5">
                         Total {formatBytes(burst.totalBytes)} • Reclaim {formatBytes(burst.potentialSavingsBytes)} by keeping best shot
                       </div>
                     </div>
@@ -401,12 +399,12 @@ export default function MediaOptimizerView() {
                       <div
                         key={item.fileId}
                         className={cn(
-                          'relative group rounded-xl overflow-hidden border transition-all cursor-pointer bg-slate-900/60',
+                          'relative group rounded-xl overflow-hidden border transition-all cursor-pointer bg-slate-950/60',
                           item.isBestShot
                             ? 'border-amber-400/80 ring-1 ring-amber-400/40'
                             : isSelected
                             ? 'border-primary ring-2 ring-primary/40'
-                            : 'border-glass-border hover:border-slate-600'
+                            : 'border-slate-800 hover:border-slate-700'
                         )}
                         onClick={() => toggleSelect(item.fileId)}
                       >
@@ -504,12 +502,12 @@ export default function MediaOptimizerView() {
 
           {/* Transformation Rule Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-xl bg-slate-900/60 border border-glass-border space-y-2">
+            <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80 space-y-2">
               <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400 uppercase tracking-wider">
                 <ImageIcon className="w-4 h-4" />
                 <span>RAW Camera Photos</span>
               </div>
-              <p className="text-xs text-gray-300">
+              <p className="text-xs text-slate-300">
                 RAW sensor data (.CR2, .ARW, .NEF) converted to WebP/AVIF (90% Quality).
               </p>
               <div className="text-sm font-bold text-white flex items-center gap-2">
@@ -518,12 +516,12 @@ export default function MediaOptimizerView() {
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-900/60 border border-glass-border space-y-2">
+            <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80 space-y-2">
               <div className="flex items-center gap-2 text-xs font-semibold text-purple-400 uppercase tracking-wider">
                 <Film className="w-4 h-4" />
                 <span>ProRes / Heavy Videos</span>
               </div>
-              <p className="text-xs text-gray-300">
+              <p className="text-xs text-slate-300">
                 Intra-frame video converted to modern H.265 (HEVC) or AV1 MP4.
               </p>
               <div className="text-sm font-bold text-white flex items-center gap-2">
@@ -532,12 +530,12 @@ export default function MediaOptimizerView() {
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-slate-900/60 border border-glass-border space-y-2">
+            <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80 space-y-2">
               <div className="flex items-center gap-2 text-xs font-semibold text-cyan-400 uppercase tracking-wider">
                 <Music className="w-4 h-4" />
                 <span>Uncompressed Audio</span>
               </div>
-              <p className="text-xs text-gray-300">
+              <p className="text-xs text-slate-300">
                 Lossless PCM WAV/AIFF master tracks converted to 256kbps AAC/MP3.
               </p>
               <div className="text-sm font-bold text-white flex items-center gap-2">
@@ -557,7 +555,7 @@ export default function MediaOptimizerView() {
             <div className="flex items-center gap-3">
               <h3 className="text-base font-semibold text-white flex items-center gap-2">
                 <span>Media Items</span>
-                <Badge variant="outline" className="text-xs border-glass-border text-gray-400">
+                <Badge variant="outline" className="text-xs border-slate-800 text-slate-400">
                   {filteredMedia.length}
                 </Badge>
               </h3>
@@ -586,7 +584,7 @@ export default function MediaOptimizerView() {
                     size="sm"
                     variant="outline"
                     onClick={archiveSelected}
-                    className="h-8 text-xs border-glass-border hover:bg-slate-800 text-gray-200"
+                    className="h-8 text-xs border-slate-800 hover:bg-slate-800 text-slate-200"
                   >
                     <Archive className="w-3.5 h-3.5 mr-1.5 text-amber-400" />
                     Stage for Archive
@@ -606,7 +604,7 @@ export default function MediaOptimizerView() {
                     size="sm"
                     variant="ghost"
                     onClick={clearSelection}
-                    className="h-8 text-xs text-gray-400 hover:text-white"
+                    className="h-8 text-xs text-slate-400 hover:text-white"
                   >
                     Clear
                   </Button>
@@ -627,10 +625,10 @@ export default function MediaOptimizerView() {
                   <div
                     key={item.fileId}
                     className={cn(
-                      'group rounded-2xl overflow-hidden border transition-all cursor-pointer bg-card/60 backdrop-blur-md flex flex-col',
+                      'group rounded-2xl overflow-hidden border transition-all cursor-pointer bg-slate-900/60 backdrop-blur-sm flex flex-col',
                       isSelected
                         ? 'border-primary ring-2 ring-primary/40'
-                        : 'border-glass-border hover:border-slate-600 hover:bg-card/80'
+                        : 'border-slate-800/80 hover:border-slate-700 hover:bg-slate-850'
                     )}
                     onClick={() => toggleSelect(item.fileId)}
                   >
@@ -730,7 +728,7 @@ export default function MediaOptimizerView() {
 
                       {/* Compression Savings Recommendation Pill */}
                       {item.compression && (
-                        <div className="pt-2 border-t border-glass-border">
+                        <div className="pt-2 border-t border-slate-800/80">
                           <div className="flex items-center justify-between text-[10px]">
                             <span className="text-emerald-400 font-medium truncate pr-1">
                               Reclaim {formatBytes(item.compression.estimatedSavingsBytes)}
@@ -739,7 +737,7 @@ export default function MediaOptimizerView() {
                               -{item.compression.savingsPercent}%
                             </span>
                           </div>
-                          <div className="text-[10px] text-gray-400 truncate mt-0.5">
+                          <div className="text-[10px] text-slate-400 truncate mt-0.5">
                             Target: {item.compression.targetFormat}
                           </div>
                         </div>
@@ -751,17 +749,17 @@ export default function MediaOptimizerView() {
             </div>
           ) : (
             /* Table Layout View */
-            <div className="rounded-2xl border border-glass-border bg-card/50 backdrop-blur-md overflow-hidden">
+            <div className="rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-sm overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="border-b border-glass-border bg-slate-900/60 text-gray-400 font-medium">
+                  <thead className="border-b border-slate-800/80 bg-slate-950/80 text-slate-400 font-medium">
                     <tr>
                       <th className="p-3.5 w-10">
                         <input
                           type="checkbox"
                           checked={isAllSelected}
                           onChange={handleToggleSelectAll}
-                          className="rounded border-gray-600 bg-slate-800 text-primary focus:ring-primary/40"
+                          className="rounded border-slate-700 bg-slate-900 text-primary focus:ring-primary/40"
                         />
                       </th>
                       <th className="p-3.5">File Name</th>
@@ -772,7 +770,7 @@ export default function MediaOptimizerView() {
                       <th className="p-3.5 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-glass-border text-gray-200">
+                  <tbody className="divide-y divide-slate-800/60 text-slate-200">
                     {filteredMedia.map((item) => {
                       const isSelected = selectedIds.has(item.fileId)
                       return (
@@ -789,7 +787,7 @@ export default function MediaOptimizerView() {
                               type="checkbox"
                               checked={isSelected}
                               onChange={() => toggleSelect(item.fileId)}
-                              className="rounded border-gray-600 bg-slate-800 text-primary focus:ring-primary/40"
+                              className="rounded border-slate-700 bg-slate-900 text-primary focus:ring-primary/40"
                             />
                           </td>
                           <td className="p-3.5">
@@ -801,7 +799,7 @@ export default function MediaOptimizerView() {
                                   className="w-9 h-9 rounded-lg object-cover flex-shrink-0"
                                 />
                               ) : (
-                                <div className="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-gray-400 flex-shrink-0">
+                                <div className="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 flex-shrink-0">
                                   {item.mediaType === 'video' ? (
                                     <Film className="w-4 h-4 text-purple-400" />
                                   ) : item.mediaType === 'audio' ? (
@@ -815,7 +813,7 @@ export default function MediaOptimizerView() {
                                 <div className="font-semibold text-white truncate max-w-xs sm:max-w-sm">
                                   {item.fileName}
                                 </div>
-                                <div className="text-[11px] text-gray-400">
+                                <div className="text-[11px] text-slate-400">
                                   {item.cameraModel || item.mimeType}
                                 </div>
                               </div>
@@ -823,14 +821,14 @@ export default function MediaOptimizerView() {
                           </td>
                           <td className="p-3.5">
                             {item.resolutionCategory ? (
-                              <Badge variant="outline" className="text-[10px] border-glass-border">
+                              <Badge variant="outline" className="text-[10px] border-slate-800 text-slate-300">
                                 {item.resolutionCategory}
                               </Badge>
                             ) : (
-                              <span className="text-gray-500">—</span>
+                              <span className="text-slate-500">—</span>
                             )}
                             {item.dimensions && (
-                              <div className="text-[11px] text-gray-400 mt-0.5">{item.dimensions}</div>
+                              <div className="text-[11px] text-slate-400 mt-0.5">{item.dimensions}</div>
                             )}
                           </td>
                           <td className="p-3.5">

@@ -10,13 +10,16 @@ import {
   Search,
   CheckCircle2,
   AlertTriangle,
-  Info
+  Info,
+  Eye
 } from 'lucide-react'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { useSmartScan } from '@/hooks/useSmartScan'
+import { useFilePreview } from '@/hooks/useFilePreview'
+import FilePreviewModal from '@/components/preview/FilePreviewModal'
 import {
   Table,
   TableBody,
@@ -86,15 +89,15 @@ function FilterChip({ label, active, count, onClick, color = 'blue' }) {
     <button
       type="button"
       onClick={onClick}
-      className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-all flex items-center gap-1.5 ${
+      className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-all flex items-center gap-1.5 ${
         active
           ? activeColorClasses[color] || activeColorClasses.blue
-          : 'bg-card/50 border-glass-border text-gray-300 hover:border-primary/50 hover:bg-card/70'
+          : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-800/60'
       }`}
     >
       <span>{label}</span>
       {count !== undefined && count > 0 && (
-        <span className={`text-xs px-1.5 py-0.5 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-white/10 text-gray-400'}`}>
+        <span className={`text-xs px-1.5 py-0.5 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400'}`}>
           {count}
         </span>
       )}
@@ -115,17 +118,17 @@ function MetricCard({ icon: Icon, title, value, subtitle, color = 'blue' }) {
   const current = colors[color] || colors.blue
 
   return (
-    <div className="p-5 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm">
+    <div className="p-5 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm">
       <div className="flex items-center gap-3 mb-2">
-        <div className={`p-2.5 rounded-lg ${current.bg}`}>
+        <div className={`p-2.5 rounded-xl ${current.bg}`}>
           <Icon className={`w-5 h-5 ${current.icon}`} />
         </div>
         <div>
-          <p className="text-xs text-gray-400">{title}</p>
-          <p className="text-xl font-bold text-gray-100">{value}</p>
+          <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">{title}</h4>
+          <span className="text-xl font-bold text-white">{value}</span>
         </div>
       </div>
-      {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
+      {subtitle && <p className="text-xs text-slate-400">{subtitle}</p>}
     </div>
   )
 }
@@ -142,8 +145,21 @@ export default function GoogleWorkspaceView() {
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState('viewed') // 'name', 'viewed', 'type'
   const [sortOrder, setSortOrder] = useState('desc')
+  const { previewFile, isPreviewOpen, openPreview, closePreview } = useFilePreview()
 
   const workspaceData = data?.workspace_files
+
+  const handlePreview = (file) => {
+    openPreview({
+      id: file.file_id || file.id,
+      name: file.file_name || file.name,
+      size: file.size_bytes || file.size || 0,
+      mimeType: file.mime_type || `application/vnd.google-apps.${file.workspace_type || 'document'}`,
+      modifiedTime: file.modified_date || file.modifiedTime,
+      webViewLink: file.drive_link || `https://drive.google.com/open?id=${file.file_id}`,
+      parentName: file.parent_name,
+    })
+  }
 
   // Filtered and sorted files
   const filteredFiles = useMemo(() => {
@@ -228,13 +244,13 @@ export default function GoogleWorkspaceView() {
           subtitle="Analyze your Docs, Sheets, Slides, Forms, and native Google files"
           illustration="📝"
         />
-        <div className="p-12 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm text-center">
+        <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
           <FileSpreadsheet className="w-16 h-16 text-blue-400 mx-auto mb-4 opacity-70" />
-          <h3 className="text-lg font-semibold text-gray-200 mb-2">No Scan Data Found</h3>
-          <p className="text-gray-400 mb-6 max-w-md mx-auto">
+          <h3 className="text-lg font-semibold text-slate-200 mb-2">No Scan Data Found</h3>
+          <p className="text-slate-400 mb-6 max-w-md mx-auto">
             Run a Smart Scan to inspect and categorize all Google Workspace files across your Drive.
           </p>
-          <Button onClick={() => runScan('root', 'user')} size="lg">
+          <Button onClick={() => runScan('root', 'user')} size="lg" className="rounded-xl">
             <RefreshCw className="w-4 h-4 mr-2" />
             Run Smart Scan
           </Button>
@@ -253,9 +269,9 @@ export default function GoogleWorkspaceView() {
           subtitle="Analyzing Google Workspace files..."
           illustration="⏳"
         />
-        <div className="p-12 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm text-center">
+        <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
           <RefreshCw className="w-8 h-8 text-blue-400 animate-spin mx-auto mb-4" />
-          <p className="text-gray-300">Scanning and categorizing Workspace files...</p>
+          <p className="text-slate-300">Scanning and categorizing Workspace files...</p>
         </div>
       </div>
     )
@@ -273,7 +289,7 @@ export default function GoogleWorkspaceView() {
         subtitle={`Discovered ${totalCount} native Google Workspace files in ${data?.folder_name || 'My Drive'}`}
         illustration="📝"
         actions={
-          <Button onClick={() => runScan('root', 'user')} size="lg">
+          <Button onClick={() => runScan('root', 'user')} size="lg" className="rounded-xl">
             <RefreshCw className="w-4 h-4 mr-2" />
             Refresh Scan
           </Button>
@@ -310,16 +326,16 @@ export default function GoogleWorkspaceView() {
       </div>
 
       {/* Filter Toolbar */}
-      <div className="p-5 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm space-y-4">
+      <div className="p-5 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm space-y-4">
         {/* Search */}
         <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
           <div className="relative w-full md:w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <Input
               placeholder="Search Workspace files..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 bg-background/50 border-glass-border text-sm"
+              className="pl-9 bg-slate-950/70 border-slate-800 text-sm h-11 rounded-xl text-white"
             />
           </div>
 
@@ -359,8 +375,8 @@ export default function GoogleWorkspaceView() {
         </div>
 
         {/* File Type Chips */}
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-glass-border/50">
-          <span className="text-xs text-gray-400 font-medium mr-1 flex items-center gap-1">
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-800/80">
+          <span className="text-xs text-slate-400 font-medium mr-1 flex items-center gap-1">
             <Filter className="w-3.5 h-3.5" /> Type:
           </span>
           <FilterChip
@@ -419,7 +435,7 @@ export default function GoogleWorkspaceView() {
           )}
 
           <div className="ml-auto flex items-center gap-2">
-            <span className="text-xs text-gray-400 font-medium mr-1">Sharing:</span>
+            <span className="text-xs text-slate-400 font-medium mr-1">Sharing:</span>
             <FilterChip
               label="All"
               active={sharingFilter === 'all'}
@@ -444,38 +460,38 @@ export default function GoogleWorkspaceView() {
 
       {/* Files Table */}
       {filteredFiles.length === 0 ? (
-        <div className="p-12 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm text-center">
-          <Info className="w-8 h-8 text-gray-500 mx-auto mb-3" />
-          <p className="text-gray-300 font-medium">No files match your filters</p>
-          <p className="text-xs text-gray-500 mt-1">Try resetting the type or inactivity filter</p>
+        <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
+          <Info className="w-8 h-8 text-slate-500 mx-auto mb-3" />
+          <p className="text-slate-300 font-medium">No files match your filters</p>
+          <p className="text-xs text-slate-500 mt-1">Try resetting the type or inactivity filter</p>
         </div>
       ) : (
-        <div className="border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm overflow-hidden">
+        <div className="border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow className="border-glass-border hover:bg-transparent">
-                <TableHead className="w-12 text-gray-400">Icon</TableHead>
+              <TableRow className="border-slate-800/80 hover:bg-transparent">
+                <TableHead className="w-12 text-slate-400">Icon</TableHead>
                 <TableHead
-                  className="text-gray-400 cursor-pointer hover:text-gray-200"
+                  className="text-slate-400 cursor-pointer hover:text-slate-200"
                   onClick={() => handleSort('name')}
                 >
                   File Name {sortBy === 'name' && (sortOrder === 'desc' ? '↓' : '↑')}
                 </TableHead>
                 <TableHead
-                  className="text-gray-400 cursor-pointer hover:text-gray-200"
+                  className="text-slate-400 cursor-pointer hover:text-slate-200"
                   onClick={() => handleSort('type')}
                 >
                   Type {sortBy === 'type' && (sortOrder === 'desc' ? '↓' : '↑')}
                 </TableHead>
                 <TableHead
-                  className="text-gray-400 cursor-pointer hover:text-gray-200"
+                  className="text-slate-400 cursor-pointer hover:text-slate-200"
                   onClick={() => handleSort('viewed')}
                 >
                   Last Viewed {sortBy === 'viewed' && (sortOrder === 'desc' ? '↓' : '↑')}
                 </TableHead>
-                <TableHead className="text-gray-400">Sharing</TableHead>
-                <TableHead className="text-gray-400">Recommendation</TableHead>
-                <TableHead className="text-right text-gray-400">Actions</TableHead>
+                <TableHead className="text-slate-400">Sharing</TableHead>
+                <TableHead className="text-slate-400">Recommendation</TableHead>
+                <TableHead className="text-right text-slate-400">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -487,7 +503,7 @@ export default function GoogleWorkspaceView() {
                 return (
                   <TableRow
                     key={file.file_id || idx}
-                    className="border-glass-border hover:bg-white/5 transition-colors"
+                    className="border-slate-800/60 hover:bg-slate-800/40 transition-colors"
                   >
                     <TableCell>
                       <span className="text-xl select-none">
@@ -495,11 +511,11 @@ export default function GoogleWorkspaceView() {
                       </span>
                     </TableCell>
 
-                    <TableCell className="font-medium text-gray-200">
+                    <TableCell className="font-medium text-slate-200">
                       <div className="flex flex-col">
                         <span className="truncate max-w-xs md:max-w-md">{file.file_name}</span>
                         {file.parent_name && (
-                          <span className="text-xs text-gray-500 font-normal">
+                          <span className="text-xs text-slate-500 font-normal">
                             📁 {file.parent_name}
                           </span>
                         )}
@@ -507,12 +523,12 @@ export default function GoogleWorkspaceView() {
                     </TableCell>
 
                     <TableCell>
-                      <Badge variant="outline" className="capitalize text-xs font-normal">
+                      <Badge variant="outline" className="capitalize text-xs font-normal border-slate-700 bg-slate-800/60 text-slate-300">
                         {file.workspace_type || 'Workspace'}
                       </Badge>
                     </TableCell>
 
-                    <TableCell className="text-sm text-gray-300">
+                    <TableCell className="text-sm text-slate-300">
                       <div className="flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5 text-orange-400/80" />
                         <span>{formatDaysAgo(file.days_since_viewed, file.last_viewed_date)}</span>
@@ -525,7 +541,7 @@ export default function GoogleWorkspaceView() {
                           <Share2 className="w-3 h-3" /> Shared
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="text-gray-400 border-gray-600 text-xs font-normal flex items-center gap-1 w-fit">
+                        <Badge variant="outline" className="text-slate-400 border-slate-700 text-xs font-normal flex items-center gap-1 w-fit">
                           <Lock className="w-3 h-3" /> Private
                         </Badge>
                       )}
@@ -546,15 +562,28 @@ export default function GoogleWorkspaceView() {
                     </TableCell>
 
                     <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => window.open(driveUrl, '_blank')}
-                        className="h-8 px-2 text-xs text-gray-300 hover:text-white hover:bg-white/10"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5 mr-1" />
-                        Open
-                      </Button>
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handlePreview(file)}
+                          className="h-8 px-2 text-xs text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg"
+                          title="Quick Preview"
+                        >
+                          <Eye className="w-3.5 h-3.5 mr-1" />
+                          Preview
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => window.open(driveUrl, '_blank')}
+                          className="h-8 px-2 text-xs text-slate-300 hover:text-blue-400 hover:bg-slate-800 rounded-lg"
+                          title="Open in Google Workspace"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5 mr-1" />
+                          Open
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 )
@@ -563,6 +592,12 @@ export default function GoogleWorkspaceView() {
           </Table>
         </div>
       )}
+
+      <FilePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        file={previewFile}
+      />
     </div>
   )
 }

@@ -96,7 +96,7 @@ export default function KanbanCard({ card, columnCards = [] }) {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       className={cn(
-        'p-3.5 rounded-xl border bg-slate-900/80 border-glass-border shadow-md backdrop-blur-sm cursor-grab active:cursor-grabbing hover:border-blue-500/40 transition-all group',
+        'p-3.5 rounded-xl border bg-slate-900/80 border-slate-800/80 shadow-md backdrop-blur-sm cursor-grab active:cursor-grabbing hover:border-blue-500/40 transition-all group',
         isDragging && 'opacity-40 ring-2 ring-blue-500'
       )}
     >
@@ -110,7 +110,7 @@ export default function KanbanCard({ card, columnCards = [] }) {
             <button
               type="button"
               onClick={() => openPreview(card, columnCards)}
-              className="text-left font-medium text-sm text-gray-200 hover:text-blue-400 transition-colors line-clamp-2 leading-snug cursor-pointer"
+              className="text-left font-medium text-sm text-slate-200 hover:text-blue-400 transition-colors line-clamp-2 leading-snug cursor-pointer"
               title="Click to preview file"
             >
               {card.fileName}
@@ -123,7 +123,7 @@ export default function KanbanCard({ card, columnCards = [] }) {
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="p-1 rounded text-gray-400 hover:text-white hover:bg-slate-800 transition-colors"
+              className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
             >
               <MoreVertical className="w-4 h-4" />
             </button>
@@ -150,7 +150,7 @@ export default function KanbanCard({ card, columnCards = [] }) {
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => removeCard(card.fileId)}
-              className="gap-2 text-gray-400 focus:text-red-400"
+              className="gap-2 text-slate-400 focus:text-red-400"
             >
               <Trash2 className="w-4 h-4" />
               Remove from Board
@@ -160,29 +160,29 @@ export default function KanbanCard({ card, columnCards = [] }) {
       </div>
 
       {/* Card Body: Metadata Tags */}
-      <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400 mb-3">
-        <span className="flex items-center gap-1 font-mono text-gray-300">
-          <HardDrive className="w-3 h-3 text-gray-500" />
+      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400 mb-3">
+        <span className="flex items-center gap-1 font-mono text-slate-300">
+          <HardDrive className="w-3 h-3 text-slate-500" />
           {formatBytes(card.sizeBytes)}
         </span>
 
         {card.parentName && (
           <span className="flex items-center gap-1 truncate max-w-[130px]" title={card.parentName}>
-            <Folder className="w-3 h-3 text-gray-500 flex-shrink-0" />
+            <Folder className="w-3 h-3 text-slate-500 flex-shrink-0" />
             <span className="truncate">{card.parentName}</span>
           </span>
         )}
 
         {card.modifiedDate && (
-          <span className="flex items-center gap-1 text-gray-400 ml-auto">
-            <Clock className="w-3 h-3 text-gray-500" />
+          <span className="flex items-center gap-1 text-slate-400 ml-auto">
+            <Clock className="w-3 h-3 text-slate-500" />
             {formatRelativeTime(card.modifiedDate)}
           </span>
         )}
       </div>
 
       {/* Card Quick Actions Footer */}
-      <div className="flex items-center justify-between pt-2 border-t border-glass-border/60 text-xs">
+      <div className="flex items-center justify-between pt-2 border-t border-slate-800/60 text-xs">
         <button
           type="button"
           onClick={() => openPreview(card, columnCards)}

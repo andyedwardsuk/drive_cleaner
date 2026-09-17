@@ -110,10 +110,9 @@ export default function SecurityAuditView() {
         <div className="flex flex-wrap items-center gap-3 mt-4">
           <Button
             variant="outline"
-            size="sm"
             onClick={refresh}
             disabled={loading || isRemediating}
-            className="border-glass-border hover:bg-slate-800 text-gray-200"
+            className="h-11 px-4 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white"
           >
             <RefreshCw className={cn('w-4 h-4 mr-2', (loading || isRemediating) && 'animate-spin')} />
             Run Security Audit
@@ -121,10 +120,9 @@ export default function SecurityAuditView() {
 
           <Button
             variant="outline"
-            size="sm"
             onClick={handleExportManifest}
             disabled={loading || allShared.length === 0}
-            className="border-glass-border hover:bg-slate-800 text-gray-200"
+            className="h-11 px-4 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white"
           >
             <Download className="w-4 h-4 mr-2" />
             Export Security Manifest (CSV)
@@ -150,9 +148,9 @@ export default function SecurityAuditView() {
       {/* Security Health Score Banner & KPI Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Security Health Meter Gauge */}
-        <div className="lg:col-span-4 p-6 rounded-2xl bg-card/60 border border-glass-border backdrop-blur-md flex flex-col justify-between relative overflow-hidden">
+        <div className="lg:col-span-4 p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Security Health Score</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Security Health Score</span>
             <div className={cn('p-2 rounded-lg', scoreColors.bg, scoreColors.text)}>
               <Shield className="w-5 h-5" />
             </div>
@@ -162,7 +160,7 @@ export default function SecurityAuditView() {
             <span className={cn('text-5xl font-black tracking-tight', scoreColors.text)}>
               {securityHealthScore}
             </span>
-            <span className="text-gray-400 text-sm font-medium">/ 100</span>
+            <span className="text-slate-400 text-sm font-medium">/ 100</span>
             <Badge
               variant="outline"
               className={cn('ml-auto text-xs font-bold px-2.5 py-0.5', scoreColors.border, scoreColors.text)}
@@ -172,7 +170,7 @@ export default function SecurityAuditView() {
           </div>
 
           {/* Progress Bar */}
-          <div className="w-full bg-slate-800/80 rounded-full h-2.5 overflow-hidden">
+          <div className="w-full bg-slate-950/80 rounded-full h-2.5 overflow-hidden border border-slate-800">
             <div
               className={cn(
                 'h-2.5 rounded-full transition-all duration-500',
@@ -182,7 +180,7 @@ export default function SecurityAuditView() {
             />
           </div>
 
-          <p className="text-xs text-gray-400 mt-4 leading-relaxed">
+          <p className="text-xs text-slate-400 mt-4 leading-relaxed">
             {securityHealthScore < 60
               ? 'Critical security vulnerabilities detected. Revoke public links and external permissions immediately.'
               : securityHealthScore < 85
@@ -194,9 +192,9 @@ export default function SecurityAuditView() {
         {/* 4 KPI Metrics */}
         <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Public Links */}
-          <div className="p-5 rounded-2xl bg-card/60 border border-glass-border backdrop-blur-md">
+          <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium uppercase tracking-wider text-gray-400">Public Web Links</span>
+              <span className="text-xs font-medium uppercase tracking-wider text-slate-400">Public Web Links</span>
               <div className="p-2 rounded-lg bg-red-500/10 text-red-400">
                 <Globe className="w-5 h-5" />
               </div>
@@ -205,16 +203,16 @@ export default function SecurityAuditView() {
               <div className="text-2xl font-bold text-red-400 tracking-tight">
                 {summary.publicLinkCount || 0} Files
               </div>
-              <div className="text-xs text-gray-400 mt-1">
+              <div className="text-xs text-slate-400 mt-1">
                 Anyone with link can access without login
               </div>
             </div>
           </div>
 
           {/* External Domain Collaborators */}
-          <div className="p-5 rounded-2xl bg-card/60 border border-glass-border backdrop-blur-md">
+          <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium uppercase tracking-wider text-gray-400">External Domains</span>
+              <span className="text-xs font-medium uppercase tracking-wider text-slate-400">External Domains</span>
               <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
                 <Users className="w-5 h-5" />
               </div>
@@ -223,16 +221,16 @@ export default function SecurityAuditView() {
               <div className="text-2xl font-bold text-amber-300 tracking-tight">
                 {summary.externalDomainCount || 0} Domains
               </div>
-              <div className="text-xs text-gray-400 mt-1">
+              <div className="text-xs text-slate-400 mt-1">
                 {summary.externalFilesCount || 0} files shared with outside organizations
               </div>
             </div>
           </div>
 
           {/* Stale Shares */}
-          <div className="p-5 rounded-2xl bg-card/60 border border-glass-border backdrop-blur-md">
+          <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium uppercase tracking-wider text-gray-400">Dormant Permissions</span>
+              <span className="text-xs font-medium uppercase tracking-wider text-slate-400">Dormant Permissions</span>
               <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400">
                 <Clock className="w-5 h-5" />
               </div>
@@ -241,16 +239,16 @@ export default function SecurityAuditView() {
               <div className="text-2xl font-bold text-blue-300 tracking-tight">
                 {summary.staleShareCount || 0} Files
               </div>
-              <div className="text-xs text-gray-400 mt-1">
+              <div className="text-xs text-slate-400 mt-1">
                 Shares untouched for over 180 days
               </div>
             </div>
           </div>
 
           {/* Sensitive Flagged Files */}
-          <div className="p-5 rounded-2xl bg-card/60 border border-glass-border backdrop-blur-md">
+          <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium uppercase tracking-wider text-gray-400">Sensitive Documents</span>
+              <span className="text-xs font-medium uppercase tracking-wider text-slate-400">Sensitive Documents</span>
               <div className="p-2 rounded-lg bg-purple-500/10 text-purple-400">
                 <Key className="w-5 h-5" />
               </div>
@@ -259,7 +257,7 @@ export default function SecurityAuditView() {
               <div className="text-2xl font-bold text-purple-300 tracking-tight">
                 {summary.sensitiveFileCount || 0} Flagged
               </div>
-              <div className="text-xs text-gray-400 mt-1">
+              <div className="text-xs text-slate-400 mt-1">
                 Credentials, NDAs, or financials exposed
               </div>
             </div>
@@ -268,21 +266,21 @@ export default function SecurityAuditView() {
       </div>
 
       {/* Risk Tabs & Search Toolbar */}
-      <div className="p-4 rounded-2xl bg-card/40 border border-glass-border backdrop-blur-md flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+      <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
         {/* Risk Tabs */}
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setActiveTab('public_links')}
             className={cn(
-              'px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
+              'px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
               activeTab === 'public_links'
                 ? 'bg-red-600 text-white shadow-lg shadow-red-600/20'
-                : 'bg-slate-800/60 text-gray-400 hover:text-gray-200 hover:bg-slate-800'
+                : 'bg-slate-900/60 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700'
             )}
           >
             <Globe className="w-3.5 h-3.5" />
             <span>Public Links</span>
-            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-900/60 text-gray-300">
+            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-950/70 text-slate-300">
               {publicLinks.length}
             </Badge>
           </button>
@@ -290,15 +288,15 @@ export default function SecurityAuditView() {
           <button
             onClick={() => setActiveTab('external_domains')}
             className={cn(
-              'px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
+              'px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
               activeTab === 'external_domains'
                 ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/20'
-                : 'bg-slate-800/60 text-gray-400 hover:text-gray-200 hover:bg-slate-800'
+                : 'bg-slate-900/60 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700'
             )}
           >
             <Users className="w-3.5 h-3.5" />
             <span>External Domains</span>
-            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-900/60 text-gray-300">
+            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-950/70 text-slate-300">
               {externalDomainShares.length}
             </Badge>
           </button>
@@ -306,15 +304,15 @@ export default function SecurityAuditView() {
           <button
             onClick={() => setActiveTab('stale_shares')}
             className={cn(
-              'px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
+              'px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
               activeTab === 'stale_shares'
                 ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-                : 'bg-slate-800/60 text-gray-400 hover:text-gray-200 hover:bg-slate-800'
+                : 'bg-slate-900/60 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700'
             )}
           >
             <Clock className="w-3.5 h-3.5" />
             <span>Dormant Access</span>
-            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-900/60 text-gray-300">
+            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-950/70 text-slate-300">
               {staleCollaborators.length}
             </Badge>
           </button>
@@ -322,15 +320,15 @@ export default function SecurityAuditView() {
           <button
             onClick={() => setActiveTab('sensitive_files')}
             className={cn(
-              'px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
+              'px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
               activeTab === 'sensitive_files'
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20'
-                : 'bg-slate-800/60 text-gray-400 hover:text-gray-200 hover:bg-slate-800'
+                : 'bg-slate-900/60 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700'
             )}
           >
             <Key className="w-3.5 h-3.5" />
             <span>Sensitive Files</span>
-            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-900/60 text-gray-300">
+            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-950/70 text-slate-300">
               {sensitiveFiles.length}
             </Badge>
           </button>
@@ -338,42 +336,42 @@ export default function SecurityAuditView() {
           <button
             onClick={() => setActiveTab('all_shared')}
             className={cn(
-              'px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
+              'px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2',
               activeTab === 'all_shared'
                 ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                : 'bg-slate-800/60 text-gray-400 hover:text-gray-200 hover:bg-slate-800'
+                : 'bg-slate-900/60 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700'
             )}
           >
             <span>All Shared</span>
-            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-900/60 text-gray-300">
+            <Badge variant="secondary" className="px-1.5 py-0 text-[10px] bg-slate-950/70 text-slate-300">
               {allShared.length}
             </Badge>
           </button>
         </div>
 
         {/* Search */}
-        <div className="relative min-w-[220px]">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <div className="relative min-w-[240px]">
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <Input
             type="text"
             placeholder="Search files, domains, keywords..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 bg-slate-900/60 border-glass-border h-9 text-xs rounded-xl focus-visible:ring-primary/40 text-gray-200"
+            className="pl-9 h-11 rounded-xl bg-slate-950/70 border-slate-800 text-white placeholder:text-slate-500 text-sm focus-visible:ring-primary/40"
           />
         </div>
       </div>
 
       {/* External Domain Cluster View (When External Domains tab is active) */}
       {activeTab === 'external_domains' && domainBreakdown.length > 0 && (
-        <div className="p-5 rounded-2xl bg-card/50 border border-glass-border backdrop-blur-md space-y-4">
+        <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-sm font-semibold text-white flex items-center gap-2">
                 <Users className="w-4 h-4 text-amber-400" />
                 <span>External Domains Breakdown</span>
               </h3>
-              <p className="text-xs text-gray-400 mt-0.5">
+              <p className="text-xs text-slate-400 mt-0.5">
                 Select an external domain to inspect all shared assets or revoke access domain-wide.
               </p>
             </div>
@@ -383,11 +381,11 @@ export default function SecurityAuditView() {
             {domainBreakdown.map((item) => (
               <div
                 key={item.domain}
-                className="p-3.5 rounded-xl bg-slate-900/60 border border-glass-border flex items-center justify-between"
+                className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between"
               >
                 <div>
                   <div className="text-xs font-semibold text-amber-300">@{item.domain}</div>
-                  <div className="text-[11px] text-gray-400 mt-0.5">{item.count} files shared</div>
+                  <div className="text-[11px] text-slate-400 mt-0.5">{item.count} files shared</div>
                 </div>
 
                 <Button
@@ -395,7 +393,7 @@ export default function SecurityAuditView() {
                   variant="destructive"
                   onClick={() => handleRevokeDomain(item.domain, item.fileIds)}
                   disabled={isRemediating}
-                  className="h-7 text-[11px] bg-red-600/80 hover:bg-red-600 px-2.5"
+                  className="h-8 rounded-lg text-[11px] bg-red-600/80 hover:bg-red-600 px-3"
                 >
                   <UserMinus className="w-3 h-3 mr-1" />
                   Revoke Domain
@@ -438,7 +436,7 @@ export default function SecurityAuditView() {
           <div className="flex items-center gap-3">
             <h3 className="text-base font-semibold text-white flex items-center gap-2">
               <span>Audited Files</span>
-              <Badge variant="outline" className="text-xs border-glass-border text-gray-400">
+              <Badge variant="outline" className="text-xs border-slate-800 text-slate-400">
                 {filteredFiles.length}
               </Badge>
             </h3>
@@ -452,17 +450,17 @@ export default function SecurityAuditView() {
         </div>
 
         {/* Audit Table */}
-        <div className="rounded-2xl border border-glass-border bg-card/50 backdrop-blur-md overflow-hidden">
+        <div className="rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="border-b border-glass-border bg-slate-900/60 text-gray-400 font-medium">
+              <thead className="border-b border-slate-800/80 bg-slate-950/80 text-slate-400 font-medium">
                 <tr>
                   <th className="p-3.5 w-10">
                     <input
                       type="checkbox"
                       checked={isAllSelected}
                       onChange={handleToggleSelectAll}
-                      className="rounded border-gray-600 bg-slate-800 text-primary focus:ring-primary/40"
+                      className="rounded border-slate-700 bg-slate-900 text-primary focus:ring-primary/40"
                     />
                   </th>
                   <th className="p-3.5">File & Severity</th>
@@ -472,7 +470,7 @@ export default function SecurityAuditView() {
                   <th className="p-3.5 text-right">Remediation</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-glass-border text-gray-200">
+              <tbody className="divide-y divide-slate-800/60 text-slate-200">
                 {filteredFiles.map((file) => {
                   const isSelected = selectedIds.has(file.fileId)
                   return (
@@ -554,7 +552,7 @@ export default function SecurityAuditView() {
                               </Badge>
                             ))}
                           {!file.isPublic && (!file.externalDomains || file.externalDomains.length === 0) && (
-                            <Badge variant="outline" className="text-[10px] border-glass-border text-gray-400">
+                            <Badge variant="outline" className="text-[10px] border-slate-800 text-slate-400">
                               Internal Domain
                             </Badge>
                           )}
@@ -567,10 +565,10 @@ export default function SecurityAuditView() {
                           {(file.collaborators || []).map((collab) => (
                             <div
                               key={collab.permissionId || collab.email}
-                              className="flex items-center justify-between text-[11px] bg-slate-900/60 px-2 py-1 rounded-lg border border-glass-border"
+                              className="flex items-center justify-between text-[11px] bg-slate-950/60 px-2.5 py-1 rounded-lg border border-slate-800"
                               onClick={(e) => e.stopPropagation()}
                             >
-                              <span className="text-gray-300 truncate mr-2" title={collab.email || collab.name}>
+                              <span className="text-slate-300 truncate mr-2" title={collab.email || collab.name}>
                                 {collab.email || collab.name}
                               </span>
 
@@ -580,7 +578,7 @@ export default function SecurityAuditView() {
                                     'text-[9px] px-1 py-0 uppercase',
                                     collab.role === 'writer'
                                       ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                                      : 'bg-slate-800 text-gray-300'
+                                      : 'bg-slate-800 text-slate-300'
                                   )}
                                 >
                                   {collab.role === 'writer' ? 'Editor' : 'Viewer'}

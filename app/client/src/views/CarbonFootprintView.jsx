@@ -45,17 +45,17 @@ function EquivalentCard({ icon: Icon, value, unit, label, color = 'emerald' }) {
   }
 
   return (
-    <div className="p-5 rounded-xl border bg-card/50 border-glass-border backdrop-blur-sm flex flex-col justify-between">
+    <div className="p-5 rounded-2xl border bg-slate-900/60 border-slate-800/80 backdrop-blur-sm flex flex-col justify-between">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-medium text-gray-400">{label}</span>
-        <div className={`p-2 rounded-lg ${colorMap[color]}`}>
+        <span className="text-xs font-medium text-slate-400">{label}</span>
+        <div className={`p-2 rounded-xl ${colorMap[color]}`}>
           <Icon className="w-4 h-4" />
         </div>
       </div>
       <div>
         <div className="flex items-baseline gap-1.5">
-          <span className="text-2xl font-bold text-gray-100">{value}</span>
-          <span className="text-xs text-gray-400 font-medium">{unit}</span>
+          <span className="text-2xl font-bold text-slate-100">{value}</span>
+          <span className="text-xs text-slate-400 font-medium">{unit}</span>
         </div>
       </div>
     </div>
@@ -81,9 +81,9 @@ export default function CarbonFootprintView() {
           subtitle="Estimate emissions and transform digital cleanup into climate action"
           illustration="🌱"
         />
-        <div className="p-12 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm text-center">
+        <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
           <RefreshCw className="w-8 h-8 animate-spin text-emerald-500 mx-auto mb-3" />
-          <p className="text-gray-300 font-medium">Calculating energy consumption & carbon emissions...</p>
+          <p className="text-slate-300 font-medium">Calculating energy consumption & carbon emissions...</p>
         </div>
       </div>
     )
@@ -98,13 +98,13 @@ export default function CarbonFootprintView() {
           subtitle="Estimate emissions and transform digital cleanup into climate action"
           illustration="🌱"
         />
-        <div className="p-12 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm text-center">
+        <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
           <Globe className="w-12 h-12 text-emerald-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-100 mb-2">No Carbon Data Available</h3>
-          <p className="text-gray-400 max-w-md mx-auto mb-6 text-sm">
+          <h3 className="text-lg font-semibold text-slate-100 mb-2">No Carbon Data Available</h3>
+          <p className="text-slate-400 max-w-md mx-auto mb-6 text-sm">
             Run a Smart Scan on your Drive to calculate your storage volume, energy consumption (kWh), and annual carbon emissions.
           </p>
-          <Button onClick={() => runScan('root', 'user')} className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium hover:opacity-90">
+          <Button onClick={() => runScan('root', 'user')} className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-medium hover:opacity-90 rounded-xl">
             <RefreshCw className="w-4 h-4 mr-2" />
             Run Smart Scan Now
           </Button>
@@ -125,7 +125,7 @@ export default function CarbonFootprintView() {
       />
 
       {/* Main Carbon Summary Card */}
-      <div className="relative overflow-hidden p-6 md:p-8 rounded-2xl border border-glass-border bg-gradient-to-br from-emerald-950/40 via-card/60 to-teal-950/30 backdrop-blur-xl">
+      <div className="relative overflow-hidden p-6 md:p-8 rounded-2xl border border-slate-800/80 bg-gradient-to-br from-emerald-950/40 via-slate-900/60 to-teal-950/30 backdrop-blur-xl">
         <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
           <Globe className="w-48 h-48 text-emerald-300" />
         </div>
@@ -136,7 +136,7 @@ export default function CarbonFootprintView() {
               <Badge variant="outline" className="bg-emerald-500/10 text-emerald-300 border-emerald-500/30 text-xs px-2.5 py-0.5">
                 {eco_rating?.icon} {eco_rating?.level}
               </Badge>
-              <span className="text-xs text-gray-400">Based on {storage_gb} GB analyzed</span>
+              <span className="text-xs text-slate-400">Based on {storage_gb} GB analyzed</span>
             </div>
 
             <div className="flex items-baseline gap-3">
@@ -213,18 +213,18 @@ export default function CarbonFootprintView() {
       </div>
 
       {/* Carbon Breakdown by Media Type */}
-      <div className="p-6 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm space-y-4">
+      <div className="p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h3 className="text-base font-semibold text-gray-100">Carbon Footprint by File Type</h3>
-            <p className="text-xs text-gray-400">Videos and high-res media typically consume the largest share of continuous storage energy.</p>
+            <h3 className="text-base font-semibold text-slate-100">Carbon Footprint by File Type</h3>
+            <p className="text-xs text-slate-400">Videos and high-res media typically consume the largest share of continuous storage energy.</p>
           </div>
-          <span className="text-xs text-gray-400 font-mono">{storage_gb} GB total</span>
+          <span className="text-xs text-slate-400 font-mono">{storage_gb} GB total</span>
         </div>
 
         {/* Stacked Percentage Bar */}
         {breakdown_by_type && (
-          <div className="w-full h-3.5 rounded-full overflow-hidden flex bg-white/5 border border-white/10">
+          <div className="w-full h-3.5 rounded-full overflow-hidden flex bg-slate-950/70 border border-slate-800">
             {Object.values(breakdown_by_type).map((item, i) => (
               <div
                 key={i}
@@ -248,17 +248,17 @@ export default function CarbonFootprintView() {
         {breakdown_by_type && (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2">
             {Object.entries(breakdown_by_type).map(([key, item]) => (
-              <div key={key} className="p-3.5 rounded-lg border border-white/5 bg-white/5 flex flex-col justify-between">
+              <div key={key} className="p-3.5 rounded-xl border border-slate-800/80 bg-slate-900/40 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-medium text-gray-300 flex items-center gap-1.5">
+                    <span className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
                       <span>{item.icon}</span> {item.label}
                     </span>
-                    <span className="text-xs font-mono font-semibold text-gray-200">{item.percentage}%</span>
+                    <span className="text-xs font-mono font-semibold text-slate-200">{item.percentage}%</span>
                   </div>
-                  <div className="text-lg font-bold text-gray-100">{item.size_gb} GB</div>
+                  <div className="text-lg font-bold text-slate-100">{item.size_gb} GB</div>
                 </div>
-                <div className="mt-2 pt-2 border-t border-white/5 text-[11px] text-gray-400 font-mono flex items-center justify-between">
+                <div className="mt-2 pt-2 border-t border-slate-800/80 text-[11px] text-slate-400 font-mono flex items-center justify-between">
                   <span>Emissions</span>
                   <span className="text-emerald-400">{item.annual_co2_kg} kg CO₂/yr</span>
                 </div>
@@ -269,11 +269,11 @@ export default function CarbonFootprintView() {
       </div>
 
       {/* Green Gamification & Climate Achievements */}
-      <div className="p-6 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm space-y-4">
+      <div className="p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Award className="w-5 h-5 text-amber-400" />
-            <h3 className="text-base font-semibold text-gray-100">Green Gamification & Achievements</h3>
+            <h3 className="text-base font-semibold text-slate-100">Green Gamification & Achievements</h3>
           </div>
           <Badge variant="outline" className="text-xs bg-amber-500/10 text-amber-300 border-amber-500/30">
             🌱 Eco Action Badges
@@ -284,10 +284,10 @@ export default function CarbonFootprintView() {
           {achievements?.map((ach) => (
             <div
               key={ach.id}
-              className={`p-4 rounded-xl border transition-all flex flex-col justify-between ${
+              className={`p-4 rounded-2xl border transition-all flex flex-col justify-between ${
                 ach.unlocked
                   ? 'bg-emerald-950/20 border-emerald-500/40 ring-1 ring-emerald-500/20'
-                  : 'bg-white/5 border-white/5 opacity-85'
+                  : 'bg-slate-900/40 border-slate-800/80 opacity-85'
               }`}
             >
               <div>
@@ -298,15 +298,15 @@ export default function CarbonFootprintView() {
                       Unlocked
                     </Badge>
                   ) : (
-                    <span className="text-[11px] text-gray-400 font-mono">{ach.progress}%</span>
+                    <span className="text-[11px] text-slate-400 font-mono">{ach.progress}%</span>
                   )}
                 </div>
-                <h5 className="text-xs font-semibold text-gray-100 mb-1">{ach.name}</h5>
-                <p className="text-[11px] text-gray-400 leading-relaxed">{ach.description}</p>
+                <h5 className="text-xs font-semibold text-slate-100 mb-1">{ach.name}</h5>
+                <p className="text-[11px] text-slate-400 leading-relaxed">{ach.description}</p>
               </div>
 
               {!ach.unlocked && (
-                <div className="mt-3 w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                <div className="mt-3 w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
                   <div
                     className="bg-emerald-500 h-full rounded-full transition-all duration-700"
                     style={{ width: `${ach.progress}%` }}
@@ -319,13 +319,13 @@ export default function CarbonFootprintView() {
       </div>
 
       {/* Educational Banner */}
-      <div className="p-5 rounded-xl border border-glass-border bg-white/5 backdrop-blur-sm flex items-start gap-4">
-        <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400 flex-shrink-0 mt-0.5">
+      <div className="p-5 rounded-2xl border border-slate-800/80 bg-slate-900/50 backdrop-blur-sm flex items-start gap-4">
+        <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400 flex-shrink-0 mt-0.5">
           <Info className="w-5 h-5" />
         </div>
         <div className="text-xs space-y-1">
-          <div className="font-semibold text-gray-200">Why does cloud storage generate carbon emissions?</div>
-          <p className="text-gray-400 leading-relaxed">
+          <div className="font-semibold text-slate-200">Why does cloud storage generate carbon emissions?</div>
+          <p className="text-slate-400 leading-relaxed">
             Data centers consume roughly 1% of worldwide electricity. Every gigabyte stored is mirrored across multiple redundant servers and solid-state disks that require uninterrupted electrical power and 24/7 cooling. By pruning redundant duplicates, obsolete items, and trivial files, you actively lower the long-term energy draw required to keep your data alive.
           </p>
         </div>

@@ -61,13 +61,13 @@ export default function DailyImpactView() {
       <ImpactTrendsChart dailyLogs={dailyLogs} />
 
       {/* Footer Motivation Banner */}
-      <div className="p-6 border rounded-xl bg-card/30 border-glass-border backdrop-blur-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-white font-medium">
             <Sparkles className="w-4 h-4 text-primary" />
             <span>Habit Tip: The 2-Minute Drive Rule</span>
           </div>
-          <p className="text-xs text-muted-foreground max-w-2xl">
+          <p className="text-xs text-slate-400 max-w-2xl">
             Spending just two minutes every morning archiving old docs or emptying temporary files prevents digital hoarding, protects your quota, and reduces continuous cloud datacenter energy consumption.
           </p>
         </div>
@@ -76,7 +76,7 @@ export default function DailyImpactView() {
           variant="outline"
           size="sm"
           onClick={() => navigate({ to: '/carbon-footprint' })}
-          className="border-glass-border shrink-0 text-xs"
+          className="border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/60 shrink-0 text-xs rounded-xl"
         >
           View Eco Impact ↗
         </Button>

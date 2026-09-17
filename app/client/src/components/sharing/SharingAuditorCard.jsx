@@ -108,10 +108,10 @@ export function SharingAuditorCard({
             <button
               key={card.id}
               onClick={() => onSelectFilter?.(card.id)}
-              className={`p-4 rounded-2xl border text-left transition-all duration-200 backdrop-blur-md relative overflow-hidden ${
+              className={`p-4 rounded-2xl border text-left transition-all duration-200 backdrop-blur-sm relative overflow-hidden ${
                 isSelected
-                  ? 'bg-card/90 border-primary shadow-lg shadow-primary/10 ring-2 ring-primary/30'
-                  : 'bg-card/40 border-glass-border hover:bg-card/70 hover:border-white/20'
+                  ? 'bg-slate-900/90 border-primary shadow-lg shadow-primary/20 ring-2 ring-primary/30'
+                  : 'bg-slate-900/60 border-slate-800/80 hover:bg-slate-850 hover:border-slate-700'
               }`}
             >
               <div className="flex items-center justify-between mb-2.5">

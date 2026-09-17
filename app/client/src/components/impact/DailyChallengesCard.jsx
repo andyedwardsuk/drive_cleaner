@@ -7,16 +7,16 @@ export default function DailyChallengesCard({ challenges = [], onCompleteChallen
   const allCompleted = challenges.length > 0 && completedCount === challenges.length
 
   return (
-    <div className="p-6 border rounded-xl bg-card/60 border-glass-border backdrop-blur-md space-y-4">
+    <div className="p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm space-y-4">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-glass-border">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
         <div className="flex items-center gap-2.5">
           <div className="p-2 rounded-lg bg-primary/10 text-primary">
             <Target className="w-5 h-5" />
           </div>
           <div>
             <h3 className="text-base font-semibold text-white">Daily Cleaning Goals</h3>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-slate-400">
               Complete micro-tasks to earn XP and level up your cleaner rank
             </p>
           </div>
@@ -34,10 +34,10 @@ export default function DailyChallengesCard({ challenges = [], onCompleteChallen
         {challenges.map((challenge) => (
           <div
             key={challenge.id}
-            className={`p-4 rounded-lg border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+            className={`p-4 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
               challenge.completed
                 ? 'bg-emerald-500/10 border-emerald-500/30'
-                : 'bg-card/40 border-glass-border hover:bg-card/60'
+                : 'bg-slate-950/60 border-slate-800 hover:bg-slate-900/80'
             }`}
           >
             <div className="flex items-start gap-3">
@@ -51,7 +51,7 @@ export default function DailyChallengesCard({ challenges = [], onCompleteChallen
                     +{challenge.xp} XP
                   </Badge>
                 </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <p className="text-xs text-slate-400 mt-0.5">
                   {challenge.description}
                 </p>
               </div>
@@ -68,7 +68,7 @@ export default function DailyChallengesCard({ challenges = [], onCompleteChallen
                   size="sm"
                   variant="outline"
                   onClick={() => onCompleteChallenge(challenge.id)}
-                  className="text-xs border-glass-border hover:border-primary/40 hover:bg-primary/10"
+                  className="text-xs rounded-xl border-slate-800 hover:border-primary/40 hover:bg-primary/10"
                 >
                   <Circle className="mr-1.5 h-3 w-3" />
                   Mark Complete

@@ -1,8 +1,10 @@
 import { useState, useMemo } from 'react'
-import { Copy, RefreshCw, ChevronDown, ChevronRight } from 'lucide-react'
+import { Copy, RefreshCw, ChevronDown, ChevronRight, Eye, Search, X, Sparkles, Folder } from 'lucide-react'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { useSmartScan } from '@/hooks/useSmartScan'
+import { useFilePreview, normalizeFileMetadata } from '@/hooks/useFilePreview'
 import {
   Table,
   TableBody,
@@ -11,12 +13,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { cn } from '@/lib/utils'
 
 /**
  * Format bytes to human readable string
  */
 function formatBytes(bytes, decimals = 2) {
-  if (bytes === 0) return '0 Bytes'
+  if (!bytes || bytes === 0) return '0 Bytes'
   const k = 1024
   const dm = decimals < 0 ? 0 : decimals
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
@@ -38,16 +41,20 @@ function formatDate(dateString) {
  */
 function DuplicatesSummary({ totalWastedSpace, groupCount, fileCount }) {
   return (
-    <div className="p-6 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm">
+    <div className="p-6 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm shadow-lg">
       <div className="flex items-center gap-4">
-        <div className="p-3 rounded-lg bg-cyan-500/10">
-          <Copy className="w-6 h-6 text-cyan-400" />
+        <div className="p-3.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+          <Copy className="w-6 h-6" />
         </div>
         <div>
-          <p className="text-sm text-gray-400 mb-1">Duplicate Files Found</p>
-          <p className="text-2xl font-semibold text-gray-100">{fileCount} duplicates</p>
-          <p className="text-sm text-gray-500">
-            {groupCount} groups • {formatBytes(totalWastedSpace)} wasted
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
+            Duplicate Files Found
+          </p>
+          <p className="text-3xl font-bold text-white tracking-tight">
+            {fileCount} duplicates
+          </p>
+          <p className="text-xs text-slate-400 mt-1">
+            {groupCount} groups • <span className="text-cyan-300 font-semibold">{formatBytes(totalWastedSpace)}</span> reclaimable space
           </p>
         </div>
       </div>
@@ -58,54 +65,75 @@ function DuplicatesSummary({ totalWastedSpace, groupCount, fileCount }) {
 /**
  * Duplicate group row component (expandable)
  */
-function DuplicateGroupRow({ group, isExpanded, onToggle }) {
+function DuplicateGroupRow({ group, isExpanded, onToggle, onPreview }) {
+  const wastedBytes = group.total_size_bytes - (group.items[0]?.size_bytes || 0)
+
   return (
     <>
       {/* Group Header Row */}
-      <TableRow className="border-glass-border hover:bg-white/5 cursor-pointer" onClick={onToggle}>
-        <TableCell>
+      <TableRow
+        className="border-b border-slate-800/60 hover:bg-slate-800/40 cursor-pointer transition-colors"
+        onClick={onToggle}
+      >
+        <TableCell className="w-10">
           {isExpanded ? (
             <ChevronDown className="w-4 h-4 text-cyan-400" />
           ) : (
-            <ChevronRight className="w-4 h-4 text-gray-400" />
+            <ChevronRight className="w-4 h-4 text-slate-400" />
           )}
         </TableCell>
-        <TableCell className="text-gray-200 font-semibold">
+        <TableCell className="text-slate-200 font-semibold text-sm">
           {group.file_name}
         </TableCell>
         <TableCell>
-          <span className="px-2 py-1 rounded text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+          <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
             {group.duplicate_count} copies
           </span>
         </TableCell>
-        <TableCell className="text-gray-300 font-mono">
+        <TableCell className="text-slate-300 font-mono text-xs">
           {formatBytes(group.total_size_bytes)}
         </TableCell>
-        <TableCell className="text-sm text-gray-400">
-          {formatBytes(group.total_size_bytes - (group.items[0]?.size_bytes || 0))} wasted
+        <TableCell className="text-xs font-semibold text-slate-300">
+          <span className="text-cyan-400">{formatBytes(wastedBytes)}</span> wasted
         </TableCell>
       </TableRow>
 
       {/* Expanded: Show individual files */}
-      {isExpanded && group.items?.map((item, index) => (
-        <TableRow key={item.file_id || index} className="border-glass-border bg-white/[0.02]">
-          <TableCell className="pl-8">
-            <div className="w-2 h-2 rounded-full bg-cyan-400/50" />
-          </TableCell>
-          <TableCell className="text-gray-400 text-sm pl-4">
-            {item.file_name}
-          </TableCell>
-          <TableCell className="text-gray-500 text-xs">
-            Copy {index + 1}
-          </TableCell>
-          <TableCell className="text-gray-400 font-mono text-sm">
-            {formatBytes(item.size_bytes)}
-          </TableCell>
-          <TableCell className="text-gray-500 text-sm">
-            {formatDate(item.created_date)}
-          </TableCell>
-        </TableRow>
-      ))}
+      {isExpanded &&
+        group.items?.map((item, index) => (
+          <TableRow
+            key={item.file_id || index}
+            className="border-b border-slate-800/40 bg-slate-950/40 hover:bg-slate-800/30 transition-colors"
+          >
+            <TableCell className="pl-6">
+              <div className="w-2 h-2 rounded-full bg-cyan-400/60" />
+            </TableCell>
+            <TableCell className="text-slate-300 text-xs pl-4 flex items-center justify-between gap-2">
+              <span className="truncate">{item.file_name}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onPreview(item)
+                }}
+                className="h-7 w-7 p-0 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg"
+                title="Preview file"
+              >
+                <Eye className="h-3.5 w-3.5" />
+              </Button>
+            </TableCell>
+            <TableCell className="text-slate-400 text-xs">
+              Copy {index + 1} {index === 0 && <span className="text-emerald-400 font-medium ml-1">(Original)</span>}
+            </TableCell>
+            <TableCell className="text-slate-400 font-mono text-xs">
+              {formatBytes(item.size_bytes)}
+            </TableCell>
+            <TableCell className="text-slate-400 text-xs">
+              {formatDate(item.created_date)}
+            </TableCell>
+          </TableRow>
+        ))}
     </>
   )
 }
@@ -115,7 +143,9 @@ function DuplicateGroupRow({ group, isExpanded, onToggle }) {
  */
 export default function DuplicatesView() {
   const { data, loading, error, runScan } = useSmartScan()
+  const { openPreview } = useFilePreview()
   const [expandedGroups, setExpandedGroups] = useState(new Set())
+  const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState('wasted') // 'wasted', 'count', 'name'
   const [sortOrder, setSortOrder] = useState('desc')
 
@@ -133,7 +163,7 @@ export default function DuplicatesView() {
   // Expand all groups
   const expandAll = () => {
     if (data?.duplicates?.groups) {
-      setExpandedGroups(new Set(data.duplicates.groups.map(g => g.file_name)))
+      setExpandedGroups(new Set(data.duplicates.groups.map((g) => g.file_name)))
     }
   }
 
@@ -142,11 +172,16 @@ export default function DuplicatesView() {
     setExpandedGroups(new Set())
   }
 
-  // Sort groups
-  const sortedGroups = useMemo(() => {
+  // Filter and Sort groups
+  const filteredAndSortedGroups = useMemo(() => {
     if (!data?.duplicates?.groups) return []
 
-    const groups = [...data.duplicates.groups]
+    let groups = [...data.duplicates.groups]
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase()
+      groups = groups.filter((g) => g.file_name.toLowerCase().includes(q))
+    }
 
     groups.sort((a, b) => {
       if (sortBy === 'wasted') {
@@ -165,14 +200,13 @@ export default function DuplicatesView() {
     })
 
     return groups
-  }, [data, sortBy, sortOrder])
+  }, [data, searchQuery, sortBy, sortOrder])
 
   // Calculate totals
   const { totalWastedSpace, totalFileCount, groupCount } = useMemo(() => {
     if (!data?.duplicates?.groups) return { totalWastedSpace: 0, totalFileCount: 0, groupCount: 0 }
 
     const wastedSpace = data.duplicates.groups.reduce((sum, group) => {
-      // Wasted space = total size - size of one file (keep one, delete others)
       const wasted = group.total_size_bytes - (group.items[0]?.size_bytes || 0)
       return sum + wasted
     }, 0)
@@ -184,7 +218,6 @@ export default function DuplicatesView() {
     }
   }, [data])
 
-  // Toggle sort
   const handleSort = (column) => {
     if (sortBy === column) {
       setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')
@@ -192,6 +225,10 @@ export default function DuplicatesView() {
       setSortBy(column)
       setSortOrder('desc')
     }
+  }
+
+  const handlePreview = (item) => {
+    openPreview(normalizeFileMetadata(item))
   }
 
   // No scan run yet
@@ -204,10 +241,13 @@ export default function DuplicatesView() {
           subtitle="Find and remove duplicate files to save space"
           illustration="📋"
         />
-        <div className="p-8 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm text-center">
-          <Copy className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-300 mb-4">Run a Smart Scan to discover duplicate files</p>
-          <Button onClick={() => runScan('root', 'user')} size="lg">
+        <div className="p-12 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
+          <Copy className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+          <p className="text-slate-300 mb-6 font-medium">Run a Smart Scan to discover duplicate files</p>
+          <Button
+            onClick={() => runScan('root', 'user')}
+            className="h-11 px-6 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-900/40"
+          >
             <RefreshCw className="w-4 h-4 mr-2" />
             Run Smart Scan
           </Button>
@@ -226,9 +266,9 @@ export default function DuplicatesView() {
           subtitle="Find and remove duplicate files to save space"
           illustration="📋"
         />
-        <div className="p-12 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm text-center">
-          <RefreshCw className="w-8 h-8 animate-spin text-cyan-400 mx-auto mb-3" />
-          <p className="text-gray-300">Scanning your Drive for duplicates...</p>
+        <div className="p-16 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
+          <RefreshCw className="w-8 h-8 animate-spin text-cyan-400 mx-auto mb-4" />
+          <p className="text-slate-300 text-sm">Scanning your Google Drive for duplicate files...</p>
         </div>
       </div>
     )
@@ -244,10 +284,13 @@ export default function DuplicatesView() {
           subtitle="Find and remove duplicate files to save space"
           illustration="📋"
         />
-        <div className="p-8 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm text-center">
-          <p className="text-red-400 mb-4">Error loading duplicates</p>
-          <p className="text-gray-400 mb-4">{error}</p>
-          <Button onClick={() => runScan('root', 'user')}>
+        <div className="p-10 border border-red-500/30 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
+          <p className="text-red-400 font-bold mb-2">Error loading duplicates</p>
+          <p className="text-slate-400 text-sm mb-6">{error}</p>
+          <Button
+            onClick={() => runScan('root', 'user')}
+            className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold"
+          >
             Retry
           </Button>
         </div>
@@ -265,10 +308,10 @@ export default function DuplicatesView() {
           subtitle="Find and remove duplicate files to save space"
           illustration="📋"
         />
-        <div className="p-8 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm text-center">
-          <Copy className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-300 mb-2">No duplicate files found</p>
-          <p className="text-sm text-gray-500">Your Drive has no duplicates!</p>
+        <div className="p-12 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
+          <Sparkles className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
+          <p className="text-slate-200 text-lg font-bold mb-1">No duplicate files found</p>
+          <p className="text-sm text-slate-400">Your Google Drive has zero duplicate file clutter!</p>
         </div>
       </div>
     )
@@ -282,7 +325,10 @@ export default function DuplicatesView() {
         subtitle="Find and remove duplicate files to save space"
         illustration="📋"
         actions={
-          <Button onClick={() => runScan('root', 'user')} size="lg">
+          <Button
+            onClick={() => runScan('root', 'user')}
+            className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-900/40"
+          >
             <RefreshCw className="w-4 h-4 mr-2" />
             Refresh Scan
           </Button>
@@ -296,50 +342,80 @@ export default function DuplicatesView() {
         fileCount={totalFileCount}
       />
 
-      {/* Expand/Collapse Controls */}
-      <div className="flex gap-2">
-        <Button variant="outline" size="sm" onClick={expandAll}>
-          Expand All
-        </Button>
-        <Button variant="outline" size="sm" onClick={collapseAll}>
-          Collapse All
-        </Button>
+      {/* Search and Expand/Collapse Controls (All h-11) */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="relative w-full sm:w-72">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Input
+            type="text"
+            placeholder="Filter duplicate groups..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-11 pl-10 bg-slate-950/80 border-slate-800 rounded-xl text-sm placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-blue-500"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 self-end sm:self-center">
+          <Button
+            variant="outline"
+            onClick={expandAll}
+            className="h-11 px-4 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 text-xs font-semibold"
+          >
+            Expand All
+          </Button>
+          <Button
+            variant="outline"
+            onClick={collapseAll}
+            className="h-11 px-4 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 text-xs font-semibold"
+          >
+            Collapse All
+          </Button>
+        </div>
       </div>
 
       {/* Duplicates Table */}
-      <div className="border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm overflow-hidden">
+      <div className="border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm overflow-hidden shadow-xl">
         <Table>
           <TableHeader>
-            <TableRow className="border-glass-border hover:bg-transparent">
-              <TableHead className="w-8"></TableHead>
+            <tr className="border-b border-slate-800 bg-slate-950/60 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              <TableHead className="w-10"></TableHead>
               <TableHead
-                className="text-gray-400 cursor-pointer hover:text-gray-300"
+                className="text-slate-400 cursor-pointer hover:text-slate-200 transition-colors"
                 onClick={() => handleSort('name')}
               >
                 File Name {sortBy === 'name' && (sortOrder === 'desc' ? '↓' : '↑')}
               </TableHead>
               <TableHead
-                className="text-gray-400 cursor-pointer hover:text-gray-300"
+                className="text-slate-400 cursor-pointer hover:text-slate-200 transition-colors"
                 onClick={() => handleSort('count')}
               >
                 Copies {sortBy === 'count' && (sortOrder === 'desc' ? '↓' : '↑')}
               </TableHead>
-              <TableHead className="text-gray-400">Total Size</TableHead>
+              <TableHead className="text-slate-400">Total Size</TableHead>
               <TableHead
-                className="text-gray-400 cursor-pointer hover:text-gray-300"
+                className="text-slate-400 cursor-pointer hover:text-slate-200 transition-colors"
                 onClick={() => handleSort('wasted')}
               >
                 Wasted Space {sortBy === 'wasted' && (sortOrder === 'desc' ? '↓' : '↑')}
               </TableHead>
-            </TableRow>
+            </tr>
           </TableHeader>
-          <TableBody>
-            {sortedGroups.map((group) => (
+          <TableBody className="divide-y divide-slate-800/50 text-sm">
+            {filteredAndSortedGroups.map((group) => (
               <DuplicateGroupRow
                 key={group.file_name}
                 group={group}
                 isExpanded={expandedGroups.has(group.file_name)}
                 onToggle={() => toggleGroup(group.file_name)}
+                onPreview={handlePreview}
               />
             ))}
           </TableBody>
@@ -347,12 +423,10 @@ export default function DuplicatesView() {
       </div>
 
       {/* Info Card */}
-      <div className="p-6 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm">
-        <h3 className="text-lg font-semibold text-gray-100 mb-2">About Duplicates</h3>
-        <p className="text-gray-400 text-sm">
-          Duplicate files are identified by matching file names and sizes. Click on a group to expand and see
-          all duplicate copies. The "wasted space" shows how much storage you could reclaim by keeping only
-          one copy and deleting the rest.
+      <div className="p-5 border border-slate-800/70 rounded-2xl bg-slate-900/40 backdrop-blur-sm">
+        <h3 className="text-sm font-semibold text-slate-200 mb-1">About Duplicate Detection</h3>
+        <p className="text-slate-400 text-xs leading-relaxed">
+          Duplicates are detected using exact MD5 checksum hashes and file size matching. Click any group to expand all identical copies and click the eye icon to preview each file before cleanup.
         </p>
       </div>
     </div>

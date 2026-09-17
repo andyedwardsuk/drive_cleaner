@@ -111,10 +111,10 @@ export default function KanbanLabelsView() {
         badge="v2.2.0 Active"
         illustration="📋"
         actions={
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3">
             <Button
               onClick={handleImport}
-              className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20"
+              className="h-11 px-4 rounded-xl gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20"
             >
               <Sparkles className="w-4 h-4" />
               Import from Smart Scan
@@ -122,7 +122,7 @@ export default function KanbanLabelsView() {
             <Button
               variant="outline"
               onClick={resetDemoCards}
-              className="gap-2 text-gray-300 hover:text-white"
+              className="h-11 px-4 rounded-xl gap-2 border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800"
             >
               <RotateCcw className="w-4 h-4" />
               Reset Cards
@@ -145,16 +145,16 @@ export default function KanbanLabelsView() {
 
       {/* Metric Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl bg-card/40 border border-glass-border backdrop-blur-md">
+        <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
           <div className="flex items-center gap-2 text-blue-400 text-xs font-semibold mb-1">
             <Inbox className="w-4 h-4" />
             TOTAL ON BOARD
           </div>
           <div className="text-2xl font-bold text-white">{cards.length} files</div>
-          <div className="text-xs text-gray-400 mt-0.5">{formatBytes(totalBytes)} total space</div>
+          <div className="text-xs text-slate-400 mt-0.5">{formatBytes(totalBytes)} total space</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-card/40 border border-glass-border backdrop-blur-md">
+        <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
           <div className="flex items-center gap-2 text-emerald-400 text-xs font-semibold mb-1">
             <CheckCircle2 className="w-4 h-4" />
             KEPT / RETAINED
@@ -163,16 +163,16 @@ export default function KanbanLabelsView() {
           <div className="text-xs text-emerald-400/80 mt-0.5">Verified to preserve</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-card/40 border border-glass-border backdrop-blur-md">
+        <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
           <div className="flex items-center gap-2 text-amber-400 text-xs font-semibold mb-1">
             <Package className="w-4 h-4" />
             STAGED FOR ARCHIVE
           </div>
           <div className="text-2xl font-bold text-white">{archiveCards.length} files</div>
-          <div className="text-xs text-gray-400 mt-0.5">{formatBytes(archiveBytes)} cold storage</div>
+          <div className="text-xs text-slate-400 mt-0.5">{formatBytes(archiveBytes)} cold storage</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-card/40 border border-glass-border backdrop-blur-md">
+        <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
           <div className="flex items-center gap-2 text-rose-400 text-xs font-semibold mb-1">
             <Trash2 className="w-4 h-4" />
             PENDING TRASH
@@ -183,18 +183,18 @@ export default function KanbanLabelsView() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="p-4 rounded-xl bg-card/40 border border-glass-border backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="relative w-full sm:w-72">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder="Search cards on board..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 bg-slate-900/60 border-glass-border text-sm"
+            className="pl-9 h-11 rounded-xl bg-slate-950/70 border-slate-800 text-white placeholder:text-slate-500 text-sm focus-visible:ring-primary/40"
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           {[
             { id: 'all', label: 'All Files' },
             { id: 'document', label: 'Docs & PDFs' },
@@ -207,10 +207,10 @@ export default function KanbanLabelsView() {
               type="button"
               onClick={() => setTypeFilter(type.id)}
               className={cn(
-                'px-3 py-1 rounded-lg text-xs font-medium transition-colors',
+                'px-3.5 py-2 rounded-xl text-xs font-medium transition-all',
                 typeFilter === type.id
-                  ? 'bg-blue-600 text-white shadow'
-                  : 'bg-slate-800/60 text-gray-300 hover:text-white hover:bg-slate-800'
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                  : 'bg-slate-900/60 border border-slate-800 text-slate-300 hover:text-white hover:border-slate-700'
               )}
             >
               {type.label}

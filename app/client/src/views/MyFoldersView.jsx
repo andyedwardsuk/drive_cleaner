@@ -172,8 +172,8 @@ export default function MyFoldersView() {
 
       {/* Attach New Folder Form / Modal Card */}
       {showAddForm && (
-        <div className="p-6 border rounded-xl bg-card/70 border-primary/30 backdrop-blur-md space-y-4 shadow-xl animate-in fade-in-50 duration-200">
-          <div className="flex items-center justify-between pb-3 border-b border-glass-border">
+        <div className="p-6 border rounded-2xl bg-slate-900/80 border-primary/40 backdrop-blur-md space-y-4 shadow-xl animate-in fade-in-50 duration-200">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-800/80">
             <div className="flex items-center gap-2 text-white font-semibold">
               <Sparkles className="w-4 h-4 text-primary" />
               <span>Attach a Google Drive Folder</span>
@@ -185,7 +185,7 @@ export default function MyFoldersView() {
 
           <form onSubmit={handleAttachFolder} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="attachUrlOrId" className="text-xs font-medium text-gray-300">
+              <Label htmlFor="attachUrlOrId" className="text-xs font-medium text-slate-300">
                 Folder URL or Folder ID <span className="text-destructive">*</span>
               </Label>
               <div className="flex gap-2">
@@ -198,7 +198,7 @@ export default function MyFoldersView() {
                     setUrlOrId(e.target.value)
                     setFormError('')
                   }}
-                  className="font-mono text-sm bg-background/60 flex-1"
+                  className="font-mono text-sm bg-slate-950/70 border-slate-800 flex-1 h-11 rounded-xl"
                 />
                 <DrivePicker onFolderSelected={handlePickerSelected} />
               </div>
@@ -210,7 +210,7 @@ export default function MyFoldersView() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="customName" className="text-xs font-medium text-gray-300">
+              <Label htmlFor="customName" className="text-xs font-medium text-slate-300">
                 Folder Nickname / Label (Optional)
               </Label>
               <Input
@@ -219,13 +219,13 @@ export default function MyFoldersView() {
                 placeholder="e.g. Finance Backups, Project Alpha, Invoices 2024"
                 value={customName}
                 onChange={(e) => setCustomName(e.target.value)}
-                className="text-sm bg-background/60"
+                className="text-sm bg-slate-950/70 border-slate-800 h-11 rounded-xl"
               />
             </div>
 
             <div className="flex items-center gap-6 pt-1 text-xs">
-              <span className="text-muted-foreground font-medium">Drive Type:</span>
-              <label className="flex items-center gap-1.5 cursor-pointer text-gray-300 hover:text-white">
+              <span className="text-slate-400 font-medium">Drive Type:</span>
+              <label className="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white">
                 <input
                   type="radio"
                   name="attachCorpora"
@@ -238,7 +238,7 @@ export default function MyFoldersView() {
                   <Users className="w-3.5 h-3.5" /> Personal / My Drive
                 </span>
               </label>
-              <label className="flex items-center gap-1.5 cursor-pointer text-gray-300 hover:text-white">
+              <label className="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white">
                 <input
                   type="radio"
                   name="attachCorpora"
@@ -259,7 +259,7 @@ export default function MyFoldersView() {
               </p>
             )}
 
-            <div className="flex justify-end gap-2 pt-2 border-t border-glass-border">
+            <div className="flex justify-end gap-2 pt-2 border-t border-slate-800/80">
               <Button
                 type="button"
                 variant="outline"
@@ -267,10 +267,11 @@ export default function MyFoldersView() {
                   setShowAddForm(false)
                   setFormError('')
                 }}
+                className="border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/60 rounded-xl"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={!urlOrId.trim()}>
+              <Button type="submit" disabled={!urlOrId.trim()} className="rounded-xl">
                 Save Folder
               </Button>
             </div>
@@ -282,11 +283,11 @@ export default function MyFoldersView() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-white">Attached Folders</h2>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-slate-400">
             Target folders ready for scanning, auditing, or browsing
           </p>
         </div>
-        <Badge variant="secondary" className="text-xs font-mono">
+        <Badge variant="secondary" className="text-xs font-mono bg-slate-800 text-slate-300 border border-slate-700">
           {folders.length} {folders.length === 1 ? 'folder' : 'folders'}
         </Badge>
       </div>
@@ -298,39 +299,39 @@ export default function MyFoldersView() {
           return (
             <div
               key={folder.id}
-              className="p-5 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm hover:border-primary/40 transition-all flex flex-col justify-between space-y-4 group"
+              className="p-5 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm hover:border-primary/40 transition-all flex flex-col justify-between space-y-4 group"
             >
               <div className="space-y-2">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-lg bg-primary/10 text-primary">
+                    <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
                       <Folder className="w-5 h-5" />
                     </div>
                     <div>
                       <h3 className="text-base font-semibold text-white group-hover:text-primary transition-colors">
                         {folder.name}
                       </h3>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-slate-400">
                         {folder.description || 'Google Drive Folder'}
                       </p>
                     </div>
                   </div>
 
-                  <Badge variant="outline" className="text-xs border-glass-border text-gray-300">
+                  <Badge variant="outline" className="text-xs border-slate-700/80 text-slate-300 bg-slate-800/60">
                     {folder.corpora === 'drive' ? 'Shared Drive' : 'Personal'}
                   </Badge>
                 </div>
 
                 {/* Folder ID Row */}
                 <div className="flex items-center justify-between pt-2 text-xs">
-                  <div className="flex items-center gap-1.5 font-mono text-muted-foreground truncate max-w-[240px]">
+                  <div className="flex items-center gap-1.5 font-mono text-slate-400 truncate max-w-[240px]">
                     <span>ID:</span>
-                    <span className="text-gray-300 truncate">{folder.id}</span>
+                    <span className="text-slate-300 truncate">{folder.id}</span>
                     <button
                       type="button"
                       onClick={() => handleCopyId(folder.id)}
                       title="Copy ID"
-                      className="p-1 rounded hover:bg-white/10 text-gray-400 hover:text-white transition-colors ml-1"
+                      className="p-1 rounded hover:bg-white/10 text-slate-400 hover:text-white transition-colors ml-1"
                     >
                       {copiedId === folder.id ? (
                         <Check className="w-3 h-3 text-green-400" />
@@ -353,12 +354,12 @@ export default function MyFoldersView() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-between pt-3 border-t border-glass-border gap-2">
+              <div className="flex items-center justify-between pt-3 border-t border-slate-800/80 gap-2">
                 <div className="flex items-center gap-2">
                   <Button
                     size="sm"
                     onClick={() => handleScanFolder(folder)}
-                    className="bg-primary hover:bg-primary/90 text-xs shadow-sm"
+                    className="bg-primary hover:bg-primary/90 text-xs shadow-sm rounded-xl"
                   >
                     <Scan className="mr-1.5 h-3.5 w-3.5" />
                     Smart Scan
@@ -367,7 +368,7 @@ export default function MyFoldersView() {
                     size="sm"
                     variant="outline"
                     onClick={() => handleBrowseInDashboard(folder)}
-                    className="border-glass-border text-xs"
+                    className="border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800/60 text-xs rounded-xl"
                   >
                     <FolderSearch className="mr-1.5 h-3.5 w-3.5" />
                     Browse
@@ -379,7 +380,7 @@ export default function MyFoldersView() {
                     size="sm"
                     variant="ghost"
                     onClick={() => handleRemoveFolder(folder.id)}
-                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 p-2 h-8 w-8"
+                    className="text-slate-400 hover:text-destructive hover:bg-destructive/10 p-2 h-8 w-8 rounded-lg"
                     title="Remove from saved list"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -392,8 +393,8 @@ export default function MyFoldersView() {
       </div>
 
       {/* Guidance Note */}
-      <div className="p-6 border rounded-xl bg-card/30 border-glass-border text-sm text-muted-foreground space-y-2">
-        <p className="font-medium text-gray-300">💡 Testing with Specific Folders</p>
+      <div className="p-6 border rounded-2xl bg-slate-900/50 border-slate-800/80 text-sm text-slate-400 space-y-2">
+        <p className="font-medium text-slate-200">💡 Testing with Specific Folders</p>
         <p>
           To test Drive Cleaner on a specific set of files without scanning your entire Google Drive,
           create a test folder in Google Drive (e.g. &ldquo;Drive Cleaner Test&rdquo;), copy its URL from your browser address bar,

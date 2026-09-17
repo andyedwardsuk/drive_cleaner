@@ -18,13 +18,16 @@ import {
   Skull,
   Layers,
   LayoutGrid,
-  List
+  List,
+  Eye
 } from 'lucide-react'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { useSmartScan } from '@/hooks/useSmartScan'
+import { useFilePreview } from '@/hooks/useFilePreview'
+import FilePreviewModal from '@/components/preview/FilePreviewModal'
 import {
   Table,
   TableBody,
@@ -77,21 +80,20 @@ function getFreshnessBadge(level) {
 }
 
 /**
- * Clutter Index Circular Gauge Component
+ * Visual Circular Gauge for Clutter Index
  */
-function ClutterGauge({ score = 0, target = 20 }) {
-  const radius = 62
+function ClutterGauge({ score, target = 20 }) {
+  const radius = 54
   const strokeWidth = 10
   const circumference = 2 * Math.PI * radius
-  const cappedScore = Math.max(0, Math.min(100, score))
-  const strokeDashoffset = circumference - (cappedScore / 100) * circumference
+  const strokeDashoffset = circumference - (score / 100) * circumference
 
-  let scoreColor = '#10b981' // emerald
-  let statusText = 'Excellent'
-  if (score > 70) {
+  let scoreColor = '#22c55e' // green
+  let statusText = 'Excellent (Minimal)'
+  if (score > 60) {
     scoreColor = '#ef4444' // red
-    statusText = 'Critical Clutter'
-  } else if (score > 45) {
+    statusText = 'Critical Hoarding'
+  } else if (score > 40) {
     scoreColor = '#f97316' // orange
     statusText = 'Needs Cleanup'
   } else if (score > 25) {
@@ -100,7 +102,7 @@ function ClutterGauge({ score = 0, target = 20 }) {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center p-6 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm">
+    <div className="flex flex-col items-center justify-center p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm">
       <div className="relative w-36 h-36 flex items-center justify-center">
         <svg className="w-full h-full transform -rotate-90" viewBox="0 0 160 160">
           <circle
@@ -110,7 +112,7 @@ function ClutterGauge({ score = 0, target = 20 }) {
             stroke="currentColor"
             strokeWidth={strokeWidth}
             fill="transparent"
-            className="text-white/10"
+            className="text-slate-800/80"
           />
           <circle
             cx="80"
@@ -127,14 +129,14 @@ function ClutterGauge({ score = 0, target = 20 }) {
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
           <span className="text-3xl font-bold tracking-tight text-white">{score}</span>
-          <span className="text-[11px] font-medium text-gray-400">/ 100</span>
+          <span className="text-[11px] font-medium text-slate-400">/ 100</span>
         </div>
       </div>
       <div className="mt-3 text-center">
         <div className="flex items-center justify-center gap-1.5 font-semibold text-sm" style={{ color: scoreColor }}>
           <span>{statusText}</span>
         </div>
-        <p className="text-xs text-gray-400 mt-0.5">Target: &lt;{target} (Minimalist)</p>
+        <p className="text-xs text-slate-400 mt-0.5">Target: &lt;{target} (Minimalist)</p>
       </div>
     </div>
   )
@@ -150,14 +152,14 @@ function HoardingScoreCard({ hoardingScore }) {
   const maxSub = 25
 
   return (
-    <div className="p-6 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm flex flex-col justify-between">
+    <div className="p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm flex flex-col justify-between">
       <div>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <span className="text-2xl">{rating?.icon || '📦'}</span>
             <div>
-              <h3 className="font-semibold text-base text-gray-100">Digital Hoarding Assessment</h3>
-              <p className="text-xs text-gray-400">Based on Digital Hoarding Questionnaire (DHQ)</p>
+              <h3 className="font-semibold text-base text-slate-100">Digital Hoarding Assessment</h3>
+              <p className="text-xs text-slate-400">Based on Digital Hoarding Questionnaire (DHQ)</p>
             </div>
           </div>
           <Badge
@@ -246,12 +248,25 @@ function HoardingScoreCard({ hoardingScore }) {
  */
 export default function RotAnalysisView() {
   const { data, loading, runScan } = useSmartScan()
+  const { previewFile, isPreviewOpen, openPreview, closePreview } = useFilePreview()
   const [activeTab, setActiveTab] = useState('all') // 'all', 'redundant', 'obsolete', 'trivial'
   const [viewMode, setViewMode] = useState('list') // 'list', 'grid'
   const [searchQuery, setSearchQuery] = useState('')
   const [freshnessFilter, setFreshnessFilter] = useState('all') // 'all', 'fresh', 'aging', 'stale', 'rotting', 'decayed'
 
   const rot = data?.rot_analysis || null
+
+  const handlePreview = (item) => {
+    openPreview({
+      id: item.file_id || item.id,
+      name: item.file_name || item.name,
+      size: item.size_bytes || item.size || 0,
+      mimeType: item.mime_type || item.mimeType || 'application/octet-stream',
+      modifiedTime: item.modified_date || item.modifiedTime,
+      webViewLink: item.drive_link || item.webViewLink,
+      parentName: item.parent_name,
+    })
+  }
 
   // Filter items
   const filteredItems = useMemo(() => {
@@ -288,9 +303,9 @@ export default function RotAnalysisView() {
           subtitle="Enterprise Redundant, Obsolete, and Trivial governance for Drive"
           illustration="🔥"
         />
-        <div className="p-12 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm text-center">
+        <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
           <RefreshCw className="w-8 h-8 animate-spin text-rose-500 mx-auto mb-3" />
-          <p className="text-gray-300 font-medium">Analyzing file decay and digital clutter...</p>
+          <p className="text-slate-300 font-medium">Analyzing file decay and digital clutter...</p>
         </div>
       </div>
     )
@@ -305,13 +320,13 @@ export default function RotAnalysisView() {
           subtitle="Enterprise Redundant, Obsolete, and Trivial governance for Drive"
           illustration="🔥"
         />
-        <div className="p-12 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm text-center">
+        <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
           <Sparkles className="w-12 h-12 text-emerald-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-100 mb-2">No Data ROT Detected</h3>
-          <p className="text-gray-400 max-w-md mx-auto mb-6 text-sm">
+          <h3 className="text-lg font-semibold text-slate-100 mb-2">No Data ROT Detected</h3>
+          <p className="text-slate-400 max-w-md mx-auto mb-6 text-sm">
             Run a Smart Scan to evaluate your Google Drive files for redundant duplicates, obsolete items, and trivial clutter.
           </p>
-          <Button onClick={() => runScan('root', 'user')} className="bg-gradient-to-r from-rose-500 to-amber-500 text-white font-medium hover:opacity-90">
+          <Button onClick={() => runScan('root', 'user')} className="bg-gradient-to-r from-rose-500 to-amber-500 text-white font-medium hover:opacity-90 rounded-xl">
             <RefreshCw className="w-4 h-4 mr-2" />
             Run Smart Scan Now
           </Button>
@@ -347,78 +362,78 @@ export default function RotAnalysisView() {
         {/* Redundant */}
         <div
           onClick={() => setActiveTab('redundant')}
-          className={`p-5 rounded-xl border cursor-pointer transition-all ${
+          className={`p-5 rounded-2xl border cursor-pointer transition-all ${
             activeTab === 'redundant'
               ? 'bg-blue-500/10 border-blue-500 shadow-md ring-1 ring-blue-500/50'
-              : 'bg-card/50 border-glass-border hover:border-white/20'
+              : 'bg-slate-900/60 border-slate-800/80 hover:border-slate-700'
           }`}
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-blue-400">R • Redundant</span>
             <Layers className="w-4 h-4 text-blue-400" />
           </div>
-          <div className="text-2xl font-bold text-gray-100">{rot.breakdown?.redundant?.count || 0}</div>
-          <p className="text-xs text-gray-400 mt-1">
+          <div className="text-2xl font-bold text-slate-100">{rot.breakdown?.redundant?.count || 0}</div>
+          <p className="text-xs text-slate-400 mt-1">
             {formatBytes(rot.breakdown?.redundant?.total_size_bytes)} potential savings
           </p>
-          <div className="text-[11px] text-gray-400 mt-2">Duplicates & superseded version iterations</div>
+          <div className="text-[11px] text-slate-400 mt-2">Duplicates & superseded version iterations</div>
         </div>
 
         {/* Obsolete */}
         <div
           onClick={() => setActiveTab('obsolete')}
-          className={`p-5 rounded-xl border cursor-pointer transition-all ${
+          className={`p-5 rounded-2xl border cursor-pointer transition-all ${
             activeTab === 'obsolete'
               ? 'bg-orange-500/10 border-orange-500 shadow-md ring-1 ring-orange-500/50'
-              : 'bg-card/50 border-glass-border hover:border-white/20'
+              : 'bg-slate-900/60 border-slate-800/80 hover:border-slate-700'
           }`}
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-orange-400">O • Obsolete</span>
             <Clock className="w-4 h-4 text-orange-400" />
           </div>
-          <div className="text-2xl font-bold text-gray-100">{rot.breakdown?.obsolete?.count || 0}</div>
-          <p className="text-xs text-gray-400 mt-1">
+          <div className="text-2xl font-bold text-slate-100">{rot.breakdown?.obsolete?.count || 0}</div>
+          <p className="text-xs text-slate-400 mt-1">
             {formatBytes(rot.breakdown?.obsolete?.total_size_bytes)} stagnant space
           </p>
-          <div className="text-[11px] text-gray-400 mt-2">Untouched for 12+ months & superseded</div>
+          <div className="text-[11px] text-slate-400 mt-2">Untouched for 12+ months & superseded</div>
         </div>
 
         {/* Trivial */}
         <div
           onClick={() => setActiveTab('trivial')}
-          className={`p-5 rounded-xl border cursor-pointer transition-all ${
+          className={`p-5 rounded-2xl border cursor-pointer transition-all ${
             activeTab === 'trivial'
               ? 'bg-amber-500/10 border-amber-500 shadow-md ring-1 ring-amber-500/50'
-              : 'bg-card/50 border-glass-border hover:border-white/20'
+              : 'bg-slate-900/60 border-slate-800/80 hover:border-slate-700'
           }`}
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-amber-400">T • Trivial</span>
             <FileQuestion className="w-4 h-4 text-amber-400" />
           </div>
-          <div className="text-2xl font-bold text-gray-100">{rot.breakdown?.trivial?.count || 0}</div>
-          <p className="text-xs text-gray-400 mt-1">
+          <div className="text-2xl font-bold text-slate-100">{rot.breakdown?.trivial?.count || 0}</div>
+          <p className="text-xs text-slate-400 mt-1">
             {formatBytes(rot.breakdown?.trivial?.total_size_bytes)} low-value stubs
           </p>
-          <div className="text-[11px] text-gray-400 mt-2">Screenshots, untitled files & stubs &lt;10KB</div>
+          <div className="text-[11px] text-slate-400 mt-2">Screenshots, untitled files & stubs &lt;10KB</div>
         </div>
       </div>
 
       {/* Freshness Gradient Decay Timeline */}
-      <div className="p-6 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm">
+      <div className="p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
-            <h3 className="text-base font-semibold text-gray-100">File Freshness & Decay Gradient</h3>
-            <p className="text-xs text-gray-400">Visual model of data gravity — files become harder to clean the longer they sit.</p>
+            <h3 className="text-base font-semibold text-slate-100">File Freshness & Decay Gradient</h3>
+            <p className="text-xs text-slate-400">Visual model of data gravity — files become harder to clean the longer they sit.</p>
           </div>
-          <div className="text-xs text-gray-400">
-            Average File Age: <span className="text-gray-200 font-semibold">{rot.clutter_index?.average_age_days || 0} days</span>
+          <div className="text-xs text-slate-400">
+            Average File Age: <span className="text-slate-200 font-semibold">{rot.clutter_index?.average_age_days || 0} days</span>
           </div>
         </div>
 
         {/* Segmented Color Bar */}
-        <div className="w-full h-3.5 rounded-full overflow-hidden flex bg-white/5 border border-white/10 mb-4">
+        <div className="w-full h-3.5 rounded-full overflow-hidden flex bg-slate-950/70 border border-slate-800 mb-4">
           <div style={{ width: `${dist.fresh?.percentage || 0}%` }} className="bg-emerald-500 h-full transition-all" title="Fresh" />
           <div style={{ width: `${dist.aging?.percentage || 0}%` }} className="bg-amber-400 h-full transition-all" title="Aging" />
           <div style={{ width: `${dist.stale?.percentage || 0}%` }} className="bg-orange-500 h-full transition-all" title="Stale" />
@@ -439,32 +454,32 @@ export default function RotAnalysisView() {
               key={stage.id}
               type="button"
               onClick={() => setFreshnessFilter(freshnessFilter === stage.id ? 'all' : stage.id)}
-              className={`p-2.5 rounded-lg border text-xs flex flex-col items-start transition-all ${
+              className={`p-2.5 rounded-xl border text-xs flex flex-col items-start transition-all ${
                 freshnessFilter === stage.id
-                  ? 'bg-white/10 border-white/40 ring-1 ring-white/30'
-                  : 'bg-white/5 border-white/5 hover:border-white/20'
+                  ? 'bg-slate-800 border-slate-600 ring-1 ring-slate-500'
+                  : 'bg-slate-900/50 border-slate-800 hover:border-slate-700'
               }`}
             >
               <div className="flex items-center justify-between w-full mb-1">
-                <span className="font-medium text-gray-300 flex items-center gap-1">
+                <span className="font-medium text-slate-300 flex items-center gap-1">
                   <span>{stage.icon}</span> {stage.label}
                 </span>
               </div>
-              <span className="text-sm font-bold text-gray-100">{stage.count} files</span>
+              <span className="text-sm font-bold text-slate-100">{stage.count} files</span>
             </button>
           ))}
         </div>
       </div>
 
       {/* Gamification & Milestone Banner */}
-      <div className="p-5 rounded-xl border border-glass-border bg-gradient-to-r from-purple-950/30 via-card/50 to-blue-950/30 backdrop-blur-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="p-5 rounded-2xl border border-slate-800/80 bg-gradient-to-r from-purple-950/30 via-slate-900/60 to-blue-950/30 backdrop-blur-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-purple-500/20 text-purple-400">
             <Award className="w-6 h-6" />
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-gray-100">Next Milestone: Reach &quot;Mild&quot; Clutter Status</h4>
-            <p className="text-xs text-gray-400">
+            <h4 className="text-sm font-semibold text-slate-100">Next Milestone: Reach &quot;Mild&quot; Clutter Status</h4>
+            <p className="text-xs text-slate-400">
               Clean up 4 more ROT items ({formatBytes(rot.total_size_bytes)}) to reduce your Clutter Index by ~15 points and unlock the <span className="text-purple-300 font-semibold">Data Minimalist 🏅</span> badge.
             </p>
           </div>
@@ -477,7 +492,7 @@ export default function RotAnalysisView() {
       </div>
 
       {/* Actionable ROT Items Section */}
-      <div className="p-6 border rounded-xl bg-card/50 border-glass-border backdrop-blur-sm space-y-4">
+      <div className="p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm space-y-4">
         {/* Controls Bar */}
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
           {/* Tabs */}
@@ -485,10 +500,10 @@ export default function RotAnalysisView() {
             <button
               type="button"
               onClick={() => setActiveTab('all')}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-all ${
                 activeTab === 'all'
                   ? 'bg-rose-500 text-white shadow-sm'
-                  : 'text-gray-400 hover:text-gray-200'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               All ROT ({rot.count})
@@ -496,10 +511,10 @@ export default function RotAnalysisView() {
             <button
               type="button"
               onClick={() => setActiveTab('redundant')}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-all ${
                 activeTab === 'redundant'
                   ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-gray-400 hover:text-gray-200'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               Redundant ({rot.breakdown?.redundant?.count || 0})
@@ -507,10 +522,10 @@ export default function RotAnalysisView() {
             <button
               type="button"
               onClick={() => setActiveTab('obsolete')}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-all ${
                 activeTab === 'obsolete'
                   ? 'bg-orange-600 text-white shadow-sm'
-                  : 'text-gray-400 hover:text-gray-200'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               Obsolete ({rot.breakdown?.obsolete?.count || 0})
@@ -518,10 +533,10 @@ export default function RotAnalysisView() {
             <button
               type="button"
               onClick={() => setActiveTab('trivial')}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-all ${
                 activeTab === 'trivial'
                   ? 'bg-amber-600 text-white shadow-sm'
-                  : 'text-gray-400 hover:text-gray-200'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               Trivial ({rot.breakdown?.trivial?.count || 0})
@@ -531,19 +546,19 @@ export default function RotAnalysisView() {
           {/* Search & View Mode */}
           <div className="flex items-center gap-2">
             <div className="relative flex-1 sm:w-64">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search ROT files or reasons..."
-                className="pl-9 h-9 text-xs bg-white/5 border-white/10"
+                className="pl-9 h-11 rounded-xl text-xs bg-slate-950/70 border-slate-800 text-white"
               />
             </div>
-            <div className="flex items-center bg-white/5 border border-white/10 rounded-lg p-0.5">
+            <div className="flex items-center bg-slate-900/60 border border-slate-800 rounded-xl p-1 h-11">
               <button
                 type="button"
                 onClick={() => setViewMode('list')}
-                className={`p-1.5 rounded ${viewMode === 'list' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-gray-200'}`}
+                className={`p-2 rounded-lg ${viewMode === 'list' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}
                 title="List View"
               >
                 <List className="w-4 h-4" />
@@ -551,7 +566,7 @@ export default function RotAnalysisView() {
               <button
                 type="button"
                 onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded ${viewMode === 'grid' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-gray-200'}`}
+                className={`p-2 rounded-lg ${viewMode === 'grid' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}
                 title="Heatmap Card Grid"
               >
                 <LayoutGrid className="w-4 h-4" />
@@ -561,7 +576,7 @@ export default function RotAnalysisView() {
         </div>
 
         {/* Results Counter */}
-        <div className="text-xs text-gray-400 flex items-center justify-between">
+        <div className="text-xs text-slate-400 flex items-center justify-between">
           <span>Showing {filteredItems.length} of {rot.count} flagged files</span>
           {freshnessFilter !== 'all' && (
             <button
@@ -584,12 +599,12 @@ export default function RotAnalysisView() {
               return (
                 <div
                   key={item.file_id}
-                  className={`p-4 rounded-xl border transition-all flex flex-col justify-between relative overflow-hidden ${
+                  className={`p-4 rounded-2xl border transition-all flex flex-col justify-between relative overflow-hidden ${
                     isDecayed
-                      ? 'bg-slate-900/60 border-slate-700/60 opacity-80'
+                      ? 'bg-slate-900/80 border-slate-700/80 opacity-80'
                       : isRotting
                       ? 'bg-rose-950/20 border-rose-900/40 opacity-90'
-                      : 'bg-card/60 border-white/10 hover:border-white/20'
+                      : 'bg-slate-900/60 border-slate-800/80 hover:border-slate-700'
                   }`}
                 >
                   {isDecayed && (
@@ -604,37 +619,48 @@ export default function RotAnalysisView() {
                       <Badge variant="outline" className={`text-[10px] px-1.5 py-0.5 ${freshBadge.color}`}>
                         {freshBadge.icon} {freshBadge.label}
                       </Badge>
-                      <span className="text-[11px] text-gray-400 font-mono">
+                      <span className="text-[11px] text-slate-400 font-mono">
                         {formatDays(item.days_inactive)}
                       </span>
                     </div>
 
-                    <h5 className="text-xs font-semibold text-gray-100 line-clamp-2 mb-1" title={item.file_name}>
+                    <h5 className="text-xs font-semibold text-slate-100 line-clamp-2 mb-1" title={item.file_name}>
                       {item.file_name}
                     </h5>
-                    <p className="text-[11px] text-gray-400 truncate mb-2">{item.parent_name}</p>
+                    <p className="text-[11px] text-slate-400 truncate mb-2">{item.parent_name}</p>
 
                     <div className="space-y-1">
                       {item.details?.map((detail, i) => (
-                        <p key={i} className="text-[11px] text-amber-300/80 line-clamp-2">
+                        <p key={i} className="text-[11px] text-amber-300/90 line-clamp-2">
                           • {detail}
                         </p>
                       ))}
                     </div>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-xs">
-                    <span className="font-mono text-gray-300">{formatBytes(item.size_bytes)}</span>
-                    {item.drive_link ? (
-                      <a
-                        href={item.drive_link}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-blue-400 hover:text-blue-300 flex items-center gap-1 text-[11px]"
+                  <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+                    <span className="font-mono text-slate-300">{formatBytes(item.size_bytes)}</span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => handlePreview(item)}
+                        title="Quick Preview"
+                        className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
                       >
-                        Open <ExternalLink className="w-3 h-3" />
-                      </a>
-                    ) : null}
+                        <Eye className="w-3.5 h-3.5" />
+                      </button>
+                      {item.drive_link ? (
+                        <a
+                          href={item.drive_link}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="p-1 rounded text-blue-400 hover:text-blue-300 hover:bg-slate-800 transition-colors"
+                          title="Open in Drive"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
               )
@@ -644,25 +670,25 @@ export default function RotAnalysisView() {
 
         {/* List Table Mode */}
         {viewMode === 'list' && (
-          <div className="rounded-lg border border-white/10 overflow-hidden">
+          <div className="rounded-2xl border border-slate-800/80 bg-slate-900/60 overflow-hidden">
             <Table>
               <TableHeader>
-                <TableRow className="border-white/10 hover:bg-transparent">
-                  <TableHead className="w-[38%] text-gray-300 text-xs">File Name</TableHead>
-                  <TableHead className="text-gray-300 text-xs">ROT Classification</TableHead>
-                  <TableHead className="text-gray-300 text-xs">Freshness</TableHead>
-                  <TableHead className="text-gray-300 text-xs text-right">Size</TableHead>
-                  <TableHead className="w-[80px] text-right text-gray-300 text-xs">Action</TableHead>
+                <TableRow className="border-slate-800/80 hover:bg-transparent">
+                  <TableHead className="w-[38%] text-slate-300 text-xs">File Name</TableHead>
+                  <TableHead className="text-slate-300 text-xs">ROT Classification</TableHead>
+                  <TableHead className="text-slate-300 text-xs">Freshness</TableHead>
+                  <TableHead className="text-slate-300 text-xs text-right">Size</TableHead>
+                  <TableHead className="w-[100px] text-right text-slate-300 text-xs">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredItems.map((item) => {
                   const freshBadge = getFreshnessBadge(item.freshness_level)
                   return (
-                    <TableRow key={item.file_id} className="border-white/5 hover:bg-white/5">
-                      <TableCell className="font-medium text-xs text-gray-200">
-                        <div className="font-semibold text-gray-100">{item.file_name}</div>
-                        <div className="text-[11px] text-gray-400">{item.parent_name}</div>
+                    <TableRow key={item.file_id} className="border-slate-800/60 hover:bg-slate-800/40">
+                      <TableCell className="font-medium text-xs text-slate-200">
+                        <div className="font-semibold text-slate-100">{item.file_name}</div>
+                        <div className="text-[11px] text-slate-400">{item.parent_name}</div>
                       </TableCell>
                       <TableCell className="text-xs">
                         <div className="flex flex-wrap gap-1 mb-1">
@@ -682,7 +708,7 @@ export default function RotAnalysisView() {
                             </Badge>
                           ))}
                         </div>
-                        <div className="text-[11px] text-gray-400">
+                        <div className="text-[11px] text-slate-400">
                           {item.details?.[0] || 'Flagged for review'}
                         </div>
                       </TableCell>
@@ -691,27 +717,38 @@ export default function RotAnalysisView() {
                           <Badge variant="outline" className={`text-[10px] px-1.5 py-0.5 ${freshBadge.color}`}>
                             {freshBadge.icon} {freshBadge.label}
                           </Badge>
-                          <span className="text-[11px] text-gray-400 font-mono">
+                          <span className="text-[11px] text-slate-400 font-mono">
                             {formatDays(item.days_inactive)}
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-xs text-right font-mono text-gray-300">
+                      <TableCell className="text-xs text-right font-mono text-slate-300">
                         {formatBytes(item.size_bytes)}
                       </TableCell>
                       <TableCell className="text-right">
-                        {item.drive_link ? (
-                          <a
-                            href={item.drive_link}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center text-xs text-blue-400 hover:text-blue-300"
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            type="button"
+                            onClick={() => handlePreview(item)}
+                            title="Quick Preview"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
                           >
-                            <ExternalLink className="w-3.5 h-3.5" />
-                          </a>
-                        ) : (
-                          <span className="text-gray-500 text-xs">—</span>
-                        )}
+                            <Eye className="w-3.5 h-3.5" />
+                          </button>
+                          {item.drive_link ? (
+                            <a
+                              href={item.drive_link}
+                              target="_blank"
+                              rel="noreferrer"
+                              title="Open in Drive"
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition-colors"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
+                          ) : (
+                            <span className="text-slate-500 text-xs">—</span>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   )
@@ -721,6 +758,12 @@ export default function RotAnalysisView() {
           </div>
         )}
       </div>
+
+      <FilePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+        file={previewFile}
+      />
     </div>
   )
 }
