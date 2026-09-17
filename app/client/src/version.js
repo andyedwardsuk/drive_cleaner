@@ -3,7 +3,7 @@
  * Auto-generated build timestamp for cache debugging
  */
 
-export const APP_VERSION = '3.3.0'
+export const APP_VERSION = '3.4.0'
 export const BUILD_TIMESTAMP = new Date().toISOString()
 export const FEATURES = [
   'Smart Scan',
@@ -23,6 +23,7 @@ export const FEATURES = [
   'Standard Clean Sidebar Headers & UK English Harmonisation',
   'Minimised Category Dock & Floating Flyout Menus',
   '2026 Flagship Spatial Architecture & ⌘K Command Engine',
+  'Unified 5-Hub Workspace Architecture & Tab Navigation',
 ]
 
 /**

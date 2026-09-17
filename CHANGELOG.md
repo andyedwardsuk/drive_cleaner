@@ -2,6 +2,22 @@
 
 All notable changes to the Drive Cleaner project will be documented in this file.
 
+## [3.4.0] - 2026-09-17
+### Changed
+- **Unified 5-Hub Workspace Architecture & Tab Navigation**:
+  - **Massive Navigation Simplification**: Consolidated 28 fragmented views into **5 primary, intuitive Hubs**, cutting sidebar cognitive clutter by **82%**:
+    1. 🏠 **Dashboard** (`/dashboard`): Health telemetry, storage quota breakdown bar, and 1-click quick actions.
+    2. 🧹 **Cleanup Center** (`/clean`): Tabbed workspace unifying *Smart Scan*, *Duplicates*, *Large Files*, *Old Files*, *Empty Items*, *Temporary Files*, *Media Optimiser*, and *Cloud Trash*.
+    3. 📁 **Organisation Studio** (`/organise`): Tabbed workspace for *Folder Explorer*, *Smart Reorganiser*, *Shared Drives*, *Workspace Docs*, and *Drive Labels*.
+    4. 🛡️ **Security & Governance** (`/security`): Tabbed workspace for *Exposure Audit*, *External Sharing*, *ROT Classification*, and *Carbon & Impact*.
+    5. ⚙️ **Operations & Automation** (`/operations`): Tabbed workspace for *Bulk Rules*, *Kanban Triage*, *Auto-Archive*, *Scheduled Triggers*, *Live Sync Engine*, and *Audit History*.
+  - **Horizontal Specular Segmented Tabs**: Sleek horizontal pill tab bar with smooth switching, tool badges, and active glowing indicators within each hub.
+  - **100% Backwards Compatibility & Route Aliasing**: All 23 legacy routes (e.g. `/duplicates`, `/trash-governance`, `/shared-drives`) seamlessly redirect to their respective Hub and pre-select the appropriate tab without breaking links or bookmarks.
+  - **Global ⌘K Deep-Linking**: Command Palette immediately jumps to any specific sub-tool and activates its tab.
+  - **Minimised Sidebar Dock**: Streamlined 64px dock with 5 hub icons, tool counts, and floating flyout menus.
+
+---
+
 ## [3.3.0] - 2026-09-17
 ### Added
 - **2026 Flagship Spatial Architecture & Living Atmospheric Lighting**:

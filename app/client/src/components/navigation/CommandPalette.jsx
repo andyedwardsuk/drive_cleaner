@@ -18,7 +18,7 @@ import {
   FolderSync,
   ShieldAlert,
 } from 'lucide-react'
-import { ALL_TOOLS, NAVIGATION_CATEGORIES } from '@/config/navigationItems'
+import { ALL_TOOLS } from '@/config/navigationItems'
 import { cn } from '@/lib/utils'
 
 // Quick action shortcuts shown when search is empty
@@ -26,7 +26,8 @@ const QUICK_ACTIONS = [
   {
     id: 'act-smart-scan',
     label: 'Run Smart Hygiene Scan',
-    path: '/smart-scan',
+    path: '/clean',
+    tab: 'smart-scan',
     icon: Scan,
     badge: 'Quick Scan',
     description: 'Execute full ROT, duplicate, and storage analysis',
@@ -35,7 +36,8 @@ const QUICK_ACTIONS = [
   {
     id: 'act-empty-trash',
     label: 'Purge Cloud Trash Bin',
-    path: '/trash-governance',
+    path: '/clean',
+    tab: 'trash-governance',
     icon: Trash2,
     badge: 'Lifecycle',
     description: 'Permanently remove expired items from Google Drive trash',
@@ -44,7 +46,8 @@ const QUICK_ACTIONS = [
   {
     id: 'act-media-opt',
     label: 'Optimise 4K Media & Videos',
-    path: '/media-optimizer',
+    path: '/clean',
+    tab: 'media-optimizer',
     icon: Film,
     badge: 'Heavy Files',
     description: 'Audit heavy video files and photo bursts eating space',
@@ -53,7 +56,8 @@ const QUICK_ACTIONS = [
   {
     id: 'act-security-audit',
     label: 'Audit Sharing & Exposure',
-    path: '/security-audit',
+    path: '/security',
+    tab: 'audit',
     icon: ShieldAlert,
     badge: 'Security',
     description: 'Review anyone-with-link and external collaborator access',
@@ -62,7 +66,8 @@ const QUICK_ACTIONS = [
   {
     id: 'act-reorganize',
     label: 'Smart Folder Reorganisation',
-    path: '/folder-reorganizer',
+    path: '/organise',
+    tab: 'reorganizer',
     icon: FolderSync,
     badge: 'Organisation',
     description: 'Organise loose files into automated year and category trees',
@@ -143,7 +148,11 @@ export default function CommandPalette({ isOpen, onClose }) {
 
   const handleSelect = (item) => {
     onClose()
-    navigate({ to: item.path })
+    if (item.tab) {
+      navigate({ to: item.path, search: { tab: item.tab } })
+    } else {
+      navigate({ to: item.path })
+    }
   }
 
   return (
