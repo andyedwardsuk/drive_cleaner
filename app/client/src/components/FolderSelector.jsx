@@ -130,28 +130,28 @@ export default function FolderSelector({
   const hasValidTarget = mode === 'root' || (extractedId && isValidDriveId(extractedId))
 
   return (
-    <div className={`p-6 border rounded-xl bg-card/60 border-glass-border backdrop-blur-md space-y-5 ${className}`}>
+    <div className={`p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-xl shadow-lg shadow-black/10 space-y-5 ${className}`}>
       {/* Target Mode Tabs */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-glass-border">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
         <div>
           <h3 className="text-base font-semibold text-white flex items-center gap-2">
-            <Folder className="w-5 h-5 text-primary" />
+            <Folder className="w-5 h-5 text-blue-400" />
             Scan Target
           </h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <p className="text-xs text-slate-400 mt-0.5">
             Select the Drive scope or target folder to analyze
           </p>
         </div>
 
-        <div className="inline-flex rounded-lg bg-background/50 p-1 border border-glass-border self-start sm:self-auto">
+        <div className="inline-flex rounded-xl bg-slate-950/70 p-1 border border-slate-800 self-start sm:self-auto">
           <button
             type="button"
             disabled={disabled}
             onClick={() => handleModeChange('root')}
-            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center gap-1.5 ${
               mode === 'root'
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'bg-blue-600 text-white shadow-sm font-semibold'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             <HardDrive className="w-3.5 h-3.5" />
@@ -161,10 +161,10 @@ export default function FolderSelector({
             type="button"
             disabled={disabled}
             onClick={() => handleModeChange('specific')}
-            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all flex items-center gap-1.5 ${
               mode === 'specific'
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'bg-blue-600 text-white shadow-sm font-semibold'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
             <FolderSearch className="w-3.5 h-3.5" />
@@ -222,7 +222,7 @@ export default function FolderSelector({
                   value={inputVal}
                   onChange={handleInputChange}
                   disabled={disabled}
-                  className="pr-8 bg-background/60 text-sm font-mono"
+                  className="pr-8 bg-slate-950/70 border-slate-700/60 text-slate-100 placeholder:text-slate-500 focus:border-blue-500 rounded-xl h-10 text-sm font-mono"
                 />
               </div>
 
@@ -234,14 +234,14 @@ export default function FolderSelector({
 
             {/* Extracted preview note */}
             {isPastedUrl && extractedId && (
-              <p className="text-xs text-primary mt-1.5 flex items-center gap-1 font-mono">
+              <p className="text-xs text-blue-400 mt-1.5 flex items-center gap-1 font-mono">
                 <Sparkles className="w-3 h-3" />
-                Extracted Folder ID: <span className="font-semibold">{extractedId}</span>
+                Extracted Folder ID: <span className="font-semibold text-blue-300">{extractedId}</span>
               </p>
             )}
 
             {!inputVal && (
-              <p className="text-xs text-muted-foreground mt-1.5">
+              <p className="text-xs text-slate-400 mt-1.5">
                 Paste any Google Drive folder URL, enter a Folder ID, or click <strong>Browse</strong> to choose visually.
               </p>
             )}
@@ -249,8 +249,8 @@ export default function FolderSelector({
 
           {/* Drive Corpora Choice */}
           <div className="flex items-center gap-4 text-xs">
-            <span className="text-muted-foreground font-medium">Drive Type:</span>
-            <label className="flex items-center gap-1.5 cursor-pointer text-gray-300 hover:text-white">
+            <span className="text-slate-400 font-medium">Drive Type:</span>
+            <label className="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white">
               <input
                 type="radio"
                 name="corpora"
@@ -258,13 +258,13 @@ export default function FolderSelector({
                 checked={corpora === 'user'}
                 onChange={() => handleCorporaChange('user')}
                 disabled={disabled}
-                className="accent-primary"
+                className="accent-blue-500"
               />
               <span className="flex items-center gap-1">
-                <Users className="w-3.5 h-3.5" /> Personal / My Drive
+                <Users className="w-3.5 h-3.5 text-slate-400" /> Personal / My Drive
               </span>
             </label>
-            <label className="flex items-center gap-1.5 cursor-pointer text-gray-300 hover:text-white">
+            <label className="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white">
               <input
                 type="radio"
                 name="corpora"
@@ -272,24 +272,24 @@ export default function FolderSelector({
                 checked={corpora === 'drive'}
                 onChange={() => handleCorporaChange('drive')}
                 disabled={disabled}
-                className="accent-primary"
+                className="accent-blue-500"
               />
               <span className="flex items-center gap-1">
-                <HardDrive className="w-3.5 h-3.5" /> Shared Drive
+                <HardDrive className="w-3.5 h-3.5 text-slate-400" /> Shared Drive
               </span>
             </label>
           </div>
 
           {/* Target Folder Details Card (if resolved) */}
           {extractedId && extractedId !== 'root' && (
-            <div className="p-3.5 rounded-lg bg-card/40 border border-glass-border flex items-center justify-between">
+            <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-center justify-between">
               <div className="flex items-center gap-2.5 overflow-hidden">
                 <span className="text-lg">📁</span>
                 <div className="truncate">
                   <p className="text-sm font-semibold text-white truncate">
                     {value?.name || `Selected Folder (${extractedId.slice(0, 10)}...)`}
                   </p>
-                  <p className="text-xs font-mono text-muted-foreground truncate">
+                  <p className="text-xs font-mono text-slate-400 truncate">
                     ID: {extractedId}
                   </p>
                 </div>
@@ -299,7 +299,7 @@ export default function FolderSelector({
                 href={getDriveFolderUrl(extractedId)}
                 target="_blank"
                 rel="noreferrer"
-                className="text-xs text-primary hover:underline flex items-center gap-1 shrink-0 ml-3"
+                className="text-xs text-blue-400 hover:underline flex items-center gap-1 shrink-0 ml-3 font-medium"
               >
                 <span>Open in Drive</span>
                 <ExternalLink className="w-3 h-3" />
@@ -311,9 +311,9 @@ export default function FolderSelector({
 
       {/* Quick Presets / Recent Folders */}
       {recentFolders && recentFolders.length > 0 && (
-        <div className="pt-2 border-t border-glass-border">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
-            <History className="w-3.5 h-3.5" />
+        <div className="pt-3 border-t border-slate-800/80">
+          <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-2 font-medium">
+            <History className="w-3.5 h-3.5 text-slate-500" />
             <span>Recent & Preset Targets:</span>
           </div>
 
@@ -326,10 +326,10 @@ export default function FolderSelector({
                   type="button"
                   disabled={disabled}
                   onClick={() => handleRecentClick(rf)}
-                  className={`px-2.5 py-1 text-xs rounded-md border transition-all flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 text-xs rounded-xl border transition-all flex items-center gap-1.5 font-medium shadow-sm ${
                     isSelected
-                      ? 'border-primary bg-primary/15 text-primary font-medium'
-                      : 'border-glass-border bg-card/40 text-muted-foreground hover:text-white hover:border-gray-500'
+                      ? 'border-blue-500/50 bg-blue-500/15 text-blue-300'
+                      : 'border-slate-800 bg-slate-950/60 text-slate-300 hover:text-white hover:border-slate-700 hover:bg-slate-900'
                   }`}
                 >
                   <span>{rf.id === 'root' ? '🏠' : '📁'}</span>

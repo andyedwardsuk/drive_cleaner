@@ -24,9 +24,9 @@ export default function NavItem({ icon: Icon, label, path, disabled = false, bad
       className={cn(
         'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
         'group relative',
-        isActive && !disabled && 'bg-blue-500/20 text-blue-300 shadow-lg shadow-blue-500/10',
-        !isActive && !disabled && 'hover:bg-glass-surface text-gray-300 hover:text-white',
-        disabled && 'text-gray-500 cursor-not-allowed opacity-60',
+        isActive && !disabled && 'bg-blue-500/15 text-blue-300 font-semibold shadow-sm',
+        !isActive && !disabled && 'hover:bg-slate-800/60 text-slate-300 hover:text-white',
+        disabled && 'text-slate-600 cursor-not-allowed opacity-50',
         collapsed && 'justify-center px-3'
       )}
     >

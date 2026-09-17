@@ -13,16 +13,16 @@ export default {
         sm: 'calc(var(--radius) - 4px)'
       },
       colors: {
-        // Blue/Indigo Theme Colors
+        // Modern Obsidian / Midnight Theme Colors
         'app-bg': {
-          start: '#0f172a',  // Slate 900
-          mid: '#1e3a8a',    // Blue 900
-          end: '#1e40af',    // Blue 800
+          start: '#070b14',  // Obsidian Slate
+          mid: '#0b1329',    // Midnight Slate
+          end: '#0e1b38',    // Subtle Navy Twilight
         },
         'glass': {
-          surface: 'rgba(30, 58, 138, 0.4)',  // Increased from 0.3 for better visibility
-          border: 'rgba(59, 130, 246, 0.4)',   // Increased from 0.2 for WCAG compliance
-          hover: 'rgba(59, 130, 246, 0.5)',    // Increased from 0.4
+          surface: 'rgba(15, 23, 42, 0.70)',   // Clean dark glass surface
+          border: 'rgba(148, 163, 184, 0.14)',  // Refined slate hairline border
+          hover: 'rgba(30, 41, 59, 0.85)',      // Slate hover state
         },
 
         // Shadcn colors adapted for blue/indigo theme

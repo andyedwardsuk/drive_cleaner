@@ -16,7 +16,7 @@ export default function SidebarSection({ title, children, collapsed = false }) {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="px-4 mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500"
+          className="px-4 mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400"
         >
           {title}
         </motion.div>

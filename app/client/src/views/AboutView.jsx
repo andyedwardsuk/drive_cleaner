@@ -76,10 +76,7 @@ export default function AboutView() {
               <span className="text-gray-400">Built with:</span> React, TanStack, Tailwind CSS
             </p>
             <p>
-              <span className="text-gray-400">Powered by:</span> Google Apps Script
-            </p>
-            <p className="text-sm text-gray-500 mt-4">
-              Made with Claude Code
+              <span className="text-gray-400">Powered by:</span> Google Apps Script & Drive API v2
             </p>
           </div>
         </div>

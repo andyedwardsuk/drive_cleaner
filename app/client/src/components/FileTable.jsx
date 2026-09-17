@@ -450,20 +450,30 @@ export default function FileTable({ data = [] }) {
   return (
     <div className="w-full space-y-4">
       {/* Controls & Search */}
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <Input
-          placeholder="Search files..."
+          placeholder="Search files by name or folder..."
           value={globalFilter ?? ''}
           onChange={(event) => setGlobalFilter(String(event.target.value))}
-          className="max-w-sm"
+          className="max-w-sm bg-slate-950/60 border-slate-700/60 text-slate-100 placeholder:text-slate-500 focus:border-blue-500 rounded-xl h-10 text-sm"
         />
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => exportToCSV(activeData)}>
-            <Download className="mr-2 h-4 w-4" />
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportToCSV(activeData)}
+            className="h-10 px-4 bg-slate-900/60 border-slate-700/60 text-slate-200 hover:text-white hover:bg-slate-800 rounded-xl shadow-sm"
+          >
+            <Download className="mr-2 h-4 w-4 text-slate-400" />
             Export CSV
           </Button>
-          <Button variant="outline" size="sm" onClick={() => exportToJSON(activeData)}>
-            <Download className="mr-2 h-4 w-4" />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportToJSON(activeData)}
+            className="h-10 px-4 bg-slate-900/60 border-slate-700/60 text-slate-200 hover:text-white hover:bg-slate-800 rounded-xl shadow-sm"
+          >
+            <Download className="mr-2 h-4 w-4 text-slate-400" />
             Export JSON
           </Button>
         </div>
@@ -471,7 +481,7 @@ export default function FileTable({ data = [] }) {
 
       {/* Floating Bulk Action Bar when rows selected */}
       {selectedRows.length > 0 && (
-        <div className="flex items-center justify-between p-3.5 rounded-xl bg-primary/10 border border-primary/25 shadow-lg backdrop-blur-md animate-in fade-in-0 slide-in-from-top-1">
+        <div className="flex items-center justify-between p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/25 shadow-lg backdrop-blur-md animate-in fade-in-0 slide-in-from-top-1">
           <div className="flex items-center gap-3">
             <span className="text-sm font-semibold text-white">
               {selectedRows.length} {selectedRows.length === 1 ? 'file' : 'files'} selected
@@ -485,7 +495,7 @@ export default function FileTable({ data = [] }) {
               variant="ghost"
               size="sm"
               onClick={() => setRowSelection({})}
-              className="text-xs text-gray-400 hover:text-white"
+              className="text-xs text-slate-400 hover:text-white"
             >
               Clear Selection
             </Button>
@@ -503,7 +513,7 @@ export default function FileTable({ data = [] }) {
       )}
 
       {/* Table */}
-      <div className="rounded-md border">
+      <div className="rounded-2xl border border-slate-800/80 bg-slate-900/40 backdrop-blur-xl overflow-hidden shadow-lg">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

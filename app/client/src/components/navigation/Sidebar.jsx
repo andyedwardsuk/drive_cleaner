@@ -233,18 +233,18 @@ export default function Sidebar() {
       transition={{ duration: 0.3, ease: 'easeInOut' }}
       className={cn(
         'relative h-screen flex flex-col',
-        'bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900',
-        'border-r border-glass-border',
+        'bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950',
+        'border-r border-slate-800/80',
         'backdrop-blur-xl'
       )}
     >
       {/* Glassmorphism overlay */}
-      <div className="absolute inset-0 bg-glass-surface backdrop-blur-sm pointer-events-none" />
+      <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm pointer-events-none" />
 
       {/* Content */}
       <div className="relative z-10 flex flex-col h-full">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-glass-border">
+        <div className="flex items-center justify-between p-4 border-b border-slate-800/80">
           <AnimatePresence mode="wait">
             {!collapsed && (
               <motion.div
@@ -298,19 +298,6 @@ export default function Sidebar() {
             </SidebarSection>
           ))}
         </nav>
-
-        {/* Footer */}
-        <div className="p-4 border-t border-glass-border">
-          {!collapsed && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-xs text-gray-500 text-center"
-            >
-              Made with Claude Code
-            </motion.div>
-          )}
-        </div>
       </div>
     </motion.aside>
   )

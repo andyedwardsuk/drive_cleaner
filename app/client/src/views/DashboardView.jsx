@@ -160,10 +160,12 @@ export default function DashboardView() {
         illustration="🏠"
       />
 
-      <div className="p-6 border rounded-xl bg-card border-glass-border backdrop-blur-sm">
-        <form onSubmit={handleSubmit} className="flex items-end gap-4">
+      <div className="p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-xl shadow-lg shadow-black/10">
+        <form onSubmit={handleSubmit} className="flex flex-col md:flex-row md:items-end gap-4">
           <div className="flex-1">
-            <Label htmlFor="folderId">Folder ID or Google Drive URL</Label>
+            <Label htmlFor="folderId" className="text-sm font-medium text-slate-200 mb-2 block">
+              Folder ID or Google Drive URL
+            </Label>
             <div className="flex gap-2">
               <Input
                 id="folderId"
@@ -172,21 +174,25 @@ export default function DashboardView() {
                 value={folderId}
                 onChange={(e) => setFolderId(e.target.value)}
                 disabled={loading}
-                className="flex-1 font-mono text-sm"
+                className="flex-1 font-mono text-sm bg-slate-950/60 border-slate-700/60 text-slate-100 placeholder:text-slate-500 focus:border-blue-500 rounded-xl h-10"
               />
               <DrivePicker onFolderSelected={handleFolderSelected} disabled={loading} />
             </div>
             {isPastedUrl && parsedId && parsedId !== 'root' && (
-              <p className="text-xs text-primary mt-1.5 flex items-center gap-1 font-mono">
+              <p className="text-xs text-blue-400 mt-1.5 flex items-center gap-1 font-mono">
                 <Sparkles className="w-3 h-3" />
-                Extracted Folder ID: <span className="font-semibold">{parsedId}</span>
+                Extracted Folder ID: <span className="font-semibold text-blue-300">{parsedId}</span>
               </p>
             )}
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-slate-400 mt-2">
               Leave empty for My Drive root, paste a Drive folder link, or click Browse to select
             </p>
           </div>
-          <Button type="submit" disabled={loading}>
+          <Button
+            type="submit"
+            disabled={loading}
+            className="h-10 px-5 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl shadow-md shadow-blue-600/25 shrink-0"
+          >
             {loading ? (
               <>
                 <RefreshCw className="mr-2 h-4 w-4 animate-spin" />

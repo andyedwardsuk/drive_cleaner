@@ -16,86 +16,61 @@ export default function Hero({
   title,
   subtitle,
   actions,
+  children,
   badge,
   illustration,
   className,
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
       className={cn(
-        'relative overflow-hidden rounded-2xl p-8 mb-8',
-        'bg-gradient-to-br from-blue-900/40 via-indigo-900/40 to-purple-900/40',
-        'border border-glass-border',
-        'backdrop-blur-xl',
+        'relative overflow-hidden rounded-2xl p-6 md:p-8 mb-6',
+        'bg-gradient-to-b from-slate-900/85 via-slate-900/60 to-slate-950/70',
+        'border border-slate-800/80 border-t-white/10',
+        'backdrop-blur-xl shadow-xl shadow-black/20',
         className
       )}
     >
-      {/* Glassmorphism overlay */}
-      <div className="absolute inset-0 bg-glass-surface backdrop-blur-sm" />
-
-      {/* Gradient orbs for depth */}
-      <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl" />
-      <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl" />
+      {/* Subtle ambient accent aura */}
+      <div className="absolute -top-16 -right-16 w-56 h-56 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Content */}
-      <div className="relative z-10 flex items-center gap-8">
+      <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-6">
         {/* Icon/Illustration */}
         <div className="flex-shrink-0">
           {illustration ? (
-            <div className="text-7xl">{illustration}</div>
+            <div className="text-5xl md:text-6xl">{illustration}</div>
           ) : Icon ? (
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-xl shadow-blue-500/30">
-              <Icon className="h-10 w-10 text-white" />
+            <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25 border border-blue-400/20">
+              <Icon className="h-7 w-7 md:h-8 md:w-8 text-white" />
             </div>
           ) : null}
         </div>
 
         {/* Text Content */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-4xl font-bold text-white">{title}</h1>
+          <div className="flex flex-wrap items-center gap-3 mb-1.5">
+            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">{title}</h1>
             {badge && (
-              <span className="px-3 py-1 rounded-full text-sm font-medium bg-blue-500/30 text-blue-200 border border-blue-500/50">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/15 text-blue-300 border border-blue-500/30">
                 {badge}
               </span>
             )}
           </div>
-          <p className="text-lg text-gray-200 max-w-2xl">{subtitle}</p>
+          <p className="text-sm md:text-base text-slate-300 max-w-2xl leading-relaxed">{subtitle}</p>
 
-          {/* Actions */}
-          {actions && <div className="mt-6 flex items-center gap-4">{actions}</div>}
+          {/* Actions & Children */}
+          {(actions || children) && (
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              {actions}
+              {children}
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Animated sparkles */}
-      <motion.div
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.3, 0.6, 0.3],
-        }}
-        transition={{
-          duration: 3,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-        className="absolute top-4 right-4 w-2 h-2 bg-blue-400 rounded-full"
-      />
-      <motion.div
-        animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.2, 0.5, 0.2],
-        }}
-        transition={{
-          duration: 4,
-          repeat: Infinity,
-          ease: 'easeInOut',
-          delay: 1,
-        }}
-        className="absolute bottom-8 right-16 w-1.5 h-1.5 bg-indigo-400 rounded-full"
-      />
     </motion.div>
   )
 }

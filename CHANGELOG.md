@@ -4,6 +4,23 @@ All notable changes to the Drive Cleaner project will be documented in this file
 
 ---
 
+## [3.0.1] - 2026-09-17
+### Changed
+- **UI Color Scheme Overhaul & Accessibility Modernization**:
+  - **Dark Mode Grounding**: Added `class="dark"` to root `<html>` tag and harmonized `:root` and `.dark` CSS tokens in `index.css` to eliminate stark white cards and glare boxes.
+  - **Refined Color Palette**: Replaced oversaturated royal blue gradient with deep obsidian midnight canvas (`#070b14` → `#0b1329` → `#0e1b38`).
+  - **Subtle Glassmorphism**: Swapped electric neon blue borders with delicate hairline slate borders (`rgba(148, 163, 184, 0.14)`) and dark glass surfaces (`rgba(15, 23, 42, 0.70)`).
+  - **WCAG AA Compliance**: Upgraded sidebar section titles (`OVERVIEW`, `CLEANUP TOOLS`, etc.) from low-contrast `text-gray-500` to high-contrast `text-slate-400 font-semibold tracking-wider` (>5:1 ratio).
+  - **Component Retheming**:
+    - Overhauled `Hero.jsx`: Replaced neon gradients and oversized orbs with a sleek, modern dark glass card with high-contrast typography and subtle ambient accenting.
+    - Updated `DashboardView.jsx`: Transformed the folder search form from a stark white box into an integrated dark glass card with slate inputs.
+    - Updated `FolderSelector.jsx`: Converted Scan Target panels, tabs, and preset chips into cohesive dark slate controls.
+    - Updated `FileTable.jsx`: Refined search inputs, table wrapper, and CSV/JSON export buttons.
+- **Branding Removal**:
+  - Removed outdated `"Made with Claude Code"` from navigation sidebar footer and About view credits.
+
+---
+
 ## [3.0.0] - 2026-09-17
 ### Added
 - **Incremental Sync & Drive Changes API Engine (`FEATURE_INCREMENTAL_SYNC`)**:
