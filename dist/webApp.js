@@ -800,6 +800,95 @@ function analyzeMediaFiles(payload) {
 }
 
 /**
+ * Runs security & sharing exposure audit
+ * Called from React app via google.script.run
+ * @param {string|Object} payload - { rootFolderId, corpora } or JSON string
+ * @returns {Object} Security audit report
+ */
+function auditSecurityPermissions(payload) {
+  try {
+    var params = payload;
+    if (typeof payload === 'string') {
+      try {
+        params = JSON.parse(payload);
+      } catch (e) {
+        params = { rootFolderId: payload, corpora: 'user' };
+      }
+    }
+    var rootFolderId = (params && params.rootFolderId) || 'root';
+    var corpora = (params && params.corpora) || 'user';
+
+    // eslint-disable-next-line no-undef
+    return typeof SecurityAuditManager !== 'undefined'
+      ? SecurityAuditManager.auditSecurityPermissions(rootFolderId, corpora)
+      : { success: false, error: 'SecurityAuditManager not loaded' };
+  } catch (err) {
+    console.error('Error in auditSecurityPermissions:', err);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Revokes public access on a file
+ * @param {string} fileId
+ * @returns {Object}
+ */
+function revokePublicAccess(fileId) {
+  // eslint-disable-next-line no-undef
+  return typeof SecurityAuditManager !== 'undefined'
+    ? SecurityAuditManager.revokePublicAccess(fileId)
+    : { success: false, error: 'SecurityAuditManager not loaded' };
+}
+
+/**
+ * Bulk revokes public access across multiple files
+ * @param {Array<string>} fileIds
+ * @returns {Object}
+ */
+function bulkRevokePublicAccess(fileIds) {
+  // eslint-disable-next-line no-undef
+  return typeof SecurityAuditManager !== 'undefined'
+    ? SecurityAuditManager.bulkRevokePublicAccess(fileIds)
+    : { success: false, error: 'SecurityAuditManager not loaded' };
+}
+
+/**
+ * Revokes a specific collaborator permission
+ * @param {Object} payload - { fileId, permissionId }
+ * @returns {Object}
+ */
+function revokeCollaboratorAccess(payload) {
+  // eslint-disable-next-line no-undef
+  return typeof SecurityAuditManager !== 'undefined'
+    ? SecurityAuditManager.revokeCollaboratorAccess(payload.fileId, payload.permissionId)
+    : { success: false, error: 'SecurityAuditManager not loaded' };
+}
+
+/**
+ * Bulk revokes all permissions matching an external domain
+ * @param {Object} payload - { domain, fileIds }
+ * @returns {Object}
+ */
+function bulkRevokeDomainAccess(payload) {
+  // eslint-disable-next-line no-undef
+  return typeof SecurityAuditManager !== 'undefined'
+    ? SecurityAuditManager.bulkRevokeDomainAccess(payload.domain, payload.fileIds)
+    : { success: false, error: 'SecurityAuditManager not loaded' };
+}
+
+/**
+ * Downgrades editor to viewer
+ * @param {Object} payload - { fileId, permissionId }
+ * @returns {Object}
+ */
+function downgradeEditorToViewer(payload) {
+  // eslint-disable-next-line no-undef
+  return typeof SecurityAuditManager !== 'undefined'
+    ? SecurityAuditManager.downgradeEditorToViewer(payload.fileId, payload.permissionId)
+    : { success: false, error: 'SecurityAuditManager not loaded' };
+}
+
+/**
  * Run this function in the Google Apps Script editor to authorize all Drive permissions!
  * Open editor: https://script.google.com/a/andyedwards.uk/d/1qkpaDFbdqq3OlpMCEdOUk68nr3svvVk3mmhhmHykRIbvaBUimsx2uN-G/edit
  * Select 'authorizeDriveCleaner' in the function dropdown at top, then click 'Run'.

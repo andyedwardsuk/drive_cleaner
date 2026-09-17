@@ -4,6 +4,21 @@ All notable changes to the Drive Cleaner project will be documented in this file
 
 ---
 
+## [2.9.0] - 2026-09-17
+### Added
+- **Sharing Permissions, External Exposure & Security Audit Hub (`FEATURE_SECURITY_AUDIT`)**:
+  - Quantified **Security Health Score (0–100)** evaluating exposure risks across public links, external domains, dormant shares, and sensitive documents.
+  - Public Web Link scanner identifying unrestricted `anyoneWithLink` files indexable on the open web.
+  - 1-click **"Revoke All Public Links"** bulk action instantly cutting open web access.
+  - External domain exposure mapping clustering shares by organization domain (`@consulting-agency.com`, etc.) with domain-wide **"Revoke Domain"** capability.
+  - Sensitive keyword detection flagging credentials, financial sheets, NDAs, and tax documents exposed to external parties.
+  - Dormant access tracker highlighting collaborator permissions inactive for > 180 days.
+  - Inline permission inspector with 1-click **Downgrade to Viewer** and **Remove Collaborator** controls.
+  - Exportable Security Audit Manifest (`.csv`) with full permission records.
+  - Universal File Preview modal integration across all security-flagged files.
+
+---
+
 ## [2.8.0] - 2026-09-16
 ### Added
 - **Google Photos & Media Optimization Center (`FEATURE_MEDIA_OPTIMIZER`)**:

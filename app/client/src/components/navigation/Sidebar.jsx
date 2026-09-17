@@ -23,6 +23,7 @@ import {
   Tag,
   Users,
   Film,
+  ShieldAlert,
   Settings,
   Info,
   ChevronLeft,
@@ -175,6 +176,12 @@ export default function Sidebar() {
           label: 'Shared Drives',
           path: '/shared-drives',
           flag: 'FEATURE_SHARED_DRIVES_HUB',
+        },
+        {
+          icon: ShieldAlert,
+          label: 'Security Audit',
+          path: '/security-audit',
+          flag: 'FEATURE_SECURITY_AUDIT',
         },
         {
           icon: FolderHeart,

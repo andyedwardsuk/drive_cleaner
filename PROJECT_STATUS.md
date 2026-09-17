@@ -1,9 +1,9 @@
 # Drive Cleaner - Project Status
 
-**Last Updated**: 2026-09-16
+**Last Updated**: 2026-09-17
 **Current Phase**: Phase 5 (Complete) - Production Hardening & Automation
-**Current Velocity**: 19 major releases deployed
-**Active Deployment**: v2.8.0 (@40)
+**Current Velocity**: 20 major releases deployed
+**Active Deployment**: v2.9.0 (@41)
 **Deployment URL**: https://script.google.com/a/macros/andyedwards.uk/s/AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w/exec
 
 ---
@@ -11,6 +11,7 @@
 ## 🎯 Quick Summary
 
 - **Core Product**: 100% Implemented & Deployed ✅
+- **Sharing Permissions & Security Audit Hub**: 100% Implemented & Deployed ✅
 - **Google Photos & Media Optimization Center**: 100% Implemented & Deployed ✅
 - **Shared Drives (Team Drive) Hygiene Hub**: 100% Implemented & Deployed ✅
 - **Google Drive Labels & Taxonomy Hub**: 100% Implemented & Deployed ✅
@@ -23,10 +24,11 @@
 
 ---
 
-## ✅ Completed Major Releases (v2.0.0 - v2.8.0)
+## ✅ Completed Major Releases (v2.0.0 - v2.9.0)
 
 | Version | Feature | Type | Status | Deployment | Git Commit |
 |---|---|---|---|---|---|
+| **v2.9.0** | **Sharing Permissions & Security Audit Hub** | Full Stack | ✅ Complete | `@41` | Working Tree |
 | **v2.8.0** | **Google Photos & Media Optimization Center** | Full Stack | ✅ Complete | `@40` | `6610e78` |
 | **v2.7.0** | **Shared Drives (Team Drive) Hygiene Hub** | Full Stack | ✅ Complete | `@39` | `0e85aee` |
 | **v2.6.0** | **Google Drive Labels & Taxonomy Hub** | Full Stack | ✅ Complete | `@38` | `88a7261` |
@@ -82,6 +84,16 @@
 - Exportable Media Optimization Manifest (CSV)
 - Interactive Media Triage Grid & Table with universal playable preview
 
+### 7. Security & Sharing Exposure Governance
+- Sharing Permissions & Security Audit Hub (`/security-audit`)
+- Security Health Score (0–100) dynamic exposure meter
+- Unrestricted public web links (`anyoneWithLink`) scanner
+- 1-click "Revoke All Public Links" bulk remediation engine
+- External domain exposure tracking with domain-wide revocation
+- Sensitive document scanner flagging exposed credentials, passwords, financials, and NDAs
+- Inline permission inspector with 1-click downgrade to viewer and collaborator removal
+- Exportable Security Audit Manifest (CSV)
+
 ---
 
 ## 🎯 Milestones Status
@@ -98,6 +110,7 @@
 
 | Version | Date | Features | Deployment ID |
 |---------|------|----------|---------------|
+| v2.9.0 | 2026-09-17 | Sharing Permissions & Security Audit Hub | AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w (@41) |
 | v2.8.0 | 2026-09-16 | Google Photos & Media Optimization Center | AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w (@40) |
 | v2.7.0 | 2026-09-16 | Shared Drives (Team Drive) Hygiene Hub | AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w (@39) |
 | v2.6.0 | 2026-09-16 | Google Drive Labels & Taxonomy Hub | AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w (@38) |
