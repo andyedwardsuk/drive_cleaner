@@ -28,7 +28,7 @@
 
 | Version | Feature | Type | Status | Deployment | Git Commit |
 |---|---|---|---|---|---|
-| **v2.9.0** | **Sharing Permissions & Security Audit Hub** | Full Stack | ✅ Complete | `@41` | Working Tree |
+| **v2.9.0** | **Sharing Permissions & Security Audit Hub** | Full Stack | ✅ Complete | `@41` | `7ff528b` |
 | **v2.8.0** | **Google Photos & Media Optimization Center** | Full Stack | ✅ Complete | `@40` | `6610e78` |
 | **v2.7.0** | **Shared Drives (Team Drive) Hygiene Hub** | Full Stack | ✅ Complete | `@39` | `0e85aee` |
 | **v2.6.0** | **Google Drive Labels & Taxonomy Hub** | Full Stack | ✅ Complete | `@38` | `88a7261` |
