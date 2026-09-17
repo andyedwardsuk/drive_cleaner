@@ -569,7 +569,7 @@ export default function FileTable({ data = [] }) {
               table.setPageSize(Number(value))
             }}
           >
-            <SelectTrigger className="h-8 w-[70px]">
+            <SelectTrigger className="h-9 w-[75px] bg-slate-900/70 border-slate-700/60 text-slate-200 rounded-xl text-xs">
               <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
@@ -587,6 +587,7 @@ export default function FileTable({ data = [] }) {
             size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
+            className="h-9 px-3 rounded-xl bg-slate-900/70 border-slate-700/60 text-slate-200 hover:text-white hover:bg-slate-800 disabled:opacity-40"
           >
             Previous
           </Button>
@@ -595,6 +596,7 @@ export default function FileTable({ data = [] }) {
             size="sm"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
+            className="h-9 px-3 rounded-xl bg-slate-900/70 border-slate-700/60 text-slate-200 hover:text-white hover:bg-slate-800 disabled:opacity-40"
           >
             Next
           </Button>

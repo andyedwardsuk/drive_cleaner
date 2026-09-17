@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { FolderSearch } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 /**
  * Drive Picker Component
  * Opens Google Drive Picker to select a folder
  */
-export default function DrivePicker({ onFolderSelected, disabled }) {
+export default function DrivePicker({ onFolderSelected, disabled, className }) {
   const [pickerApiLoaded, setPickerApiLoaded] = useState(false)
   const [oauthToken, setOauthToken] = useState(null)
   const [isAuthorizing, setIsAuthorizing] = useState(false)
@@ -172,12 +173,16 @@ export default function DrivePicker({ onFolderSelected, disabled }) {
       variant="outline"
       onClick={showPicker}
       disabled={disabled || isAuthorizing || !pickerApiLoaded}
+      className={cn(
+        "h-11 px-4 bg-slate-900/80 border-slate-700/60 text-slate-200 hover:text-white hover:bg-slate-800 rounded-xl shrink-0 flex items-center gap-2",
+        className
+      )}
     >
       {isAuthorizing ? (
         'Loading...'
       ) : (
         <>
-          <FolderSearch className="mr-2 h-4 w-4" />
+          <FolderSearch className="h-4 w-4 text-slate-400" />
           Browse
         </>
       )}

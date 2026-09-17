@@ -222,7 +222,7 @@ export default function FolderSelector({
                   value={inputVal}
                   onChange={handleInputChange}
                   disabled={disabled}
-                  className="pr-8 bg-slate-950/70 border-slate-700/60 text-slate-100 placeholder:text-slate-500 focus:border-blue-500 rounded-xl h-10 text-sm font-mono"
+                  className="pr-8 bg-slate-950/70 border-slate-700/60 text-slate-100 placeholder:text-slate-500 focus:border-blue-500 rounded-xl h-11 text-sm font-mono"
                 />
               </div>
 

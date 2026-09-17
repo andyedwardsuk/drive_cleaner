@@ -161,50 +161,59 @@ export default function DashboardView() {
       />
 
       <div className="p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-xl shadow-lg shadow-black/10">
-        <form onSubmit={handleSubmit} className="flex flex-col md:flex-row md:items-end gap-4">
-          <div className="flex-1">
-            <Label htmlFor="folderId" className="text-sm font-medium text-slate-200 mb-2 block">
-              Folder ID or Google Drive URL
-            </Label>
-            <div className="flex gap-2">
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <Label htmlFor="folderId" className="text-sm font-semibold text-slate-200 block">
+            Folder ID or Google Drive URL
+          </Label>
+
+          {/* Unified Input + Action Controls Row */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+            <div className="relative flex-1">
               <Input
                 id="folderId"
                 type="text"
-                placeholder="Enter folder ID, URL, or use Browse to select"
+                placeholder="Enter folder ID, URL, or click Browse to select"
                 value={folderId}
                 onChange={(e) => setFolderId(e.target.value)}
                 disabled={loading}
-                className="flex-1 font-mono text-sm bg-slate-950/60 border-slate-700/60 text-slate-100 placeholder:text-slate-500 focus:border-blue-500 rounded-xl h-10"
+                className="w-full font-mono text-sm bg-slate-950/70 border-slate-700/60 text-slate-100 placeholder:text-slate-500 focus:border-blue-500 rounded-xl h-11 px-4"
               />
-              <DrivePicker onFolderSelected={handleFolderSelected} disabled={loading} />
             </div>
+            <DrivePicker
+              onFolderSelected={handleFolderSelected}
+              disabled={loading}
+            />
+            <Button
+              type="submit"
+              disabled={loading}
+              className="h-11 px-6 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl shadow-md shadow-blue-600/25 shrink-0 flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <FolderSearch className="h-4 w-4" />
+                  Load Folder
+                </>
+              )}
+            </Button>
+          </div>
+
+          {/* Helper Footnote & Extracted ID */}
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
+            <p className="text-slate-400">
+              Leave empty for My Drive root, paste a Drive folder link, or click <strong>Browse</strong> to select visually.
+            </p>
             {isPastedUrl && parsedId && parsedId !== 'root' && (
-              <p className="text-xs text-blue-400 mt-1.5 flex items-center gap-1 font-mono">
-                <Sparkles className="w-3 h-3" />
-                Extracted Folder ID: <span className="font-semibold text-blue-300">{parsedId}</span>
+              <p className="text-blue-400 flex items-center gap-1 font-mono font-medium">
+                <Sparkles className="w-3.5 h-3.5 text-blue-300" />
+                Extracted Folder ID: <span className="text-blue-200 font-semibold">{parsedId}</span>
               </p>
             )}
-            <p className="text-xs text-slate-400 mt-2">
-              Leave empty for My Drive root, paste a Drive folder link, or click Browse to select
-            </p>
           </div>
-          <Button
-            type="submit"
-            disabled={loading}
-            className="h-10 px-5 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl shadow-md shadow-blue-600/25 shrink-0"
-          >
-            {loading ? (
-              <>
-                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                Loading...
-              </>
-            ) : (
-              <>
-                <FolderSearch className="mr-2 h-4 w-4" />
-                Load Folder
-              </>
-            )}
-          </Button>
         </form>
       </div>
 
