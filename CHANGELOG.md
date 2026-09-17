@@ -2,6 +2,20 @@
 
 All notable changes to the Drive Cleaner project will be documented in this file.
 
+## [3.2.3] - 2026-09-17
+### Added
+- **Minimised Category Dock & Floating Flyout Menus (`Sidebar.jsx`)**:
+  - **Category Dock Architecture**: Replaced the overwhelming, unbroken 27-icon vertical column with an intuitive, 64px compact Category Dock:
+    - Dedicated 1-click shortcuts for primary core tools: `Dashboard` (`Home`), `Smart Scan` (`Scan`), and `Settings` (`Settings`).
+    - Prominent Category Hub tiles: `Cleanup Tools` (8 tools), `Organisation` (6 tools), `Security & Governance` (4 tools), `Insights & Impact` (3 tools), and `Operations & Settings` (5 tools).
+    - Refined count badges (`bg-slate-800 text-slate-300 text-[9px] font-bold`) on each category hub and active indicator pills.
+  - **Fixed-Position Floating Flyouts**:
+    - Built flyout menus anchored dynamically with `position: fixed` and `getBoundingClientRect()`, completely eliminating overflow clipping caused by `<nav>`'s `overflow-y-auto`.
+    - Integrated 200ms mouseleave debouncing so users can glide smoothly between category tiles and the flyout menu without accidental dismissals.
+    - Added status badges, active route indicators, and direct tool navigation within flyouts.
+  - **Unclipped Floating Tooltips**:
+    - Rendered top-level shortcuts and category tooltips as fixed-position floating pills at `left: 5.25rem` with micro-animations.
+
 ---
 
 ## [3.2.2] - 2026-09-17
