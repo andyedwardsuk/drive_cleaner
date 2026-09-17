@@ -888,6 +888,51 @@ function downgradeEditorToViewer(payload) {
     : { success: false, error: 'SecurityAuditManager not loaded' };
 }
 
+// ============================================
+// INCREMENTAL SYNC & DRIVE CHANGES API
+// ============================================
+
+/**
+ * Retrieves the starting change token from Drive API Changes resource
+ * Called from React app via google.script.run
+ * @returns {Object} { success, changeToken, largestChangeId, timestamp }
+ */
+function getStartChangeToken() {
+  // eslint-disable-next-line no-undef
+  return typeof SyncManager !== 'undefined'
+    ? SyncManager.getStartChangeToken()
+    : { success: false, error: 'SyncManager not loaded' };
+}
+
+/**
+ * Synchronizes incremental changes since a given change token
+ * Called from React app via google.script.run
+ * @param {string|Object} payload - { changeToken, corpora } or changeToken string
+ * @returns {Object} Delta changes package
+ */
+function syncIncrementalChanges(payload) {
+  try {
+    var params = payload;
+    if (typeof payload === 'string') {
+      try {
+        params = JSON.parse(payload);
+      } catch (e) {
+        params = { changeToken: payload, corpora: 'user' };
+      }
+    }
+    var changeToken = (params && (params.changeToken || params.savedChangeId)) || null;
+    var corpora = (params && params.corpora) || 'user';
+
+    // eslint-disable-next-line no-undef
+    return typeof SyncManager !== 'undefined'
+      ? SyncManager.syncIncrementalChanges(changeToken, corpora)
+      : { success: false, error: 'SyncManager not loaded' };
+  } catch (err) {
+    console.error('Error in syncIncrementalChanges:', err);
+    return { success: false, error: err.message };
+  }
+}
+
 /**
  * Run this function in the Google Apps Script editor to authorize all Drive permissions!
  * Open editor: https://script.google.com/a/andyedwards.uk/d/1qkpaDFbdqq3OlpMCEdOUk68nr3svvVk3mmhhmHykRIbvaBUimsx2uN-G/edit

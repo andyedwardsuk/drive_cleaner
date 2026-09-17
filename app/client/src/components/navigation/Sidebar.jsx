@@ -24,6 +24,7 @@ import {
   Users,
   Film,
   ShieldAlert,
+  Activity,
   Settings,
   Info,
   ChevronLeft,
@@ -32,6 +33,7 @@ import {
 import NavItem from './NavItem'
 import SidebarSection from './SidebarSection'
 import { isFeatureEnabled, getFeatureBadge } from '@/config/featureFlags'
+import { APP_VERSION } from '@/version'
 import { cn } from '@/lib/utils'
 
 export default function Sidebar() {
@@ -184,6 +186,12 @@ export default function Sidebar() {
           flag: 'FEATURE_SECURITY_AUDIT',
         },
         {
+          icon: Activity,
+          label: 'Incremental Sync',
+          path: '/incremental-sync',
+          flag: 'FEATURE_INCREMENTAL_SYNC',
+        },
+        {
           icon: FolderHeart,
           label: 'My Folders',
           path: '/my-folders',
@@ -251,7 +259,7 @@ export default function Sidebar() {
                 </div>
                 <div>
                   <h1 className="text-lg font-bold text-white">Drive Cleaner</h1>
-                  <p className="text-xs text-gray-400">v2.7.0</p>
+                  <p className="text-xs text-gray-400">v{APP_VERSION}</p>
                 </div>
               </motion.div>
             )}

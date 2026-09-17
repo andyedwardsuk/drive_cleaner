@@ -28,6 +28,7 @@ import DriveLabelsView from './views/DriveLabelsView'
 import SharedDrivesView from './views/SharedDrivesView'
 import MediaOptimizerView from './views/MediaOptimizerView'
 import SecurityAuditView from './views/SecurityAuditView'
+import IncrementalSyncView from './views/IncrementalSyncView'
 
 // Create root route
 const rootRoute = createRootRoute({
@@ -194,6 +195,12 @@ const securityAuditRoute = createRoute({
   component: SecurityAuditView,
 })
 
+const incrementalSyncRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/incremental-sync',
+  component: IncrementalSyncView,
+})
+
 const aboutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/about',
@@ -225,6 +232,7 @@ const routeTree = rootRoute.addChildren([
   sharedDrivesRoute,
   mediaOptimizerRoute,
   securityAuditRoute,
+  incrementalSyncRoute,
   myFoldersRoute,
   historyRoute,
   settingsRoute,

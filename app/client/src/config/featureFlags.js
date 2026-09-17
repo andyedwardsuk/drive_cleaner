@@ -58,6 +58,9 @@ export const FEATURE_FLAGS = {
 
   // Phase 13 (v2.9.0) - Sharing & Security Audit Hub
   FEATURE_SECURITY_AUDIT: true,
+
+  // Phase 14 (v3.0.0) - Incremental Sync & Drive Changes API Engine
+  FEATURE_INCREMENTAL_SYNC: true,
 }
 
 /**
@@ -132,6 +135,9 @@ export const getFeatureVersion = (flagName) => {
 
     // v2.9.0
     FEATURE_SECURITY_AUDIT: 'v2.9.0',
+
+    // v3.0.0
+    FEATURE_INCREMENTAL_SYNC: 'v3.0.0',
   }
 
   return versionMap[flagName] || 'Future'
