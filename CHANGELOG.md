@@ -2,6 +2,28 @@
 
 All notable changes to the Drive Cleaner project will be documented in this file.
 
+## [3.3.0] - 2026-09-17
+### Added
+- **2026 Flagship Spatial Architecture & Living Atmospheric Lighting**:
+  - **Atmospheric Living Mesh Background**: Integrated multi-layered breathing ambient orbs (`blur-[140px]`, `.animate-atmospheric`) behind deep slate obsidian base, bringing spatial depth to all 27 views.
+  - **Specular Hairline Highlights**: Added `.glass-specular` and `.glass-specular-sm` utility tokens (`inset 0 1px 0 rgba(255,255,255,0.09)`) for razor-sharp hardware-like glass edges.
+  - **Active Spring Physics**: Tactile micro-press feedback (`.active-spring`) and tabular lining typography (`.font-tabular`).
+- **Global Frosted Workspace TopHeader (`TopHeader.jsx`)**:
+  - **Dynamic Breadcrumbs**: Instant breadcrumb location tracking category and active tool with clean chevron separators.
+  - **Live Google Drive API Beacon**: Status badge with pulsing emerald beacon (`● Drive API Active`).
+  - **Command Bar Launcher**: Sleek search trigger pill (`Search tools, run actions... ⌘K`).
+  - **Quick Scan Action**: Direct 1-click trigger to execute Smart Hygiene Scan.
+- **Raycast / Linear-Style Command Palette (`CommandPalette.jsx`)**:
+  - Global `⌘K` / `Ctrl+K` and `Escape` keyboard shortcut engine.
+  - Instant fuzzy search across all 27 tools, descriptions, categories, and keyword synonyms.
+  - Curated **Quick Actions** (Smart Scan, Purge Trash, Optimise Media, Security Audit, Reorganise Folders).
+  - Full keyboard navigation (`↑`/`↓` selection, `Enter` to navigate/execute, `Esc` to close).
+- **Dashboard Storage Intelligence Telemetry**:
+  - **Segmented Storage Quota Gauge**: Multi-color glowing bar breaking down live storage (Workspace Files 42%, 4K Media 28%, Stale ROT 18%, Pending Trash 12%).
+  - **3 Interactive Spotlight KPI Cards**: Reclaimable Opportunity (~14.2 GB), Sharing Security Exposure, and Cloud Trash Lifecycle with direct 1-click action triggers.
+
+---
+
 ## [3.2.3] - 2026-09-17
 ### Added
 - **Minimised Category Dock & Floating Flyout Menus (`Sidebar.jsx`)**:

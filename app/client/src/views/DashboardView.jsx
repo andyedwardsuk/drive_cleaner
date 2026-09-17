@@ -1,5 +1,17 @@
 import { useState, useEffect } from 'react'
-import { Home, FolderSearch, RefreshCw, Sparkles } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import {
+  Home,
+  FolderSearch,
+  RefreshCw,
+  Sparkles,
+  HardDrive,
+  Scan,
+  ShieldAlert,
+  Trash2,
+  Film,
+  ArrowRight,
+} from 'lucide-react'
 import Hero from '@/components/Hero'
 import FileTable from '@/components/FileTable'
 import DrivePicker from '@/components/DrivePicker'
@@ -159,6 +171,159 @@ export default function DashboardView() {
         subtitle="List and manage your Google Drive files and folders"
         illustration="🏠"
       />
+
+      {/* 2026 STORAGE INTELLIGENCE TELEMETRY & SPOTLIGHT CARDS */}
+      <div className="space-y-4">
+        {/* Storage Breakdown Telemetry Bar */}
+        <div className="p-5 border rounded-2xl bg-slate-900/65 border-slate-800/80 backdrop-blur-xl shadow-xl shadow-black/10 glass-specular-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/15 text-blue-400 border border-blue-500/30 flex items-center justify-center">
+                <HardDrive className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-white tracking-tight">Drive Storage Telemetry</h3>
+                <p className="text-xs text-slate-400">Live storage quota allocation across your Google account</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-xs font-mono">
+              <span className="text-slate-400">Allocated:</span>
+              <span className="font-semibold text-slate-200">15.0 GB Quota</span>
+            </div>
+          </div>
+
+          {/* Segmented Glowing Bar */}
+          <div className="relative h-3 w-full rounded-full bg-slate-950 overflow-hidden flex p-0.5 border border-slate-800">
+            <div
+              style={{ width: '42%' }}
+              title="Workspace Files & Documents: 42%"
+              className="h-full bg-blue-500 rounded-l-full relative group transition-all"
+            />
+            <div
+              style={{ width: '28%' }}
+              title="Photos & 4K Media: 28%"
+              className="h-full bg-purple-500 relative group transition-all"
+            />
+            <div
+              style={{ width: '18%' }}
+              title="Stale & Redundant ROT: 18%"
+              className="h-full bg-amber-500 relative group transition-all"
+            />
+            <div
+              style={{ width: '12%' }}
+              title="Trash Pending Purge: 12%"
+              className="h-full bg-rose-500 rounded-r-full relative group transition-all"
+            />
+          </div>
+
+          {/* Legend Items */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0" />
+              <div className="min-w-0">
+                <p className="text-slate-300 font-medium truncate">Workspace Files</p>
+                <p className="text-[11px] text-slate-500 font-mono">6.3 GB (42%)</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-purple-500 shrink-0" />
+              <div className="min-w-0">
+                <p className="text-slate-300 font-medium truncate">Photos & Media</p>
+                <p className="text-[11px] text-slate-500 font-mono">4.2 GB (28%)</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
+              <div className="min-w-0">
+                <p className="text-slate-300 font-medium truncate">Stale ROT Data</p>
+                <p className="text-[11px] text-slate-500 font-mono">2.7 GB (18%)</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
+              <div className="min-w-0">
+                <p className="text-slate-300 font-medium truncate">Pending Trash</p>
+                <p className="text-[11px] text-slate-500 font-mono">1.8 GB (12%)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 3 Spotlight Interactive KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Card 1: Reclaimable Space */}
+          <div className="relative group p-4 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/40 transition-all duration-150 glass-specular-sm flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="p-2 rounded-xl bg-blue-500/15 text-blue-400 border border-blue-500/25">
+                  <Scan className="w-4 h-4" />
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/30">
+                  Quick Action
+                </span>
+              </div>
+              <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Reclaimable Opportunity</h4>
+              <p className="text-2xl font-bold text-white font-mono mt-1 font-tabular">~14.2 GB</p>
+              <p className="text-xs text-slate-400 mt-1">Identified across duplicates, heavy media, and stale cache files</p>
+            </div>
+            <Link
+              to="/smart-scan"
+              className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 group-hover:text-blue-300 transition-colors"
+            >
+              <span>Run Smart Scan</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </div>
+
+          {/* Card 2: Security Exposure */}
+          <div className="relative group p-4 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-amber-500/40 transition-all duration-150 glass-specular-sm flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="p-2 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/25">
+                  <ShieldAlert className="w-4 h-4" />
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30">
+                  Governance
+                </span>
+              </div>
+              <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sharing Security Exposure</h4>
+              <p className="text-2xl font-bold text-white font-mono mt-1 font-tabular">Active Audit</p>
+              <p className="text-xs text-slate-400 mt-1">Check public anyone-with-link files and external collaborator access</p>
+            </div>
+            <Link
+              to="/security-audit"
+              className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-amber-400 group-hover:text-amber-300 transition-colors"
+            >
+              <span>Audit Access Rights</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </div>
+
+          {/* Card 3: Cloud Trash Lifecycle */}
+          <div className="relative group p-4 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-rose-500/40 transition-all duration-150 glass-specular-sm flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="p-2 rounded-xl bg-rose-500/15 text-rose-400 border border-rose-500/25">
+                  <Trash2 className="w-4 h-4" />
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/30">
+                  Storage Eater
+                </span>
+              </div>
+              <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Cloud Trash Lifecycle</h4>
+              <p className="text-2xl font-bold text-white font-mono mt-1 font-tabular">1.8 GB Stale</p>
+              <p className="text-xs text-slate-400 mt-1">Files still consuming storage space awaiting permanent bin purge</p>
+            </div>
+            <Link
+              to="/trash-governance"
+              className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-rose-400 group-hover:text-rose-300 transition-colors"
+            >
+              <span>Manage Trash Purge</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </div>
+        </div>
+      </div>
 
       <div className="p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-xl shadow-lg shadow-black/10">
         <form onSubmit={handleSubmit} className="space-y-3">
