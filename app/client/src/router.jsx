@@ -8,9 +8,11 @@ import OrganisationHubView from './views/hubs/OrganisationHubView'
 import SecurityHubView from './views/hubs/SecurityHubView'
 import OperationsHubView from './views/hubs/OperationsHubView'
 
-// General Preferences Views
+// General Preferences & Legal Views
 import SettingsView from './views/SettingsView'
 import AboutView from './views/AboutView'
+import PrivacyView from './views/PrivacyView'
+import TermsView from './views/TermsView'
 
 // Create root route with fallback redirection to /dashboard
 const rootRoute = createRootRoute({
@@ -85,6 +87,18 @@ const aboutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/about',
   component: AboutView,
+})
+
+const privacyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/privacy',
+  component: PrivacyView,
+})
+
+const termsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/terms',
+  component: TermsView,
 })
 
 // -------------------------------------------------------------
@@ -272,9 +286,11 @@ const routeTree = rootRoute.addChildren([
   organiseRoute,
   securityRoute,
   operationsRoute,
-  // General
+  // General & Legal
   settingsRoute,
   aboutRoute,
+  privacyRoute,
+  termsRoute,
   // Backwards-Compatible Aliases
   smartScanRoute,
   duplicatesRoute,

@@ -1,5 +1,6 @@
-import { Info, Github, Bug, Mail, Shield, CheckCircle2, Cpu, HardDrive } from 'lucide-react'
+import { Info, Github, Bug, Mail, Shield, CheckCircle2, Cpu, HardDrive, FileText, Scale } from 'lucide-react'
 import { faCircleInfo } from '@fortawesome/pro-duotone-svg-icons'
+import { Link } from '@tanstack/react-router'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { APP_VERSION, BUILD_TIMESTAMP, FEATURES } from '@/version'
@@ -81,13 +82,35 @@ export default function AboutView() {
           </div>
         </div>
 
-        {/* Links */}
+        {/* Links & Compliance */}
         <div className="p-6 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm shadow-lg">
-          <h3 className="text-base font-bold text-white mb-4">Support & Documentation</h3>
-          <div className="space-y-2.5">
+          <h3 className="text-base font-bold text-white mb-4">Documentation & Legal</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
             <Button
               variant="outline"
-              className="w-full justify-start h-11 rounded-xl border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white text-xs font-semibold"
+              className="w-full justify-start h-10 rounded-xl border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white text-xs font-semibold"
+              asChild
+            >
+              <Link to="/privacy">
+                <Shield className="mr-2 h-4 w-4 text-emerald-400" />
+                Privacy Policy
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full justify-start h-10 rounded-xl border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white text-xs font-semibold"
+              asChild
+            >
+              <Link to="/terms">
+                <FileText className="mr-2 h-4 w-4 text-purple-400" />
+                Terms of Service
+              </Link>
+            </Button>
+          </div>
+          <div className="space-y-2">
+            <Button
+              variant="outline"
+              className="w-full justify-start h-10 rounded-xl border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white text-xs font-semibold"
               asChild
             >
               <a href="https://github.com/andyedwardsuk/drive_cleaner" target="_blank" rel="noopener noreferrer">
@@ -97,7 +120,7 @@ export default function AboutView() {
             </Button>
             <Button
               variant="outline"
-              className="w-full justify-start h-11 rounded-xl border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white text-xs font-semibold"
+              className="w-full justify-start h-10 rounded-xl border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white text-xs font-semibold"
               asChild
             >
               <a href="mailto:support@andyedwards.uk">

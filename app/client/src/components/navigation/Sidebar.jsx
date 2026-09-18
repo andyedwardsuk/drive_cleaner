@@ -246,8 +246,17 @@ export default function Sidebar() {
                 <span>About</span>
               </Link>
 
+              {/* Legal & Compliance Links */}
+              <div className="px-3 pt-2.5 pb-1 flex items-center justify-between text-[11px] text-slate-500 border-t border-slate-800/60">
+                <Link to="/privacy" className="hover:text-slate-300 transition-colors">Privacy</Link>
+                <span>•</span>
+                <Link to="/terms" className="hover:text-slate-300 transition-colors">Terms</Link>
+                <span>•</span>
+                <a href="mailto:support@andyedwards.uk" className="hover:text-slate-300 transition-colors">Support</a>
+              </div>
+
               {/* Version pill */}
-              <div className="px-3 pt-2 flex items-center justify-between text-[10px] text-slate-400">
+              <div className="px-3 pt-1 flex items-center justify-between text-[10px] text-slate-400">
                 <span>Drive Cleaner</span>
                 <span className="font-mono font-medium text-slate-400">v{APP_VERSION}</span>
               </div>
