@@ -82,26 +82,23 @@ export default function CleanupHubView() {
   const navigate = useNavigate()
 
   // Extract ?tab= query parameter or default to 'smart-scan'
-  const searchParams = new URLSearchParams(window.location.search)
-  const initialTab = searchParams.get('tab') || 'smart-scan'
+  const searchTab = router.location.search?.tab || new URLSearchParams(window.location.search).get('tab')
+  const initialTab = searchTab || 'smart-scan'
   const [activeTab, setActiveTab] = useState(
     CLEANUP_TABS.some((t) => t.id === initialTab) ? initialTab : 'smart-scan'
   )
 
   // Synchronize when query string changes
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const tabParam = params.get('tab')
+    const tabParam = router.location.search?.tab || new URLSearchParams(window.location.search).get('tab')
     if (tabParam && CLEANUP_TABS.some((t) => t.id === tabParam)) {
       setActiveTab(tabParam)
     }
-  }, [router.location.pathname, router.location.search])
+  }, [router.location.search])
 
   const handleTabChange = (tabId) => {
     setActiveTab(tabId)
-    const url = new URL(window.location.href)
-    url.searchParams.set('tab', tabId)
-    window.history.replaceState({}, '', url.toString())
+    navigate({ search: { tab: tabId }, replace: true })
   }
 
   const currentTabObj = CLEANUP_TABS.find((t) => t.id === activeTab) || CLEANUP_TABS[0]

@@ -1,4 +1,4 @@
-import { createRouter, createRoute, createRootRoute } from '@tanstack/react-router'
+import { createRouter, createRoute, createRootRoute, createHashHistory, Navigate } from '@tanstack/react-router'
 import RootLayout from './layouts/RootLayout'
 
 // Import 5 Primary Hub Views
@@ -12,9 +12,10 @@ import OperationsHubView from './views/hubs/OperationsHubView'
 import SettingsView from './views/SettingsView'
 import AboutView from './views/AboutView'
 
-// Create root route
+// Create root route with fallback redirection to /dashboard
 const rootRoute = createRootRoute({
   component: RootLayout,
+  notFoundComponent: () => <Navigate to="/dashboard" />,
 })
 
 // Index redirects to dashboard
@@ -305,5 +306,12 @@ const routeTree = rootRoute.addChildren([
   historyRoute,
 ])
 
+// Create hash history for seamless iframe and Google Apps Script compatibility
+const hashHistory = createHashHistory()
+
 // Create router instance
-export const router = createRouter({ routeTree })
+export const router = createRouter({
+  routeTree,
+  history: hashHistory,
+  defaultNotFoundComponent: () => <Navigate to="/dashboard" />,
+})
