@@ -9,6 +9,7 @@ import {
   Plus,
   Archive,
 } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import KanbanCard from './KanbanCard'
 import { useKanbanBoard } from '@/hooks/useKanbanBoard'
 import { useFileActions } from '@/hooks/useFileActions'
@@ -107,7 +108,13 @@ export default function KanbanColumn({ column, cards = [] }) {
       {/* Column Header */}
       <div className="flex items-center justify-between pb-3 border-b border-slate-800/80 mb-3">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="text-xl">{column.icon}</span>
+          {typeof column.icon === 'object' ? (
+            <div className="w-8 h-8 rounded-xl bg-slate-800/80 border border-slate-700/50 flex items-center justify-center shrink-0">
+              <FontAwesomeIcon icon={column.icon} className={cn('w-4 h-4', column.iconColor || 'text-primary')} />
+            </div>
+          ) : (
+            <span className="text-xl">{column.icon}</span>
+          )}
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-sm text-white truncate">{column.title}</h3>

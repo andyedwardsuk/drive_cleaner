@@ -29,6 +29,8 @@ import {
   CheckSquare,
   Square
 } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faXmark } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { useDriveLabels } from '@/hooks/useDriveLabels'
 import { useSmartScan } from '@/hooks/useSmartScan'
@@ -544,10 +546,10 @@ export default function DriveLabelsView() {
                                     <button
                                       type="button"
                                       onClick={() => removeLabel([file.fileId], lbl.id)}
-                                      className="text-muted-foreground hover:text-foreground ml-0.5"
+                                      className="text-muted-foreground hover:text-foreground ml-1 inline-flex items-center"
                                       title="Remove label"
                                     >
-                                      ✕
+                                      <FontAwesomeIcon icon={faXmark} className="w-3 h-3" />
                                     </button>
                                   </span>
                                 )

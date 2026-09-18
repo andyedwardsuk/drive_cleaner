@@ -33,7 +33,7 @@ export default function DashboardView() {
     if (!isGAS) {
       setData([
         {
-          icon: '📂',
+          icon: 'folder',
           fileName: 'Sample Folder',
           fileSize: '',
           fileCategory: 'Folder',
@@ -50,7 +50,7 @@ export default function DashboardView() {
           fileSizeBytes: 0,
         },
         {
-          icon: '📃',
+          icon: 'document',
           fileName: 'Sample Document.docx',
           fileSize: '125.50 KB',
           fileCategory: 'Document',
@@ -59,7 +59,7 @@ export default function DashboardView() {
           lastViewedDate: '16/11/2024 18:20',
           ownerNames: 'Sample User',
           sharingStatus: 'Shared',
-          starred: '⭐',
+          starred: 'star',
           parentName: 'Sample Folder',
           fileId: 'abcdef1234567890',
           driveLink: 'https://drive.google.com/file/d/abcdef1234567890/view',

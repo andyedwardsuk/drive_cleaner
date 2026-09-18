@@ -13,7 +13,24 @@ import {
   Info,
   Eye
 } from 'lucide-react'
-import { faFileLines, faClockRotateLeft } from '@fortawesome/pro-duotone-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  faFileLines,
+  faClockRotateLeft,
+  faTable,
+  faPresentationScreen,
+  faClipboardList,
+  faPalette,
+  faGlobe,
+  faCode,
+  faBullseye,
+  faShareNodes,
+  faFile,
+  faUsers,
+  faLock,
+  faFolderOpen,
+  faLayerGroup
+} from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -56,32 +73,32 @@ function formatDaysAgo(days, isoDate) {
 function getWorkspaceIcon(type) {
   switch (type) {
     case 'document':
-      return '📝'
+      return faFileLines
     case 'spreadsheet':
-      return '📊'
+      return faTable
     case 'presentation':
-      return '📽️'
+      return faPresentationScreen
     case 'form':
-      return '📋'
+      return faClipboardList
     case 'drawing':
-      return '🎨'
+      return faPalette
     case 'site':
-      return '🌐'
+      return faGlobe
     case 'script':
-      return '⚙️'
+      return faCode
     case 'jam':
-      return '🎯'
+      return faBullseye
     case 'shortcut':
-      return '🔗'
+      return faShareNodes
     default:
-      return '📄'
+      return faFile
   }
 }
 
 /**
  * Filter Chip Component
  */
-function FilterChip({ label, active, count, onClick, color = 'blue' }) {
+function FilterChip({ label, icon, active, count, onClick, color = 'blue' }) {
   const activeColorClasses = {
     blue: 'bg-blue-600 border-blue-500 text-white shadow-sm',
     orange: 'bg-orange-600 border-orange-500 text-white shadow-sm',
@@ -90,19 +107,17 @@ function FilterChip({ label, active, count, onClick, color = 'blue' }) {
 
   return (
     <button
-      type="button"
       onClick={onClick}
-      className={`px-3 py-1.5 rounded-xl border text-sm font-medium transition-all flex items-center gap-1.5 ${
+      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-medium border transition-all ${
         active
           ? activeColorClasses[color] || activeColorClasses.blue
-          : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-800/60'
+          : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:border-slate-700 hover:text-white'
       }`}
     >
+      {icon && <FontAwesomeIcon icon={icon} className="w-3.5 h-3.5 opacity-90" />}
       <span>{label}</span>
-      {count !== undefined && count > 0 && (
-        <span className={`text-xs px-1.5 py-0.5 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400'}`}>
-          {count}
-        </span>
+      {count !== undefined && (
+        <span className="opacity-80 font-mono text-[11px]">({count})</span>
       )}
     </button>
   )
@@ -443,13 +458,15 @@ export default function GoogleWorkspaceView() {
           </span>
           <FilterChip
             label="All Types"
+            icon={faLayerGroup}
             count={typeCounts.all}
             active={typeFilter === 'all'}
             onClick={() => setTypeFilter('all')}
           />
           {typeCounts.document > 0 && (
             <FilterChip
-              label="📝 Docs"
+              label="Docs"
+              icon={faFileLines}
               count={typeCounts.document}
               active={typeFilter === 'document'}
               onClick={() => setTypeFilter('document')}
@@ -457,7 +474,8 @@ export default function GoogleWorkspaceView() {
           )}
           {typeCounts.spreadsheet > 0 && (
             <FilterChip
-              label="📊 Sheets"
+              label="Sheets"
+              icon={faTable}
               count={typeCounts.spreadsheet}
               active={typeFilter === 'spreadsheet'}
               onClick={() => setTypeFilter('spreadsheet')}
@@ -465,7 +483,8 @@ export default function GoogleWorkspaceView() {
           )}
           {typeCounts.presentation > 0 && (
             <FilterChip
-              label="📽️ Slides"
+              label="Slides"
+              icon={faPresentationScreen}
               count={typeCounts.presentation}
               active={typeFilter === 'presentation'}
               onClick={() => setTypeFilter('presentation')}
@@ -473,7 +492,8 @@ export default function GoogleWorkspaceView() {
           )}
           {typeCounts.form > 0 && (
             <FilterChip
-              label="📋 Forms"
+              label="Forms"
+              icon={faClipboardList}
               count={typeCounts.form}
               active={typeFilter === 'form'}
               onClick={() => setTypeFilter('form')}
@@ -481,7 +501,8 @@ export default function GoogleWorkspaceView() {
           )}
           {typeCounts.drawing > 0 && (
             <FilterChip
-              label="🎨 Drawings"
+              label="Drawings"
+              icon={faPalette}
               count={typeCounts.drawing}
               active={typeFilter === 'drawing'}
               onClick={() => setTypeFilter('drawing')}
@@ -489,7 +510,8 @@ export default function GoogleWorkspaceView() {
           )}
           {typeCounts.shortcut > 0 && (
             <FilterChip
-              label="🔗 Shortcuts"
+              label="Shortcuts"
+              icon={faShareNodes}
               count={typeCounts.shortcut}
               active={typeFilter === 'shortcut'}
               onClick={() => setTypeFilter('shortcut')}
@@ -505,13 +527,15 @@ export default function GoogleWorkspaceView() {
               color="purple"
             />
             <FilterChip
-              label="👥 Shared"
+              label="Shared"
+              icon={faUsers}
               active={sharingFilter === 'shared'}
               onClick={() => setSharingFilter('shared')}
               color="purple"
             />
             <FilterChip
-              label="🔒 Private"
+              label="Private"
+              icon={faLock}
               active={sharingFilter === 'private'}
               onClick={() => setSharingFilter('private')}
               color="purple"
@@ -523,44 +547,55 @@ export default function GoogleWorkspaceView() {
       {/* Files Table */}
       {filteredFiles.length === 0 ? (
         <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
-          <Info className="w-8 h-8 text-slate-500 mx-auto mb-3" />
-          <p className="text-slate-300 font-medium">No files match your filters</p>
-          <p className="text-xs text-slate-500 mt-1">Try resetting the type or inactivity filter</p>
+          <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
+          <h3 className="text-base font-semibold text-slate-100 mb-1">No Matching Workspace Files</h3>
+          <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            Try adjusting your search query, type filter, or sharing settings.
+          </p>
         </div>
       ) : (
-        <div className="border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm overflow-hidden">
+        <div className="border border-slate-800/80 rounded-2xl overflow-hidden bg-slate-900/60 backdrop-blur-sm">
           <Table>
-            <TableHeader>
-              <TableRow className="border-slate-800/80 hover:bg-transparent">
-                <TableHead className="w-12 text-slate-400">Icon</TableHead>
+            <TableHeader className="bg-slate-950/60">
+              <TableRow className="border-slate-800/80">
+                <TableHead className="w-12"></TableHead>
                 <TableHead
-                  className="text-slate-400 cursor-pointer hover:text-slate-200"
+                  className="cursor-pointer hover:text-slate-100 transition-colors"
                   onClick={() => handleSort('name')}
                 >
-                  File Name {sortBy === 'name' && (sortOrder === 'desc' ? '↓' : '↑')}
+                  File Name {sortBy === 'name' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
                 </TableHead>
                 <TableHead
-                  className="text-slate-400 cursor-pointer hover:text-slate-200"
+                  className="cursor-pointer hover:text-slate-100 transition-colors"
                   onClick={() => handleSort('type')}
                 >
-                  Type {sortBy === 'type' && (sortOrder === 'desc' ? '↓' : '↑')}
+                  Type {sortBy === 'type' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
                 </TableHead>
                 <TableHead
-                  className="text-slate-400 cursor-pointer hover:text-slate-200"
-                  onClick={() => handleSort('viewed')}
+                  className="cursor-pointer hover:text-slate-100 transition-colors"
+                  onClick={() => handleSort('shared')}
                 >
-                  Last Viewed {sortBy === 'viewed' && (sortOrder === 'desc' ? '↓' : '↑')}
+                  Sharing {sortBy === 'shared' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
                 </TableHead>
-                <TableHead className="text-slate-400">Sharing</TableHead>
-                <TableHead className="text-slate-400">Recommendation</TableHead>
-                <TableHead className="text-right text-slate-400">Actions</TableHead>
+                <TableHead
+                  className="cursor-pointer hover:text-slate-100 transition-colors"
+                  onClick={() => handleSort('last_viewed')}
+                >
+                  Last Viewed {sortBy === 'last_viewed' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
+                </TableHead>
+                <TableHead
+                  className="cursor-pointer hover:text-slate-100 transition-colors"
+                  onClick={() => handleSort('created')}
+                >
+                  Created {sortBy === 'created' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
+                </TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody className={cn(loading && 'opacity-60 transition-opacity duration-150')}>
               {filteredFiles.map((file, idx) => {
-                const driveUrl =
-                  file.drive_link ||
-                  `https://drive.google.com/open?id=${file.file_id}`
+                const isInactive = file.days_since_viewed && file.days_since_viewed > 180
+                const isShared = file.shared
 
                 return (
                   <TableRow
@@ -568,17 +603,18 @@ export default function GoogleWorkspaceView() {
                     className="border-slate-800/60 hover:bg-slate-800/40 transition-colors"
                   >
                     <TableCell>
-                      <span className="text-xl select-none">
-                        {getWorkspaceIcon(file.workspace_type)}
-                      </span>
+                      <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                        <FontAwesomeIcon icon={getWorkspaceIcon(file.workspace_type)} className="w-4 h-4 text-blue-400" />
+                      </div>
                     </TableCell>
 
                     <TableCell className="font-medium text-slate-200">
                       <div className="flex flex-col">
                         <span className="truncate max-w-xs md:max-w-md">{file.file_name}</span>
                         {file.parent_name && (
-                          <span className="text-xs text-slate-500 font-normal">
-                            📁 {file.parent_name}
+                          <span className="text-xs text-slate-500 font-normal flex items-center gap-1.5 mt-0.5">
+                            <FontAwesomeIcon icon={faFolderOpen} className="w-3 h-3 text-slate-500" />
+                            {file.parent_name}
                           </span>
                         )}
                       </div>

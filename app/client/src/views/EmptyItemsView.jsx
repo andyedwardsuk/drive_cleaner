@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Trash2, Filter, RefreshCw, Folder, FileX, Eye, Search, X, Download, Sparkles } from 'lucide-react'
-import { faFolderMinus } from '@fortawesome/pro-duotone-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faFolderMinus, faFolderOpen, faFileSlash, faLayerGroup } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -27,18 +28,19 @@ function isFolder(mimeType) {
 /**
  * Type filter chip component
  */
-function TypeFilterChip({ label, active, onClick }) {
+function TypeFilterChip({ label, icon, active, onClick }) {
   return (
     <button
       onClick={onClick}
       className={cn(
-        'px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all',
+        'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all',
         active
           ? 'bg-purple-600 border-purple-500 text-white shadow-md shadow-purple-900/30'
-          : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:bg-slate-800'
+          : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white'
       )}
     >
-      {label}
+      {icon && <FontAwesomeIcon icon={icon} className={cn('w-3.5 h-3.5', active ? 'text-white' : 'text-purple-400')} />}
+      <span>{label}</span>
     </button>
   )
 }
@@ -216,16 +218,19 @@ export default function EmptyItemsView() {
           <div className="flex flex-wrap gap-2">
             <TypeFilterChip
               label={`All Items (${folderCount + fileCount})`}
+              icon={faLayerGroup}
               active={typeFilter === 'all'}
               onClick={() => setTypeFilter('all')}
             />
             <TypeFilterChip
-              label={`📁 Folders Only (${folderCount})`}
+              label={`Folders Only (${folderCount})`}
+              icon={faFolderOpen}
               active={typeFilter === 'folders'}
               onClick={() => setTypeFilter('folders')}
             />
             <TypeFilterChip
-              label={`📄 0-Byte Files (${fileCount})`}
+              label={`0-Byte Files (${fileCount})`}
+              icon={faFileSlash}
               active={typeFilter === 'files'}
               onClick={() => setTypeFilter('files')}
             />

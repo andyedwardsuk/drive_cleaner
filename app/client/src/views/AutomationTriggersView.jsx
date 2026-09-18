@@ -19,6 +19,8 @@ import {
   ExternalLink,
   ChevronRight
 } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faXmark, faLightbulb } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { useAutomationTriggers } from '@/hooks/useAutomationTriggers'
 import { Button } from '@/components/ui/button'
@@ -88,7 +90,7 @@ export default function AutomationTriggersView() {
               onClick={clearActionMessage}
               className="h-8 px-2 text-xs hover:bg-transparent"
             >
-              ✕
+              <FontAwesomeIcon icon={faXmark} className="w-3.5 h-3.5" />
             </Button>
           </motion.div>
         )}
@@ -507,9 +509,9 @@ export default function AutomationTriggersView() {
                   size="sm"
                   variant="ghost"
                   onClick={() => setPreviewModalOpen(false)}
-                  className="h-8 w-8 p-0 text-muted-foreground"
+                  className="h-8 w-8 p-0 text-muted-foreground flex items-center justify-center"
                 >
-                  ✕
+                  <FontAwesomeIcon icon={faXmark} className="w-4 h-4" />
                 </Button>
               </div>
 
@@ -545,7 +547,10 @@ export default function AutomationTriggersView() {
                   </div>
 
                   <div className="rounded-lg border-l-4 border-sky-400 bg-slate-900/80 p-3.5 text-xs text-slate-300 leading-relaxed">
-                    <strong>💡 Recommendation of the Week:</strong><br />
+                    <div className="flex items-center gap-1.5 font-bold mb-1 text-sky-300">
+                      <FontAwesomeIcon icon={faLightbulb} className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Recommendation of the Week:</span>
+                    </div>
                     You have staged items in your <strong>Auto-Archive</strong> and <strong>Kanban Labels</strong> queue ready to be reviewed. Archiving unused spreadsheets and old recordings keeps your active searches fast!
                   </div>
 

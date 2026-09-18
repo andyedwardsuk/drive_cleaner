@@ -27,6 +27,8 @@ import {
   CheckSquare,
   Square
 } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faXmark } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { useArchiveEngine } from '@/hooks/useArchiveEngine'
 import { useKanbanBoard } from '@/hooks/useKanbanBoard'
@@ -812,9 +814,9 @@ export default function AutoArchiveView() {
                 size="sm"
                 variant="ghost"
                 onClick={dismissUndo}
-                className="h-8 w-8 p-0 text-muted-foreground"
+                className="h-8 w-8 p-0 text-muted-foreground flex items-center justify-center"
               >
-                ✕
+                <FontAwesomeIcon icon={faXmark} className="w-4 h-4" />
               </Button>
             </div>
           </motion.div>

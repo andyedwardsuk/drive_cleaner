@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Folder, FolderSearch, ExternalLink, Sparkles, X, History, HardDrive, Users } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faFolder, faHouse } from '@fortawesome/pro-duotone-svg-icons'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -284,7 +286,7 @@ export default function FolderSelector({
           {extractedId && extractedId !== 'root' && (
             <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-center justify-between">
               <div className="flex items-center gap-2.5 overflow-hidden">
-                <span className="text-lg">📁</span>
+                <FontAwesomeIcon icon={faFolder} className="w-4 h-4 text-blue-400 shrink-0" />
                 <div className="truncate">
                   <p className="text-sm font-semibold text-white truncate">
                     {value?.name || `Selected Folder (${extractedId.slice(0, 10)}...)`}
@@ -332,7 +334,7 @@ export default function FolderSelector({
                       : 'border-slate-800 bg-slate-950/60 text-slate-300 hover:text-white hover:border-slate-700 hover:bg-slate-900'
                   }`}
                 >
-                  <span>{rf.id === 'root' ? '🏠' : '📁'}</span>
+                  <FontAwesomeIcon icon={rf.id === 'root' ? faHouse : faFolder} className="w-3.5 h-3.5 text-blue-400 shrink-0" />
                   <span className="max-w-[160px] truncate">{rf.name || rf.id}</span>
                 </button>
               )

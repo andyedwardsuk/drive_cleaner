@@ -1,5 +1,6 @@
 import { Scan, FileText, Clock, Copy, Trash2, AlertCircle, CheckCircle, ChevronRight, FileSpreadsheet, Flame, Leaf, ExternalLink, RotateCcw, FolderSearch } from 'lucide-react'
-import { faCircleCheck, faMagnifyingGlassChart } from '@fortawesome/pro-duotone-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCircleCheck, faMagnifyingGlassChart, faFolderOpen, faHourglassHalf, faCheck } from '@fortawesome/pro-duotone-svg-icons'
 import { useNavigate } from '@tanstack/react-router'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
@@ -136,8 +137,8 @@ function ScanResults({ data }) {
         {/* Scanned Folder Details Header */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
-              <span className="text-xl">📁</span>
+            <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center">
+              <FontAwesomeIcon icon={faFolderOpen} className="w-5 h-5 text-blue-400" />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -342,7 +343,7 @@ export default function SmartScanView() {
           >
             {loading ? (
               <>
-                <span className="animate-spin mr-2">⏳</span>
+                <FontAwesomeIcon icon={faHourglassHalf} className="animate-spin mr-2 text-blue-300" />
                 Scanning {targetLabel}...
               </>
             ) : (
@@ -392,14 +393,14 @@ export default function SmartScanView() {
             Smart Scan will comprehensively analyse <strong className="text-white">{targetLabel}</strong> for:
           </p>
           <ul className="text-left max-w-md mx-auto space-y-2 text-slate-300 text-xs">
-            <li>✓ Duplicate files (byte-exact and name matches)</li>
-            <li>✓ Large files (&gt;100MB, &gt;500MB, &gt;1GB)</li>
-            <li>✓ Old & abandoned files (&gt;1 year, &gt;2 years, &gt;5 years)</li>
-            <li>✓ Empty files and folders</li>
-            <li>✓ Temporary & cache files (.DS_Store, logs, temps)</li>
-            <li>✓ Google Workspace files (unused Docs, Sheets, Slides, Forms)</li>
-            <li>✓ Data ROT analysis (Redundant, Obsolete, Trivial clutter index)</li>
-            <li>✓ Cloud Carbon Footprint (CO₂ emissions & green achievements)</li>
+            <li className="flex items-center gap-2"><FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> Duplicate files (byte-exact and name matches)</li>
+            <li className="flex items-center gap-2"><FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> Large files (&gt;100MB, &gt;500MB, &gt;1GB)</li>
+            <li className="flex items-center gap-2"><FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> Old & abandoned files (&gt;1 year, &gt;2 years, &gt;5 years)</li>
+            <li className="flex items-center gap-2"><FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> Empty files and folders</li>
+            <li className="flex items-center gap-2"><FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> Temporary & cache files (.DS_Store, logs, temps)</li>
+            <li className="flex items-center gap-2"><FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> Google Workspace files (unused Docs, Sheets, Slides, Forms)</li>
+            <li className="flex items-center gap-2"><FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> Data ROT analysis (Redundant, Obsolete, Trivial clutter index)</li>
+            <li className="flex items-center gap-2"><FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5 text-emerald-400 shrink-0" /> Cloud Carbon Footprint (CO₂ emissions & green achievements)</li>
           </ul>
         </div>
       )}

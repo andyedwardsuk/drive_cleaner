@@ -1,6 +1,16 @@
 import { useState, useMemo } from 'react'
 import { Clock, Filter, RefreshCw, Eye, Search, X, Download, Sparkles } from 'lucide-react'
-import { faHourglassHalf } from '@fortawesome/pro-duotone-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  faHourglassHalf,
+  faFilm,
+  faImage,
+  faMusic,
+  faFileLines,
+  faBoxArchive,
+  faPaperclip,
+  faLayerGroup
+} from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -71,12 +81,12 @@ function getFileTypeCategory(mimeType) {
 function getFileTypeIcon(mimeType) {
   const category = getFileTypeCategory(mimeType)
   const icons = {
-    video: '🎥',
-    image: '🖼️',
-    audio: '🎵',
-    document: '📄',
-    archive: '📦',
-    other: '📎'
+    video: faFilm,
+    image: faImage,
+    audio: faMusic,
+    document: faFileLines,
+    archive: faBoxArchive,
+    other: faPaperclip
   }
   return icons[category] || icons.other
 }
@@ -103,18 +113,20 @@ function AgeFilterChip({ label, active, onClick }) {
 /**
  * File type tab component
  */
-function FileTypeTab({ label, count, active, onClick }) {
+function FileTypeTab({ label, icon, count, active, onClick }) {
   return (
     <button
       onClick={onClick}
       className={cn(
-        'px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all',
+        'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all',
         active
           ? 'bg-amber-600 border-amber-500 text-white shadow-md shadow-amber-900/30'
-          : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:bg-slate-800'
+          : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white'
       )}
     >
-      {label} {count > 0 && <span className="ml-1 text-[11px] opacity-75">({count})</span>}
+      {icon && <FontAwesomeIcon icon={icon} className={cn('w-3.5 h-3.5', active ? 'text-white' : 'text-amber-400')} />}
+      <span>{label}</span>
+      {count > 0 && <span className="ml-1 text-[11px] opacity-75">({count})</span>}
     </button>
   )
 }
@@ -373,13 +385,13 @@ export default function OldFilesView() {
             Filter by Category
           </label>
           <div className="flex flex-wrap gap-2">
-            <FileTypeTab label="All Types" count={typeCounts.all} active={typeFilter === 'all'} onClick={() => setTypeFilter('all')} />
-            <FileTypeTab label="🎥 Videos" count={typeCounts.video} active={typeFilter === 'video'} onClick={() => setTypeFilter('video')} />
-            <FileTypeTab label="🖼️ Images" count={typeCounts.image} active={typeFilter === 'image'} onClick={() => setTypeFilter('image')} />
-            <FileTypeTab label="🎵 Audio" count={typeCounts.audio} active={typeFilter === 'audio'} onClick={() => setTypeFilter('audio')} />
-            <FileTypeTab label="📄 Documents" count={typeCounts.document} active={typeFilter === 'document'} onClick={() => setTypeFilter('document')} />
-            <FileTypeTab label="📦 Archives" count={typeCounts.archive} active={typeFilter === 'archive'} onClick={() => setTypeFilter('archive')} />
-            <FileTypeTab label="📎 Other" count={typeCounts.other} active={typeFilter === 'other'} onClick={() => setTypeFilter('other')} />
+            <FileTypeTab label="All Types" icon={faLayerGroup} count={typeCounts.all} active={typeFilter === 'all'} onClick={() => setTypeFilter('all')} />
+            <FileTypeTab label="Videos" icon={faFilm} count={typeCounts.video} active={typeFilter === 'video'} onClick={() => setTypeFilter('video')} />
+            <FileTypeTab label="Images" icon={faImage} count={typeCounts.image} active={typeFilter === 'image'} onClick={() => setTypeFilter('image')} />
+            <FileTypeTab label="Audio" icon={faMusic} count={typeCounts.audio} active={typeFilter === 'audio'} onClick={() => setTypeFilter('audio')} />
+            <FileTypeTab label="Documents" icon={faFileLines} count={typeCounts.document} active={typeFilter === 'document'} onClick={() => setTypeFilter('document')} />
+            <FileTypeTab label="Archives" icon={faBoxArchive} count={typeCounts.archive} active={typeFilter === 'archive'} onClick={() => setTypeFilter('archive')} />
+            <FileTypeTab label="Other" icon={faPaperclip} count={typeCounts.other} active={typeFilter === 'other'} onClick={() => setTypeFilter('other')} />
           </div>
         </div>
 
@@ -463,7 +475,9 @@ export default function OldFilesView() {
                   className="hover:bg-slate-800/40 transition-colors group"
                 >
                   <TableCell>
-                    <span className="text-xl">{getFileTypeIcon(file.mime_type)}</span>
+                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                      <FontAwesomeIcon icon={getFileTypeIcon(file.mime_type)} className="w-4 h-4 text-amber-400" />
+                    </div>
                   </TableCell>
                   <TableCell className="text-slate-200 font-medium">
                     <span className="truncate block max-w-md">{file.file_name}</span>

@@ -19,6 +19,8 @@ import {
   Eye,
 } from 'lucide-react'
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faStar } from '@fortawesome/pro-duotone-svg-icons'
 import { useFilePreview } from '@/hooks/useFilePreview'
 import { cn } from '@/lib/utils'
 
@@ -256,7 +258,9 @@ export default function FileTable({ data = [], loading = false }) {
             >
               {row.getValue('fileName')}
             </button>
-            {row.original.starred && <span className="text-yellow-500">{row.original.starred}</span>}
+            {row.original.starred && (
+              <FontAwesomeIcon icon={faStar} className="w-3.5 h-3.5 text-amber-400 shrink-0" title="Starred in Drive" />
+            )}
           </div>
         ),
       },

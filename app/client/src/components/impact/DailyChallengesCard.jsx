@@ -1,6 +1,25 @@
 import { Target, CheckCircle2, Circle, Sparkles, Award } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  faMagnifyingGlassChart,
+  faTrashCan,
+  faSeedling,
+  faClone,
+  faFireFlameCurved,
+  faFolderOpen,
+  faSparkles
+} from '@fortawesome/pro-duotone-svg-icons'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+
+const CHALLENGE_ICONS = {
+  scan: { icon: faMagnifyingGlassChart, color: 'text-blue-400 bg-blue-500/10 border-blue-500/20' },
+  temp: { icon: faTrashCan, color: 'text-rose-400 bg-rose-500/10 border-rose-500/20' },
+  carbon: { icon: faSeedling, color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
+  duplicates: { icon: faClone, color: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
+  rot: { icon: faFireFlameCurved, color: 'text-orange-400 bg-orange-500/10 border-orange-500/20' },
+  folders: { icon: faFolderOpen, color: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20' },
+}
 
 export default function DailyChallengesCard({ challenges = [], onCompleteChallenge }) {
   const completedCount = challenges.filter((c) => c.completed).length
@@ -41,7 +60,14 @@ export default function DailyChallengesCard({ challenges = [], onCompleteChallen
             }`}
           >
             <div className="flex items-start gap-3">
-              <span className="text-2xl mt-0.5">{challenge.icon}</span>
+              {(() => {
+                const iconMeta = CHALLENGE_ICONS[challenge.category] || CHALLENGE_ICONS[challenge.id] || { icon: faSparkles, color: 'text-primary bg-primary/10 border-primary/20' }
+                return (
+                  <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 mt-0.5 ${iconMeta.color}`}>
+                    <FontAwesomeIcon icon={iconMeta.icon} className="w-4 h-4" />
+                  </div>
+                )
+              })()}
               <div>
                 <div className="flex items-center gap-2">
                   <h4 className={`text-sm font-semibold ${challenge.completed ? 'text-emerald-300 line-through' : 'text-white'}`}>

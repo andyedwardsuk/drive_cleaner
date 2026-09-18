@@ -14,7 +14,8 @@ import {
   Sparkles,
 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
-import { faFolderTree } from '@fortawesome/pro-duotone-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faFolderTree, faLightbulb } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -396,7 +397,9 @@ export default function MyFoldersView() {
 
       {/* Guidance Note */}
       <div className="p-6 border rounded-2xl bg-slate-900/50 border-slate-800/80 text-sm text-slate-400 space-y-2">
-        <p className="font-medium text-slate-200">💡 Testing with Specific Folders</p>
+        <p className="font-medium text-slate-200 flex items-center gap-2">
+          <FontAwesomeIcon icon={faLightbulb} className="w-4 h-4 text-amber-400" /> Testing with Specific Folders
+        </p>
         <p>
           To test Drive Cleaner on a specific set of files without scanning your entire Google Drive,
           create a test folder in Google Drive (e.g. &ldquo;Drive Cleaner Test&rdquo;), copy its URL from your browser address bar,

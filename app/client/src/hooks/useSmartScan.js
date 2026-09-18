@@ -327,7 +327,7 @@ export const useSmartScanStore = create((set, get) => ({
                 rating: {
                   level: 'Moderate',
                   color: 'yellow',
-                  icon: '📦',
+                  icon: 'moderate',
                   description: 'Noticeable digital clutter accumulating'
                 },
                 components: {
@@ -484,10 +484,10 @@ export const useSmartScanStore = create((set, get) => ({
                 coffee_cups: 5
               },
               breakdown_by_type: {
-                videos: { count: 3, size_bytes: 2684354560, size_gb: 2.5, annual_co2_kg: 0.125, percentage: 51, label: 'Videos', icon: '📽️', color: 'rose' },
-                photos: { count: 18, size_bytes: 1288490188, size_gb: 1.2, annual_co2_kg: 0.060, percentage: 25, label: 'Photos & Images', icon: '🖼️', color: 'amber' },
-                documents: { count: 45, size_bytes: 858993459, size_gb: 0.8, annual_co2_kg: 0.040, percentage: 16, label: 'Documents & Sheets', icon: '📄', color: 'blue' },
-                other: { count: 12, size_bytes: 411041792, size_gb: 0.38, annual_co2_kg: 0.019, percentage: 8, label: 'Archives & Other', icon: '📦', color: 'purple' }
+                videos: { count: 3, size_bytes: 2684354560, size_gb: 2.5, annual_co2_kg: 0.125, percentage: 51, label: 'Videos', icon: 'videos', color: 'rose' },
+                photos: { count: 18, size_bytes: 1288490188, size_gb: 1.2, annual_co2_kg: 0.060, percentage: 25, label: 'Photos & Images', icon: 'photos', color: 'amber' },
+                documents: { count: 45, size_bytes: 858993459, size_gb: 0.8, annual_co2_kg: 0.040, percentage: 16, label: 'Documents & Sheets', icon: 'documents', color: 'blue' },
+                other: { count: 12, size_bytes: 411041792, size_gb: 0.38, annual_co2_kg: 0.019, percentage: 8, label: 'Archives & Other', icon: 'other', color: 'purple' }
               },
               potential_savings: {
                 cleanup_gb: 0.88,
@@ -506,7 +506,7 @@ export const useSmartScanStore = create((set, get) => ({
               eco_rating: {
                 level: 'Eco Champion',
                 color: 'emerald',
-                icon: '🌟',
+                icon: 'star',
                 badge: 'Minimal Carbon Impact',
                 message: 'Your cloud storage has an ultra-low carbon footprint.'
               },
@@ -514,7 +514,7 @@ export const useSmartScanStore = create((set, get) => ({
                 {
                   id: 'sapling_saver',
                   name: 'Sapling Saver',
-                  icon: '🌱',
+                  icon: 'sapling',
                   description: 'Potential to save 0.05 kg CO2 (~1 GB deleted)',
                   unlocked: false,
                   progress: 88
@@ -522,7 +522,7 @@ export const useSmartScanStore = create((set, get) => ({
                 {
                   id: 'tree_planter',
                   name: 'Tree Planter',
-                  icon: '🌳',
+                  icon: 'tree',
                   description: 'Offset equivalent of 1 tree for a year (21 kg CO2)',
                   unlocked: false,
                   progress: 5
@@ -530,7 +530,7 @@ export const useSmartScanStore = create((set, get) => ({
                 {
                   id: 'carbon_neutral',
                   name: 'Drive Carbon Neutral',
-                  icon: '♻️',
+                  icon: 'recycle',
                   description: 'Clean enough obsolete files to offset your entire annual Drive footprint',
                   unlocked: false,
                   progress: 35
@@ -538,7 +538,7 @@ export const useSmartScanStore = create((set, get) => ({
                 {
                   id: 'forest_guardian',
                   name: 'Forest Guardian',
-                  icon: '🌲',
+                  icon: 'forest',
                   description: 'Save 100 kg CO2 through comprehensive cleanup',
                   unlocked: false,
                   progress: 1

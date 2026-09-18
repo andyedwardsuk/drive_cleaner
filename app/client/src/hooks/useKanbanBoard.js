@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { faInbox, faThumbtack, faBoxArchive, faTrashCan } from '@fortawesome/pro-duotone-svg-icons'
 
 export const KANBAN_STORAGE_KEY = 'drive_cleaner_kanban_cards_v1'
 
@@ -6,7 +7,8 @@ export const KANBAN_COLUMNS = [
   {
     id: 'inbox',
     title: 'Needs Review',
-    icon: '📥',
+    icon: faInbox,
+    iconColor: 'text-blue-400',
     color: 'blue',
     badgeClass: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
     description: 'Unsorted files awaiting triage',
@@ -14,7 +16,8 @@ export const KANBAN_COLUMNS = [
   {
     id: 'keep',
     title: 'Keep / Retain',
-    icon: '📌',
+    icon: faThumbtack,
+    iconColor: 'text-emerald-400',
     color: 'emerald',
     badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
     description: 'Important files verified to preserve',
@@ -22,7 +25,8 @@ export const KANBAN_COLUMNS = [
   {
     id: 'archive',
     title: 'Archive',
-    icon: '📦',
+    icon: faBoxArchive,
+    iconColor: 'text-amber-400',
     color: 'amber',
     badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
     description: 'Inactive files to compress or store',
@@ -30,7 +34,8 @@ export const KANBAN_COLUMNS = [
   {
     id: 'trash',
     title: 'Pending Trash',
-    icon: '🗑️',
+    icon: faTrashCan,
+    iconColor: 'text-rose-400',
     color: 'rose',
     badgeClass: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
     description: 'Files staged for batch deletion',

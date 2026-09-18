@@ -1,4 +1,6 @@
 import { Flame, Trophy, Info } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faFireFlameCurved } from '@fortawesome/pro-duotone-svg-icons'
 import { Badge } from '@/components/ui/badge'
 
 export default function StreakCalendar({ streak, calendarDays = [] }) {
@@ -77,8 +79,8 @@ export default function StreakCalendar({ streak, calendarDays = [] }) {
                 <span className={`text-sm font-semibold mt-0.5 ${isFlameDay ? 'text-emerald-400' : 'text-slate-300'}`}>
                   {day.dayOfMonth}
                 </span>
-                <span className="text-[11px] mt-0.5">
-                  {isFlameDay ? '🔥' : '·'}
+                <span className="text-[11px] mt-0.5 flex items-center justify-center h-4">
+                  {isFlameDay ? <FontAwesomeIcon icon={faFireFlameCurved} className="w-3 h-3 text-amber-400" /> : <span className="text-slate-600">·</span>}
                 </span>
 
                 {/* Hover Tooltip */}

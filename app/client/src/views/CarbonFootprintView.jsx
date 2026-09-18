@@ -16,8 +16,38 @@ import {
   Coffee,
   Laptop
 } from 'lucide-react'
-import { faLeaf } from '@fortawesome/pro-duotone-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  faLeaf,
+  faSeedling,
+  faSparkles,
+  faFilm,
+  faImage,
+  faFileLines,
+  faBoxArchive,
+  faTree,
+  faTrees,
+  faRecycle
+} from '@fortawesome/pro-duotone-svg-icons'
 import { useNavigate } from '@tanstack/react-router'
+
+const BREAKDOWN_ICONS = {
+  videos: { icon: faFilm, color: 'text-rose-400' },
+  photos: { icon: faImage, color: 'text-amber-400' },
+  documents: { icon: faFileLines, color: 'text-blue-400' },
+  other: { icon: faBoxArchive, color: 'text-purple-400' },
+}
+
+const ACHIEVEMENT_ICONS = {
+  sapling_saver: { icon: faSeedling, color: 'text-emerald-400' },
+  tree_planter: { icon: faTree, color: 'text-green-400' },
+  carbon_neutral: { icon: faRecycle, color: 'text-teal-400' },
+  forest_guardian: { icon: faTrees, color: 'text-emerald-500' },
+  sapling: { icon: faSeedling, color: 'text-emerald-400' },
+  tree: { icon: faTree, color: 'text-green-400' },
+  recycle: { icon: faRecycle, color: 'text-teal-400' },
+  forest: { icon: faTrees, color: 'text-emerald-500' },
+}
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -198,8 +228,9 @@ export default function CarbonFootprintView() {
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-xl">
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="bg-emerald-500/10 text-emerald-300 border-emerald-500/30 text-xs px-2.5 py-0.5">
-                {eco_rating?.icon} {eco_rating?.level}
+              <Badge variant="outline" className="bg-emerald-500/10 text-emerald-300 border-emerald-500/30 text-xs px-2.5 py-0.5 inline-flex items-center gap-1.5">
+                <FontAwesomeIcon icon={faSparkles} className="w-3.5 h-3.5 text-amber-400" />
+                <span>{eco_rating?.level || 'Eco Champion'}</span>
               </Badge>
               <span className="text-xs text-slate-400">Based on {storage_gb} GB analyzed</span>
             </div>
@@ -316,8 +347,12 @@ export default function CarbonFootprintView() {
               <div key={key} className="p-3.5 rounded-xl border border-slate-800/80 bg-slate-900/40 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
-                      <span>{item.icon}</span> {item.label}
+                    <span className="text-xs font-medium text-slate-300 flex items-center gap-2">
+                      <FontAwesomeIcon
+                        icon={BREAKDOWN_ICONS[key]?.icon || faBoxArchive}
+                        className={`w-3.5 h-3.5 ${BREAKDOWN_ICONS[key]?.color || 'text-slate-400'}`}
+                      />
+                      {item.label}
                     </span>
                     <span className="text-xs font-mono font-semibold text-slate-200">{item.percentage}%</span>
                   </div>
@@ -340,8 +375,8 @@ export default function CarbonFootprintView() {
             <Award className="w-5 h-5 text-amber-400" />
             <h3 className="text-base font-semibold text-slate-100">Green Gamification & Achievements</h3>
           </div>
-          <Badge variant="outline" className="text-xs bg-amber-500/10 text-amber-300 border-amber-500/30">
-            🌱 Eco Action Badges
+          <Badge variant="outline" className="text-xs bg-amber-500/10 text-amber-300 border-amber-500/30 inline-flex items-center gap-1.5">
+            <FontAwesomeIcon icon={faSeedling} className="w-3.5 h-3.5 text-emerald-400" /> Eco Action Badges
           </Badge>
         </div>
 
@@ -357,7 +392,12 @@ export default function CarbonFootprintView() {
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-2xl">{ach.icon}</span>
+                  <div className="w-8 h-8 rounded-xl bg-slate-800/80 border border-slate-700/50 flex items-center justify-center">
+                    <FontAwesomeIcon
+                      icon={ACHIEVEMENT_ICONS[ach.id]?.icon || ACHIEVEMENT_ICONS[ach.icon]?.icon || faSeedling}
+                      className={`w-4 h-4 ${ACHIEVEMENT_ICONS[ach.id]?.color || 'text-emerald-400'}`}
+                    />
+                  </div>
                   {ach.unlocked ? (
                     <Badge variant="outline" className="text-[10px] bg-emerald-500/20 text-emerald-300 border-emerald-500/30">
                       Unlocked

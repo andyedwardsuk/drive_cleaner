@@ -25,6 +25,8 @@ import {
   Sliders,
   ExternalLink
 } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faFolder, faXmark } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { useFolderReorganizer } from '@/hooks/useFolderReorganizer'
 import { Button } from '@/components/ui/button'
@@ -343,36 +345,36 @@ export default function SmartReorganizerView() {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-indigo-300 font-semibold">
                       <Briefcase className="h-3.5 w-3.5 text-indigo-400" />
-                      <span>📁 Work /</span>
+                      <span className="flex items-center gap-1.5"><FontAwesomeIcon icon={faFolder} className="w-3.5 h-3.5 text-blue-400" /> Work /</span>
                     </div>
                     <div className="pl-5 space-y-1 border-l border-border/30 ml-2 text-slate-400">
-                      <div>├─ 📁 Clients / Acme Corp/ <span className="text-emerald-400">(consolidated)</span></div>
-                      <div>└─ 📁 Projects / Active/</div>
+                      <div className="flex items-center gap-1.5"><span>├─</span> <FontAwesomeIcon icon={faFolder} className="w-3 h-3 text-blue-400" /> Clients / Acme Corp/ <span className="text-emerald-400">(consolidated)</span></div>
+                      <div className="flex items-center gap-1.5"><span>└─</span> <FontAwesomeIcon icon={faFolder} className="w-3 h-3 text-blue-400" /> Projects / Active/</div>
                     </div>
                   </div>
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-emerald-300 font-semibold">
                       <User className="h-3.5 w-3.5 text-emerald-400" />
-                      <span>📁 Personal /</span>
+                      <span className="flex items-center gap-1.5"><FontAwesomeIcon icon={faFolder} className="w-3.5 h-3.5 text-blue-400" /> Personal /</span>
                     </div>
                     <div className="pl-5 space-y-1 border-l border-border/30 ml-2 text-slate-400">
-                      <div>├─ 📁 Finance /</div>
-                      <div>└─ 📁 Travel /</div>
+                      <div className="flex items-center gap-1.5"><span>├─</span> <FontAwesomeIcon icon={faFolder} className="w-3 h-3 text-blue-400" /> Finance /</div>
+                      <div className="flex items-center gap-1.5"><span>└─</span> <FontAwesomeIcon icon={faFolder} className="w-3 h-3 text-blue-400" /> Travel /</div>
                     </div>
                   </div>
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-sky-300 font-semibold">
                       <ImageIcon className="h-3.5 w-3.5 text-sky-400" />
-                      <span>📁 Media & Assets /</span>
+                      <span className="flex items-center gap-1.5"><FontAwesomeIcon icon={faFolder} className="w-3.5 h-3.5 text-blue-400" /> Media & Assets /</span>
                     </div>
                   </div>
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 text-amber-300 font-semibold">
                       <Archive className="h-3.5 w-3.5 text-amber-400" />
-                      <span>📁 Archive / 2023 /</span>
+                      <span className="flex items-center gap-1.5"><FontAwesomeIcon icon={faFolder} className="w-3.5 h-3.5 text-blue-400" /> Archive / 2023 /</span>
                     </div>
                   </div>
                 </div>
@@ -692,9 +694,9 @@ export default function SmartReorganizerView() {
                 size="sm"
                 variant="ghost"
                 onClick={dismissUndo}
-                className="h-8 w-8 p-0 text-muted-foreground"
+                className="h-8 w-8 p-0 text-muted-foreground flex items-center justify-center"
               >
-                ✕
+                <FontAwesomeIcon icon={faXmark} className="w-4 h-4" />
               </Button>
             </div>
           </motion.div>

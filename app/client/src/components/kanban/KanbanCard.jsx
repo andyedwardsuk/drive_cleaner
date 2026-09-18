@@ -16,6 +16,7 @@ import {
   HardDrive,
   Check,
 } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useFilePreview } from '@/hooks/useFilePreview'
 import { useKanbanBoard, KANBAN_COLUMNS } from '@/hooks/useKanbanBoard'
 import { Button } from '@/components/ui/button'
@@ -136,7 +137,11 @@ export default function KanbanCard({ card, columnCards = [] }) {
                 onClick={() => moveCard(card.fileId, target.id)}
                 className="gap-2"
               >
-                <span>{target.icon}</span>
+                {typeof target.icon === 'object' ? (
+                  <FontAwesomeIcon icon={target.icon} className={cn('w-3.5 h-3.5', target.iconColor || 'text-primary')} />
+                ) : (
+                  <span>{target.icon}</span>
+                )}
                 <span>{target.title}</span>
               </DropdownMenuItem>
             ))}

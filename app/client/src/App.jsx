@@ -21,7 +21,7 @@ function App() {
       // Mock data for development
       setData([
         {
-          icon: '📂',
+          icon: 'folder',
           fileName: 'Sample Folder',
           fileId: '1234567890abcdef',
           parentName: 'Root',
@@ -29,7 +29,7 @@ function App() {
           mimeType: 'application/vnd.google-apps.folder'
         },
         {
-          icon: '📃',
+          icon: 'document',
           fileName: 'Sample Document.docx',
           fileId: 'abcdef1234567890',
           parentName: 'Sample Folder',
@@ -37,7 +37,7 @@ function App() {
           mimeType: 'application/vnd.google-apps.document'
         },
         {
-          icon: '📃',
+          icon: 'spreadsheet',
           fileName: 'Sample Spreadsheet.xlsx',
           fileId: 'xyz123abc456',
           parentName: 'Sample Folder',

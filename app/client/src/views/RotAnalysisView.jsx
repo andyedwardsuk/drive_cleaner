@@ -21,7 +21,16 @@ import {
   List,
   Eye
 } from 'lucide-react'
-import { faFireFlameCurved } from '@fortawesome/pro-duotone-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  faFireFlameCurved,
+  faBoxesStacked,
+  faMedal,
+  faSeedling,
+  faSkullCrossbones,
+  faSkull,
+  faCircleDot
+} from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -69,16 +78,16 @@ function formatDays(days) {
 function getFreshnessBadge(level) {
   switch (level) {
     case 'fresh':
-      return { label: 'Fresh', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', icon: '🟢' }
+      return { label: 'Fresh', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', dotColor: 'bg-emerald-400' }
     case 'aging':
-      return { label: 'Aging', color: 'bg-amber-500/10 text-amber-400 border-amber-500/20', icon: '🟡' }
+      return { label: 'Aging', color: 'bg-amber-500/10 text-amber-400 border-amber-500/20', dotColor: 'bg-amber-400' }
     case 'stale':
-      return { label: 'Stale', color: 'bg-orange-500/10 text-orange-400 border-orange-500/20', icon: '🟠' }
+      return { label: 'Stale', color: 'bg-orange-500/10 text-orange-400 border-orange-500/20', dotColor: 'bg-orange-400' }
     case 'rotting':
-      return { label: 'Rotting', color: 'bg-rose-500/10 text-rose-400 border-rose-500/20', icon: '🔴' }
+      return { label: 'Rotting', color: 'bg-rose-500/10 text-rose-400 border-rose-500/20', dotColor: 'bg-rose-400' }
     case 'decayed':
     default:
-      return { label: 'Decayed', color: 'bg-slate-500/20 text-slate-300 border-slate-500/30', icon: '⚫' }
+      return { label: 'Decayed', color: 'bg-slate-500/20 text-slate-300 border-slate-500/30', dotColor: 'bg-slate-400' }
   }
 }
 
@@ -158,8 +167,10 @@ function HoardingScoreCard({ hoardingScore }) {
     <div className="p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm flex flex-col justify-between">
       <div>
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">{rating?.icon || '📦'}</span>
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+              <FontAwesomeIcon icon={faBoxesStacked} className="w-4 h-4" />
+            </div>
             <div>
               <h3 className="font-semibold text-base text-slate-100">Digital Hoarding Assessment</h3>
               <p className="text-xs text-slate-400">Based on Digital Hoarding Questionnaire (DHQ)</p>
@@ -537,11 +548,11 @@ export default function RotAnalysisView() {
         {/* Freshness Filter Chips */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
           {[
-            { id: 'fresh', label: 'Fresh (0-3m)', color: 'border-emerald-500/40 text-emerald-400', count: dist.fresh?.count || 0, icon: '🟢' },
-            { id: 'aging', label: 'Aging (3-6m)', color: 'border-amber-500/40 text-amber-400', count: dist.aging?.count || 0, icon: '🟡' },
-            { id: 'stale', label: 'Stale (6-12m)', color: 'border-orange-500/40 text-orange-400', count: dist.stale?.count || 0, icon: '🟠' },
-            { id: 'rotting', label: 'Rotting (1-2y)', color: 'border-rose-500/40 text-rose-400', count: dist.rotting?.count || 0, icon: '🔴' },
-            { id: 'decayed', label: 'Decayed (2y+)', color: 'border-slate-500/40 text-slate-300', count: dist.decayed?.count || 0, icon: '⚫' },
+            { id: 'fresh', label: 'Fresh (0-3m)', dotColor: 'bg-emerald-400', count: dist.fresh?.count || 0 },
+            { id: 'aging', label: 'Aging (3-6m)', dotColor: 'bg-amber-400', count: dist.aging?.count || 0 },
+            { id: 'stale', label: 'Stale (6-12m)', dotColor: 'bg-orange-400', count: dist.stale?.count || 0 },
+            { id: 'rotting', label: 'Rotting (1-2y)', dotColor: 'bg-rose-400', count: dist.rotting?.count || 0 },
+            { id: 'decayed', label: 'Decayed (2y+)', dotColor: 'bg-slate-400', count: dist.decayed?.count || 0 },
           ].map((stage) => (
             <button
               key={stage.id}
@@ -554,8 +565,8 @@ export default function RotAnalysisView() {
               }`}
             >
               <div className="flex items-center justify-between w-full mb-1">
-                <span className="font-medium text-slate-300 flex items-center gap-1">
-                  <span>{stage.icon}</span> {stage.label}
+                <span className="font-medium text-slate-300 flex items-center gap-1.5">
+                  <span className={`w-2 h-2 rounded-full ${stage.dotColor}`} /> {stage.label}
                 </span>
               </div>
               <span className="text-sm font-bold text-slate-100">{stage.count} files</span>
@@ -573,13 +584,13 @@ export default function RotAnalysisView() {
           <div>
             <h4 className="text-sm font-semibold text-slate-100">Next Milestone: Reach &quot;Mild&quot; Clutter Status</h4>
             <p className="text-xs text-slate-400">
-              Clean up 4 more ROT items ({formatBytes(rot.total_size_bytes)}) to reduce your Clutter Index by ~15 points and unlock the <span className="text-purple-300 font-semibold">Data Minimalist 🏅</span> badge.
+              Clean up 4 more ROT items ({formatBytes(rot.total_size_bytes)}) to reduce your Clutter Index by ~15 points and unlock the <span className="text-purple-300 font-semibold inline-flex items-center gap-1">Data Minimalist <FontAwesomeIcon icon={faMedal} className="w-3 h-3 text-amber-400" /></span> badge.
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="bg-purple-500/10 text-purple-300 border-purple-500/30 text-xs">
-            🌱 Spring Cleaner Ready
+          <Badge variant="outline" className="bg-purple-500/10 text-purple-300 border-purple-500/30 text-xs inline-flex items-center gap-1.5">
+            <FontAwesomeIcon icon={faSeedling} className="w-3.5 h-3.5 text-emerald-400" /> Spring Cleaner Ready
           </Badge>
         </div>
       </div>
@@ -701,16 +712,20 @@ export default function RotAnalysisView() {
                   }`}
                 >
                   {isDecayed && (
-                    <div className="absolute right-2 top-2 opacity-20 text-2xl select-none">☠️</div>
+                    <div className="absolute right-2 top-2 opacity-20 text-2xl select-none text-slate-400">
+                      <FontAwesomeIcon icon={faSkullCrossbones} className="w-6 h-6" />
+                    </div>
                   )}
                   {isRotting && (
-                    <div className="absolute right-2 top-2 opacity-20 text-2xl select-none">💀</div>
+                    <div className="absolute right-2 top-2 opacity-20 text-2xl select-none text-rose-500">
+                      <FontAwesomeIcon icon={faSkull} className="w-6 h-6" />
+                    </div>
                   )}
 
                   <div>
                     <div className="flex items-center gap-1.5 mb-2">
-                      <Badge variant="outline" className={`text-[10px] px-1.5 py-0.5 ${freshBadge.color}`}>
-                        {freshBadge.icon} {freshBadge.label}
+                      <Badge variant="outline" className={`text-[10px] px-1.5 py-0.5 inline-flex items-center gap-1 ${freshBadge.color}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${freshBadge.dotColor}`} /> {freshBadge.label}
                       </Badge>
                       <span className="text-[11px] text-slate-400 font-mono">
                         {formatDays(item.days_inactive)}
@@ -807,8 +822,8 @@ export default function RotAnalysisView() {
                       </TableCell>
                       <TableCell className="text-xs">
                         <div className="flex items-center gap-1.5">
-                          <Badge variant="outline" className={`text-[10px] px-1.5 py-0.5 ${freshBadge.color}`}>
-                            {freshBadge.icon} {freshBadge.label}
+                          <Badge variant="outline" className={`text-[10px] px-1.5 py-0.5 inline-flex items-center gap-1 ${freshBadge.color}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${freshBadge.dotColor}`} /> {freshBadge.label}
                           </Badge>
                           <span className="text-[11px] text-slate-400 font-mono">
                             {formatDays(item.days_inactive)}

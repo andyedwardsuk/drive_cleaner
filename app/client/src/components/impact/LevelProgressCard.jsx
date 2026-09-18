@@ -1,13 +1,15 @@
 import { Shield, Sparkles, Award, HardDrive, Trash2, Leaf } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSeedling, faFireFlameCurved, faRecycle, faSwords, faRocket } from '@fortawesome/pro-duotone-svg-icons'
 import { Badge } from '@/components/ui/badge'
 import { formatBytes } from '@/lib/utils'
 
 const BADGES_META = [
-  { id: 'first_clean', name: 'First Clean', icon: '🌱', desc: 'Cleaned your first file' },
-  { id: 'streak_3', name: '3-Day Streak', icon: '🔥', desc: 'Maintained a 3-day cleaning streak' },
-  { id: 'carbon_friend', name: 'Carbon Friend', icon: '♻️', desc: 'Avoided 0.1 kg of CO2 emissions' },
-  { id: 'rot_slayer', name: 'ROT Slayer', icon: '⚔️', desc: 'Purged redundant or obsolete data' },
-  { id: 'space_champion', name: 'Space Champion', icon: '🚀', desc: 'Freed over 1 GB of storage' },
+  { id: 'first_clean', name: 'First Clean', icon: faSeedling, iconColor: 'text-emerald-400', desc: 'Cleaned your first file' },
+  { id: 'streak_3', name: '3-Day Streak', icon: faFireFlameCurved, iconColor: 'text-amber-400', desc: 'Maintained a 3-day cleaning streak' },
+  { id: 'carbon_friend', name: 'Carbon Friend', icon: faRecycle, iconColor: 'text-teal-400', desc: 'Avoided 0.1 kg of CO2 emissions' },
+  { id: 'rot_slayer', name: 'ROT Slayer', icon: faSwords, iconColor: 'text-purple-400', desc: 'Purged redundant or obsolete data' },
+  { id: 'space_champion', name: 'Space Champion', icon: faRocket, iconColor: 'text-blue-400', desc: 'Freed over 1 GB of storage' },
 ]
 
 export default function LevelProgressCard({ profile }) {
@@ -109,7 +111,9 @@ export default function LevelProgressCard({ profile }) {
                     : 'bg-slate-950/40 border-slate-800/50 text-slate-400 opacity-50'
                 }`}
               >
-                <span className="text-xl block mb-1">{badge.icon}</span>
+                <div className="flex justify-center mb-1.5">
+                  <FontAwesomeIcon icon={badge.icon} className={`w-5 h-5 ${badge.iconColor || 'text-primary'}`} />
+                </div>
                 <p className="text-xs font-medium truncate">{badge.name}</p>
                 <p className="text-[10px] text-muted-foreground line-clamp-1">{badge.desc}</p>
               </div>
