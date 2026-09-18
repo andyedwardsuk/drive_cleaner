@@ -12,6 +12,7 @@ import {
   Film,
   ArrowRight,
 } from 'lucide-react'
+import { faGaugeHigh } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import FileTable from '@/components/FileTable'
 import DrivePicker from '@/components/DrivePicker'
@@ -166,10 +167,10 @@ export default function DashboardView() {
   return (
     <div className="space-y-6">
       <Hero
-        icon={Home}
+        faIcon={faGaugeHigh}
+        variant="primary"
         title="Dashboard"
         subtitle="List and manage your Google Drive files and folders"
-        illustration="🏠"
       />
 
       {/* 2026 STORAGE INTELLIGENCE TELEMETRY & SPOTLIGHT CARDS */}

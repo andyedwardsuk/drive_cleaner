@@ -1,18 +1,23 @@
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import IconBadge from '@/components/common/IconBadge'
 
 /**
- * Hero - Reusable hero section with glassmorphism
+ * Hero - Reusable hero section with glassmorphism and specular vector badges
  * @param {Object} props
- * @param {React.Component} props.icon - Lucide icon component
+ * @param {React.Component|Object} props.icon - Lucide or FontAwesome icon
+ * @param {Object} props.faIcon - FontAwesome Pro icon object
+ * @param {string} props.variant - Color variant for the badge (primary, emerald, amber, rose, purple, cyan)
  * @param {string} props.title - Hero title
  * @param {string} props.subtitle - Hero subtitle/description
  * @param {React.ReactNode} props.actions - Optional action buttons
  * @param {string} props.badge - Optional badge text (e.g., "Coming Soon")
- * @param {string} props.illustration - Optional illustration/emoji
+ * @param {string|React.ReactNode} props.illustration - Optional vector illustration/icon
  */
 export default function Hero({
   icon: Icon,
+  faIcon,
+  variant = 'primary',
   title,
   subtitle,
   actions,
@@ -21,6 +26,8 @@ export default function Hero({
   illustration,
   className,
 }) {
+  const activeIcon = faIcon || Icon || (typeof illustration === 'object' ? illustration : null)
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -39,14 +46,12 @@ export default function Hero({
 
       {/* Content */}
       <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-6">
-        {/* Icon/Illustration */}
+        {/* Icon/Illustration Emblem */}
         <div className="flex-shrink-0">
-          {illustration ? (
-            <div className="text-5xl md:text-6xl">{illustration}</div>
-          ) : Icon ? (
-            <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25 border border-blue-400/20">
-              <Icon className="h-7 w-7 md:h-8 md:w-8 text-white" />
-            </div>
+          {activeIcon ? (
+            <IconBadge icon={activeIcon} variant={variant} size="xl" />
+          ) : typeof illustration === 'string' ? (
+            <div className="text-4xl md:text-5xl select-none">{illustration}</div>
           ) : null}
         </div>
 

@@ -13,6 +13,7 @@ import {
   Info,
   Eye
 } from 'lucide-react'
+import { faFileLines, faClockRotateLeft } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -242,7 +243,8 @@ export default function GoogleWorkspaceView() {
           icon={FileSpreadsheet}
           title="Google Workspace Files"
           subtitle="Analyse your Docs, Sheets, Slides, Forms, and native Google files"
-          illustration="📝"
+          faIcon={faFileLines}
+          variant="primary"
         />
         <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
           <FileSpreadsheet className="w-16 h-16 text-blue-400 mx-auto mb-4 opacity-70" />
@@ -267,7 +269,8 @@ export default function GoogleWorkspaceView() {
           icon={FileSpreadsheet}
           title="Google Workspace Files"
           subtitle="Analysing Google Workspace files..."
-          illustration="⏳"
+          faIcon={faClockRotateLeft}
+          variant="amber"
         />
         <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
           <RefreshCw className="w-8 h-8 text-blue-400 animate-spin mx-auto mb-4" />
@@ -287,7 +290,8 @@ export default function GoogleWorkspaceView() {
         icon={FileSpreadsheet}
         title="Google Workspace Files"
         subtitle={`Discovered ${totalCount} native Google Workspace files in ${data?.folder_name || 'My Drive'}`}
-        illustration="📝"
+        faIcon={faFileLines}
+        variant="primary"
         actions={
           <Button onClick={() => runScan('root', 'user')} size="lg" className="rounded-xl">
             <RefreshCw className="w-4 h-4 mr-2" />

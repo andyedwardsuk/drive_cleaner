@@ -1,4 +1,5 @@
 import { Flame, Scan, Sparkles } from 'lucide-react'
+import { faFireFlameCurved } from '@fortawesome/pro-duotone-svg-icons'
 import { useNavigate } from '@tanstack/react-router'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
@@ -27,7 +28,8 @@ export default function DailyImpactView() {
         icon={Flame}
         title="Daily Impact Tracker"
         subtitle="Build sustained Drive cleaning habits, maintain daily streaks, and track your lifetime carbon reduction"
-        illustration="🔥"
+        faIcon={faFireFlameCurved}
+        variant="amber"
         actions={
           <div className="flex items-center gap-2">
             <Button

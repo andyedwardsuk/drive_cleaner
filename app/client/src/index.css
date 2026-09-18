@@ -56,6 +56,19 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+
+    /* Web Awesome Dark Theme Harmonisation */
+    --wa-color-brand-50: #3b82f6;
+    --wa-color-brand-60: #2563eb;
+    --wa-color-brand-40: #60a5fa;
+    --wa-color-surface-raised: #0f172a;
+    --wa-color-surface-default: #0b0f19;
+    --wa-color-surface-lowered: #070a12;
+    --wa-color-surface-border: #1e293b;
+    --wa-color-text-normal: #f8fafc;
+    --wa-color-text-quiet: #94a3b8;
+    --wa-border-radius-medium: 0.75rem;
+    --wa-focus-ring-color: #3b82f6;
   }
 }
 

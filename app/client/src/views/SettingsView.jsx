@@ -21,8 +21,27 @@ import {
   CheckCircle2,
   FolderOpen,
 } from 'lucide-react'
+import {
+  faSliders,
+  faHardDrive,
+  faPalette,
+  faShieldCheck,
+  faDatabase,
+  faRotateLeft,
+  faDownload,
+  faTrashCan,
+  faTriangleExclamation,
+  faCheck,
+  faSparkles,
+  faClock,
+  faBoltLightning,
+  faFolderOpen,
+  faGear
+} from '@fortawesome/pro-duotone-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Hero from '@/components/Hero'
 import { useSettings } from '@/hooks/useSettings'
+import { WaSwitch, WaCallout, WaButton, WaBadge } from '@/components/ui/webawesome'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -84,11 +103,11 @@ export default function SettingsView() {
   }
 
   const tabs = [
-    { id: 'thresholds', label: 'Thresholds & Rules', icon: Sliders },
-    { id: 'scanning', label: 'Scan & Scope', icon: HardDrive },
-    { id: 'appearance', label: 'Appearance', icon: Palette },
-    { id: 'safety', label: 'Safety & Trash', icon: ShieldCheck },
-    { id: 'data', label: 'Data & Privacy', icon: Database },
+    { id: 'thresholds', label: 'Thresholds & Rules', faIcon: faSliders },
+    { id: 'scanning', label: 'Scan & Scope', faIcon: faHardDrive },
+    { id: 'appearance', label: 'Appearance', faIcon: faPalette },
+    { id: 'safety', label: 'Safety & Trash', faIcon: faShieldCheck },
+    { id: 'data', label: 'Data & Privacy', faIcon: faDatabase },
   ]
 
   const largeSizeOptions = [
@@ -117,64 +136,71 @@ export default function SettingsView() {
 
   return (
     <div className="space-y-6">
-      {/* Toast notification */}
+      {/* Zero-Layout-Shift Fixed Floating Toast */}
       <AnimatePresence>
         {saveToast && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed top-6 right-8 z-50 flex items-center gap-2 px-4 py-2.5 bg-emerald-500/90 text-white text-sm font-medium rounded-lg shadow-xl backdrop-blur-md border border-emerald-400/30"
+            initial={{ opacity: 0, y: 16, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 16, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 bg-slate-900/95 text-white text-sm font-medium rounded-xl shadow-2xl backdrop-blur-xl border border-blue-500/40"
+            style={{
+              boxShadow: '0 20px 40px -8px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15)'
+            }}
           >
-            <CheckCircle2 className="w-4 h-4 text-emerald-200" />
+            <div className="w-6 h-6 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center border border-blue-500/30">
+              <FontAwesomeIcon icon={faCheck} className="w-3.5 h-3.5" />
+            </div>
             <span>{actionSuccessMessage || 'Preferences updated'}</span>
           </motion.div>
         )}
       </AnimatePresence>
 
       <Hero
-        icon={Settings}
+        faIcon={faSliders}
+        variant="primary"
         title="Settings & Preferences"
         subtitle="Fine-tune cleanup thresholds, scan behaviours, visual themes, and safe trash policies."
         badge="v3.4.0 Active"
-        illustration="⚙️"
       />
 
       {/* Tabs bar */}
       <div className="flex flex-wrap gap-2 p-1.5 bg-slate-900/60 border border-slate-800/80 rounded-2xl backdrop-blur-md">
         {tabs.map((tab) => {
-          const Icon = tab.icon
+          const FaIcon = tab.faIcon
           const isActive = activeTab === tab.id
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all',
+                'flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150',
                 isActive
                   ? 'bg-blue-600 text-white shadow-md'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
               )}
             >
-              <Icon className="w-4 h-4" />
+              <FontAwesomeIcon icon={FaIcon} className="w-4 h-4" />
               <span>{tab.label}</span>
             </button>
           )
         })}
       </div>
 
-      {/* Tab Panels */}
-      <div className="p-6 md:p-8 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-md space-y-8">
+      {/* Tab Panels with Stable Height */}
+      <div className="p-6 md:p-8 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-md space-y-8 min-h-[520px]">
         {/* TAB 1: THRESHOLDS */}
         {activeTab === 'thresholds' && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
             className="space-y-8"
           >
             <div>
-              <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-                <Sliders className="w-5 h-5 text-blue-400" />
+              <h2 className="text-xl font-semibold text-white flex items-center gap-2.5">
+                <FontAwesomeIcon icon={faSliders} className="w-5 h-5 text-blue-400" />
                 Cleanup & Analysis Thresholds
               </h2>
               <p className="text-sm text-slate-400 mt-1">
@@ -280,8 +306,9 @@ export default function SettingsView() {
                   step="5"
                   value={thresholds.targetClutterIndex || 20}
                   onChange={(e) =>
-                    handleUpdate('thresholds', 'targetClutterIndex', parseInt(e.target.value, 10))
+                    updateSetting('thresholds', 'targetClutterIndex', parseInt(e.target.value, 10))
                   }
+                  onPointerUp={() => triggerSaveToast('Target clutter index updated')}
                   className="flex-1 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
                 />
                 <span className="text-sm font-semibold text-purple-300 w-16 text-right">
@@ -295,13 +322,14 @@ export default function SettingsView() {
         {/* TAB 2: SCAN & SCOPE */}
         {activeTab === 'scanning' && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
             className="space-y-6"
           >
             <div>
-              <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-                <HardDrive className="w-5 h-5 text-indigo-400" />
+              <h2 className="text-xl font-semibold text-white flex items-center gap-2.5">
+                <FontAwesomeIcon icon={faHardDrive} className="w-5 h-5 text-indigo-400" />
                 Scan & Search Preferences
               </h2>
               <p className="text-sm text-slate-400 mt-1">
@@ -369,23 +397,12 @@ export default function SettingsView() {
                   Analyse Docs, Sheets, and Slides for unused drafts and sharing sprawl during Smart Scan.
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() =>
-                  handleUpdate('scanning', 'autoIncludeWorkspace', !scanning.autoIncludeWorkspace)
+              <WaSwitch
+                checked={scanning.autoIncludeWorkspace}
+                onCheckedChange={(checked) =>
+                  handleUpdate('scanning', 'autoIncludeWorkspace', checked)
                 }
-                className={cn(
-                  'w-12 h-6 rounded-full transition-colors relative flex items-center p-0.5',
-                  scanning.autoIncludeWorkspace ? 'bg-blue-600' : 'bg-slate-700'
-                )}
-              >
-                <div
-                  className={cn(
-                    'w-5 h-5 rounded-full bg-white transition-transform',
-                    scanning.autoIncludeWorkspace ? 'translate-x-6' : 'translate-x-0'
-                  )}
-                />
-              </button>
+              />
             </div>
 
             {/* Cache Persistence */}
@@ -398,23 +415,12 @@ export default function SettingsView() {
                   Keep scan results stored locally so navigating between views is instantaneous.
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() =>
-                  handleUpdate('scanning', 'enableAutoCache', !scanning.enableAutoCache)
+              <WaSwitch
+                checked={scanning.enableAutoCache}
+                onCheckedChange={(checked) =>
+                  handleUpdate('scanning', 'enableAutoCache', checked)
                 }
-                className={cn(
-                  'w-12 h-6 rounded-full transition-colors relative flex items-center p-0.5',
-                  scanning.enableAutoCache ? 'bg-blue-600' : 'bg-slate-700'
-                )}
-              >
-                <div
-                  className={cn(
-                    'w-5 h-5 rounded-full bg-white transition-transform',
-                    scanning.enableAutoCache ? 'translate-x-6' : 'translate-x-0'
-                  )}
-                />
-              </button>
+              />
             </div>
           </motion.div>
         )}
@@ -422,13 +428,14 @@ export default function SettingsView() {
         {/* TAB 3: APPEARANCE */}
         {activeTab === 'appearance' && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
             className="space-y-6"
           >
             <div>
-              <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-                <Palette className="w-5 h-5 text-emerald-400" />
+              <h2 className="text-xl font-semibold text-white flex items-center gap-2.5">
+                <FontAwesomeIcon icon={faPalette} className="w-5 h-5 text-emerald-400" />
                 Appearance & Theme
               </h2>
               <p className="text-sm text-slate-400 mt-1">
@@ -515,13 +522,14 @@ export default function SettingsView() {
         {/* TAB 4: SAFETY */}
         {activeTab === 'safety' && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
             className="space-y-6"
           >
             <div>
-              <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-emerald-400" />
+              <h2 className="text-xl font-semibold text-white flex items-center gap-2.5">
+                <FontAwesomeIcon icon={faShieldCheck} className="w-5 h-5 text-emerald-400" />
                 Safety & Safe Trash Policies
               </h2>
               <p className="text-sm text-slate-400 mt-1">
@@ -539,23 +547,12 @@ export default function SettingsView() {
                   Always show a dialog displaying affected files and reclaimed space before proceeding.
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() =>
-                  handleUpdate('safety', 'confirmBeforeTrash', !safety.confirmBeforeTrash)
+              <WaSwitch
+                checked={safety.confirmBeforeTrash}
+                onCheckedChange={(checked) =>
+                  handleUpdate('safety', 'confirmBeforeTrash', checked)
                 }
-                className={cn(
-                  'w-12 h-6 rounded-full transition-colors relative flex items-center p-0.5',
-                  safety.confirmBeforeTrash ? 'bg-emerald-600' : 'bg-slate-700'
-                )}
-              >
-                <div
-                  className={cn(
-                    'w-5 h-5 rounded-full bg-white transition-transform',
-                    safety.confirmBeforeTrash ? 'translate-x-6' : 'translate-x-0'
-                  )}
-                />
-              </button>
+              />
             </div>
 
             {/* Undo Toast Window */}
@@ -569,9 +566,9 @@ export default function SettingsView() {
                     How long the floating "Undo Trash" button remains active after cleaning files.
                   </p>
                 </div>
-                <Badge variant="outline" className="text-emerald-400 border-emerald-500/30">
+                <WaBadge variant="success" appearance="outlined" pill>
                   {safety.undoTimeoutSeconds || 10} seconds
-                </Badge>
+                </WaBadge>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
@@ -601,13 +598,14 @@ export default function SettingsView() {
         {/* TAB 5: DATA & PRIVACY */}
         {activeTab === 'data' && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
             className="space-y-6"
           >
             <div>
-              <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-                <Database className="w-5 h-5 text-cyan-400" />
+              <h2 className="text-xl font-semibold text-white flex items-center gap-2.5">
+                <FontAwesomeIcon icon={faDatabase} className="w-5 h-5 text-cyan-400" />
                 Data, Backups & Privacy
               </h2>
               <p className="text-sm text-slate-400 mt-1">
@@ -656,92 +654,95 @@ export default function SettingsView() {
             </div>
 
             {/* Danger Zone */}
-            <div className="p-5 rounded-2xl bg-red-950/20 border border-red-500/30 space-y-4">
-              <div className="flex items-center gap-2 text-red-400">
-                <AlertTriangle className="w-5 h-5" />
-                <h3 className="font-semibold text-base">Danger Zone</h3>
-              </div>
-
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 border-t border-red-500/20">
-                <div>
-                  <div className="font-medium text-sm text-slate-200">
-                    Reset Settings to Defaults
+            <WaCallout
+              variant="danger"
+              appearance="outlined"
+              title="Danger Zone"
+              faIcon={faTriangleExclamation}
+              className="p-5"
+            >
+              <div className="space-y-4 pt-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 border-t border-red-500/20">
+                  <div>
+                    <div className="font-medium text-sm text-slate-200">
+                      Reset Settings to Defaults
+                    </div>
+                    <div className="text-xs text-slate-400">
+                      Restores all thresholds, scanning options, and UI preferences to initial state.
+                    </div>
                   </div>
-                  <div className="text-xs text-slate-400">
-                    Restores all thresholds, scanning options, and UI preferences to initial state.
-                  </div>
+                  {showResetConfirm ? (
+                    <div className="flex items-center gap-2">
+                      <WaButton
+                        variant="danger"
+                        appearance="filled"
+                        size="small"
+                        onClick={handleReset}
+                      >
+                        Confirm Reset
+                      </WaButton>
+                      <WaButton
+                        variant="neutral"
+                        appearance="plain"
+                        size="small"
+                        onClick={() => setShowResetConfirm(false)}
+                      >
+                        Cancel
+                      </WaButton>
+                    </div>
+                  ) : (
+                    <WaButton
+                      variant="danger"
+                      appearance="outlined"
+                      size="small"
+                      onClick={() => setShowResetConfirm(true)}
+                    >
+                      Reset Defaults
+                    </WaButton>
+                  )}
                 </div>
-                {showResetConfirm ? (
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={handleReset}
-                      className="bg-red-600 hover:bg-red-700 h-10 rounded-xl"
-                    >
-                      Confirm Reset
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowResetConfirm(false)}
-                      className="h-10 rounded-xl"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                ) : (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowResetConfirm(true)}
-                    className="border-red-500/40 text-red-400 hover:bg-red-500/10 h-10 rounded-xl"
-                  >
-                    Reset Defaults
-                  </Button>
-                )}
-              </div>
 
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-red-500/20">
-                <div>
-                  <div className="font-medium text-sm text-slate-200">
-                    Wipe Scan & Action Audit History
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-red-500/20">
+                  <div>
+                    <div className="font-medium text-sm text-slate-200">
+                      Wipe Scan & Action Audit History
+                    </div>
+                    <div className="text-xs text-slate-400">
+                      Permanently deletes all historical scan events and trash logs from local storage.
+                    </div>
                   </div>
-                  <div className="text-xs text-slate-400">
-                    Permanently deletes all historical scan events and trash logs from local storage.
-                  </div>
+                  {showClearHistoryConfirm ? (
+                    <div className="flex items-center gap-2">
+                      <WaButton
+                        variant="danger"
+                        appearance="filled"
+                        size="small"
+                        onClick={handleClearHistory}
+                      >
+                        Confirm Wipe
+                      </WaButton>
+                      <WaButton
+                        variant="neutral"
+                        appearance="plain"
+                        size="small"
+                        onClick={() => setShowClearHistoryConfirm(false)}
+                      >
+                        Cancel
+                      </WaButton>
+                    </div>
+                  ) : (
+                    <WaButton
+                      variant="danger"
+                      appearance="outlined"
+                      size="small"
+                      onClick={() => setShowClearHistoryConfirm(true)}
+                    >
+                      Clear History
+                    </WaButton>
+                  )}
                 </div>
-                {showClearHistoryConfirm ? (
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={handleClearHistory}
-                      className="bg-red-600 hover:bg-red-700 h-10 rounded-xl"
-                    >
-                      Confirm Wipe
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowClearHistoryConfirm(false)}
-                      className="h-10 rounded-xl"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                ) : (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowClearHistoryConfirm(true)}
-                    className="border-red-500/40 text-red-400 hover:bg-red-500/10 h-10 rounded-xl"
-                  >
-                    Clear History
-                  </Button>
-                )}
               </div>
-            </div>
+            </WaCallout>
           </motion.div>
         )}
       </div>

@@ -1,5 +1,13 @@
 import { BarChart3, HardDrive, Database, Trash2, RefreshCw, ArrowRight } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts'
+import {
+  faChartPie,
+  faLightbulb,
+  faTrashCan,
+  faClone,
+  faClock
+} from '@fortawesome/pro-duotone-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { useQuota } from '@/hooks/useQuota'
@@ -59,10 +67,10 @@ export default function StorageAnalyticsView() {
     return (
       <div className="space-y-6">
         <Hero
-          icon={BarChart3}
+          faIcon={faChartPie}
+          variant="cyan"
           title="Storage Analytics"
           subtitle="Visual breakdown of your Drive storage usage"
-          illustration="📊"
         />
         <div className="p-16 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
           <RefreshCw className="w-8 h-8 animate-spin text-blue-400 mx-auto mb-4" />
@@ -76,10 +84,10 @@ export default function StorageAnalyticsView() {
     return (
       <div className="space-y-6">
         <Hero
-          icon={BarChart3}
+          faIcon={faChartPie}
+          variant="cyan"
           title="Storage Analytics"
           subtitle="Visual breakdown of your Drive storage usage"
-          illustration="📊"
         />
         <div className="p-10 border border-red-500/30 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
           <p className="text-red-400 font-bold mb-2">Error loading storage analytics</p>
@@ -99,10 +107,10 @@ export default function StorageAnalyticsView() {
     return (
       <div className="space-y-6">
         <Hero
-          icon={BarChart3}
+          faIcon={faChartPie}
+          variant="cyan"
           title="Storage Analytics"
           subtitle="Visual breakdown of your Drive storage usage"
-          illustration="📊"
         />
         <div className="p-12 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
           <p className="text-slate-400 text-sm">No storage quota data available</p>
@@ -151,10 +159,10 @@ export default function StorageAnalyticsView() {
   return (
     <div className="space-y-6">
       <Hero
-        icon={BarChart3}
+        faIcon={faChartPie}
+        variant="cyan"
         title="Storage Analytics"
         subtitle="Visual breakdown of your Google Drive storage quota and allocation"
-        illustration="📊"
         actions={
           <Button
             onClick={fetchQuota}
@@ -300,10 +308,12 @@ export default function StorageAnalyticsView() {
 
       {/* Additional Info / Storage Tips */}
       <div className="p-6 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm shadow-xl">
-        <h3 className="text-base font-semibold text-white mb-4">Storage Optimization Tips</h3>
+        <h3 className="text-base font-semibold text-white mb-4">Storage Optimisation Tips</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-          <div className="flex gap-3 p-4 rounded-xl bg-slate-950/50 border border-slate-800/60">
-            <div className="text-xl">💡</div>
+          <div className="flex gap-3 p-4 rounded-xl bg-slate-950/50 border border-slate-800/60 items-center">
+            <div className="w-8 h-8 rounded-lg bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center flex-shrink-0">
+              <FontAwesomeIcon icon={faLightbulb} className="w-4 h-4" />
+            </div>
             <div>
               <h4 className="font-semibold text-slate-200 mb-0.5">Find Large Files</h4>
               <p className="text-slate-400 leading-relaxed">
@@ -311,8 +321,10 @@ export default function StorageAnalyticsView() {
               </p>
             </div>
           </div>
-          <div className="flex gap-3 p-4 rounded-xl bg-slate-950/50 border border-slate-800/60">
-            <div className="text-xl">🗑️</div>
+          <div className="flex gap-3 p-4 rounded-xl bg-slate-950/50 border border-slate-800/60 items-center">
+            <div className="w-8 h-8 rounded-lg bg-rose-500/15 text-rose-400 border border-rose-500/30 flex items-center justify-center flex-shrink-0">
+              <FontAwesomeIcon icon={faTrashCan} className="w-4 h-4" />
+            </div>
             <div>
               <h4 className="font-semibold text-slate-200 mb-0.5">Govern Trash Lifecycle</h4>
               <p className="text-slate-400 leading-relaxed">
@@ -322,8 +334,10 @@ export default function StorageAnalyticsView() {
               </p>
             </div>
           </div>
-          <div className="flex gap-3 p-4 rounded-xl bg-slate-950/50 border border-slate-800/60">
-            <div className="text-xl">📦</div>
+          <div className="flex gap-3 p-4 rounded-xl bg-slate-950/50 border border-slate-800/60 items-center">
+            <div className="w-8 h-8 rounded-lg bg-blue-500/15 text-blue-400 border border-blue-500/30 flex items-center justify-center flex-shrink-0">
+              <FontAwesomeIcon icon={faClone} className="w-4 h-4" />
+            </div>
             <div>
               <h4 className="font-semibold text-slate-200 mb-0.5">Purge Redundant Duplicates</h4>
               <p className="text-slate-400 leading-relaxed">
@@ -331,8 +345,10 @@ export default function StorageAnalyticsView() {
               </p>
             </div>
           </div>
-          <div className="flex gap-3 p-4 rounded-xl bg-slate-950/50 border border-slate-800/60">
-            <div className="text-xl">⏰</div>
+          <div className="flex gap-3 p-4 rounded-xl bg-slate-950/50 border border-slate-800/60 items-center">
+            <div className="w-8 h-8 rounded-lg bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 flex items-center justify-center flex-shrink-0">
+              <FontAwesomeIcon icon={faClock} className="w-4 h-4" />
+            </div>
             <div>
               <h4 className="font-semibold text-slate-200 mb-0.5">Archive Inactive Documents</h4>
               <p className="text-slate-400 leading-relaxed">

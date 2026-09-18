@@ -9,6 +9,7 @@ import {
   Search,
   CheckCircle2,
 } from 'lucide-react'
+import { faBoltLightning } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -278,11 +279,11 @@ export default function BulkActionsView() {
     <div className="space-y-6">
       {/* Hero Header */}
       <Hero
-        icon={Layers}
+        faIcon={faBoltLightning}
+        variant="amber"
         title="Bulk Actions Hub"
         subtitle="Review cleanup candidates across categories, select presets, and execute safe batch trashing with undo"
         badge="Active"
-        illustration="⚡"
         actions={
           <div className="flex items-center gap-2">
             <Button

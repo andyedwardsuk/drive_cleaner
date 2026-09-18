@@ -14,6 +14,7 @@ import {
   HardDrive,
   RefreshCw,
 } from 'lucide-react'
+import { faTableColumns } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import KanbanColumn from '@/components/kanban/KanbanColumn'
 import { useKanbanBoard } from '@/hooks/useKanbanBoard'
@@ -107,9 +108,10 @@ export default function KanbanLabelsView() {
       <Hero
         icon={Kanban}
         title="Google Drive Labels & Kanban Board"
-        subtitle="Visual drag-and-drop workflow to triage, organize, stage for archival, and bulk cleanup files."
+        subtitle="Visual drag-and-drop workflow to triage, organise, stage for archival, and bulk cleanup files."
         badge="v2.2.0 Active"
-        illustration="📋"
+        faIcon={faTableColumns}
+        variant="purple"
         actions={
           <div className="flex flex-wrap items-center gap-3">
             <Button

@@ -16,6 +16,7 @@ import {
   Coffee,
   Laptop
 } from 'lucide-react'
+import { faLeaf } from '@fortawesome/pro-duotone-svg-icons'
 import { useNavigate } from '@tanstack/react-router'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
@@ -79,7 +80,8 @@ export default function CarbonFootprintView() {
           icon={Leaf}
           title="Cloud Carbon Footprint"
           subtitle="Estimate emissions and transform digital cleanup into climate action"
-          illustration="🌱"
+          faIcon={faLeaf}
+          variant="emerald"
         />
         <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
           <RefreshCw className="w-8 h-8 animate-spin text-emerald-500 mx-auto mb-3" />
@@ -96,7 +98,8 @@ export default function CarbonFootprintView() {
           icon={Leaf}
           title="Cloud Carbon Footprint"
           subtitle="Estimate emissions and transform digital cleanup into climate action"
-          illustration="🌱"
+          faIcon={faLeaf}
+          variant="emerald"
         />
         <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
           <Globe className="w-12 h-12 text-emerald-400 mx-auto mb-4" />
@@ -121,7 +124,8 @@ export default function CarbonFootprintView() {
         icon={Leaf}
         title="Cloud Carbon Footprint & Green Impact"
         subtitle="Track the environmental cost of cloud storage and turn digital cleanup into tangible climate action."
-        illustration="🌱"
+        faIcon={faLeaf}
+        variant="emerald"
       />
 
       {/* Main Carbon Summary Card */}

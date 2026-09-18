@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { HardDrive, Filter, RefreshCw, Eye, Search, X, Download, Sparkles } from 'lucide-react'
+import { faHardDrive } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -244,10 +245,10 @@ export default function LargeFilesView() {
     return (
       <div className="space-y-6">
         <Hero
-          icon={HardDrive}
+          faIcon={faHardDrive}
+          variant="primary"
           title="Large Files"
           subtitle="Find and manage files taking up the most space"
-          illustration="📦"
         />
         <div className="p-12 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
           <HardDrive className="w-16 h-16 text-slate-600 mx-auto mb-4" />
@@ -269,10 +270,10 @@ export default function LargeFilesView() {
     return (
       <div className="space-y-6">
         <Hero
-          icon={HardDrive}
+          faIcon={faHardDrive}
+          variant="primary"
           title="Large Files"
           subtitle="Find and manage files taking up the most space"
-          illustration="📦"
         />
         <div className="p-16 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
           <RefreshCw className="w-8 h-8 animate-spin text-blue-400 mx-auto mb-4" />
@@ -287,10 +288,10 @@ export default function LargeFilesView() {
     return (
       <div className="space-y-6">
         <Hero
-          icon={HardDrive}
+          faIcon={faHardDrive}
+          variant="primary"
           title="Large Files"
           subtitle="Find and manage files taking up the most space"
-          illustration="📦"
         />
         <div className="p-10 border border-red-500/30 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
           <p className="text-red-400 font-bold mb-2">Error loading large files</p>
@@ -311,15 +312,15 @@ export default function LargeFilesView() {
     return (
       <div className="space-y-6">
         <Hero
-          icon={HardDrive}
+          faIcon={faHardDrive}
+          variant="primary"
           title="Large Files"
           subtitle="Find and manage files taking up the most space"
-          illustration="📦"
         />
         <div className="p-12 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
           <Sparkles className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
           <p className="text-slate-200 text-lg font-bold mb-1">No large files found</p>
-          <p className="text-sm text-slate-400">Your Google Drive is exceptionally lean and well-optimized!</p>
+          <p className="text-sm text-slate-400">Your Google Drive is exceptionally lean and well-optimised!</p>
         </div>
       </div>
     )
@@ -328,10 +329,10 @@ export default function LargeFilesView() {
   return (
     <div className="space-y-6">
       <Hero
-        icon={HardDrive}
+        faIcon={faHardDrive}
+        variant="primary"
         title="Large Files"
         subtitle="Find and manage files taking up the most space"
-        illustration="📦"
         actions={
           <Button
             onClick={() => runScan('root', 'user')}

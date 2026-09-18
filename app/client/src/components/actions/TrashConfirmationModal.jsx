@@ -1,6 +1,14 @@
-import { AlertTriangle, Trash2, Star, Users, HardDrive } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import React from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  faTrashCan,
+  faStar,
+  faUsers,
+  faHardDrive,
+  faTriangleExclamation,
+  faCircleInfo,
+} from '@fortawesome/pro-duotone-svg-icons'
+import { WaButton, WaBadge, WaCallout } from '@/components/ui/webawesome'
 
 export function TrashConfirmationModal({
   isOpen,
@@ -25,32 +33,32 @@ export function TrashConfirmationModal({
   const largeFiles = files.filter((f) => (f.fileSizeBytes || 0) > 500 * 1024 * 1024)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in-0">
-      <div className="relative w-full max-w-xl p-6 overflow-hidden border rounded-2xl bg-slate-900/95 border-slate-800 shadow-2xl backdrop-blur-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in-0">
+      <div className="relative w-full max-w-xl p-6 overflow-hidden border rounded-3xl bg-slate-900/95 border-slate-800 shadow-2xl backdrop-blur-xl space-y-5">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-3 text-red-400 rounded-xl bg-red-500/10 border border-red-500/20">
-            <Trash2 className="w-6 h-6" />
+        <div className="flex items-center gap-3">
+          <div className="p-3 text-red-400 rounded-2xl bg-red-500/10 border border-red-500/20 shadow-inner">
+            <FontAwesomeIcon icon={faTrashCan} className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white">Move to Trash</h2>
-            <p className="text-sm text-gray-400">Review selected files before trashing</p>
+            <h2 className="text-xl font-bold text-white tracking-tight">Move to Trash</h2>
+            <p className="text-sm text-slate-400">Review selected files before trashing</p>
           </div>
         </div>
 
         {/* Stats Summary */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-            <span className="text-xs font-medium text-gray-400">Total Items</span>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="p-3.5 rounded-2xl bg-slate-800/50 border border-slate-700/60">
+            <span className="text-xs font-medium text-slate-400">Total Items</span>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="text-xl font-bold text-white">{files.length}</span>
-              <span className="text-xs text-gray-400">files</span>
+              <span className="text-xs text-slate-400">files</span>
             </div>
           </div>
-          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+          <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
             <span className="text-xs font-medium text-emerald-300">Space to Reclaim</span>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <HardDrive className="w-4 h-4 text-emerald-400" />
+              <FontAwesomeIcon icon={faHardDrive} className="w-4 h-4 text-emerald-400" />
               <span className="text-xl font-bold text-emerald-400">{formatBytes(totalBytes)}</span>
             </div>
           </div>
@@ -58,61 +66,69 @@ export function TrashConfirmationModal({
 
         {/* Safety Warnings */}
         {(starredFiles.length > 0 || sharedFiles.length > 0 || largeFiles.length > 0) && (
-          <div className="p-3.5 mb-4 space-y-2 border rounded-xl bg-amber-500/10 border-amber-500/30 text-amber-200 text-xs">
-            <div className="flex items-center gap-2 font-semibold text-amber-300">
-              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>Safety Attention:</span>
+          <WaCallout
+            variant="warning"
+            title="Safety Attention"
+            faIcon={faTriangleExclamation}
+          >
+            <div className="space-y-1.5 mt-1">
+              {starredFiles.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <FontAwesomeIcon icon={faStar} className="w-3.5 h-3.5 text-amber-400" />
+                  <span>
+                    <strong>{starredFiles.length}</strong> starred {starredFiles.length === 1 ? 'file' : 'files'} included.
+                  </span>
+                </div>
+              )}
+              {sharedFiles.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <FontAwesomeIcon icon={faUsers} className="w-3.5 h-3.5 text-blue-400" />
+                  <span>
+                    <strong>{sharedFiles.length}</strong> shared {sharedFiles.length === 1 ? 'file' : 'files'} included. Collaborators will lose access.
+                  </span>
+                </div>
+              )}
+              {largeFiles.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <FontAwesomeIcon icon={faHardDrive} className="w-3.5 h-3.5 text-purple-400" />
+                  <span>
+                    <strong>{largeFiles.length}</strong> very large {largeFiles.length === 1 ? 'file' : 'files'} (&gt;500 MB).
+                  </span>
+                </div>
+              )}
             </div>
-            {starredFiles.length > 0 && (
-              <div className="flex items-center gap-1.5 pl-6 text-amber-200/90">
-                <Star className="w-3.5 h-3.5 text-yellow-400" />
-                <span>
-                  <strong>{starredFiles.length}</strong> starred {starredFiles.length === 1 ? 'file' : 'files'} included.
-                </span>
-              </div>
-            )}
-            {sharedFiles.length > 0 && (
-              <div className="flex items-center gap-1.5 pl-6 text-amber-200/90">
-                <Users className="w-3.5 h-3.5 text-blue-400" />
-                <span>
-                  <strong>{sharedFiles.length}</strong> shared {sharedFiles.length === 1 ? 'file' : 'files'} included. Collaborators will lose access.
-                </span>
-              </div>
-            )}
-            {largeFiles.length > 0 && (
-              <div className="flex items-center gap-1.5 pl-6 text-amber-200/90">
-                <HardDrive className="w-3.5 h-3.5 text-purple-400" />
-                <span>
-                  <strong>{largeFiles.length}</strong> very large {largeFiles.length === 1 ? 'file' : 'files'} (&gt;500 MB).
-                </span>
-              </div>
-            )}
-          </div>
+          </WaCallout>
         )}
 
         {/* Preview List */}
-        <div className="mb-4">
+        <div>
           <div className="flex justify-between items-center mb-2">
-            <span className="text-xs font-medium text-gray-400">File Preview</span>
-            <span className="text-xs text-gray-500">Showing up to 5 items</span>
+            <span className="text-xs font-medium text-slate-400">File Preview</span>
+            <span className="text-xs text-slate-500">Showing up to 5 items</span>
           </div>
-          <div className="max-h-36 overflow-y-auto space-y-1.5 pr-1 text-sm border rounded-xl p-2 bg-black/20 border-white/5">
+          <div className="max-h-36 overflow-y-auto space-y-1.5 pr-1 text-sm border rounded-2xl p-2.5 bg-slate-950/60 border-slate-800">
             {files.slice(0, 5).map((file) => (
-              <div key={file.fileId} className="flex items-center justify-between py-1 px-2 rounded-lg hover:bg-white/5">
-                <span className="truncate max-w-[280px] text-gray-200 font-medium">
+              <div key={file.fileId} className="flex items-center justify-between py-1.5 px-2.5 rounded-xl hover:bg-slate-800/40 transition-colors">
+                <span className="truncate max-w-[280px] text-slate-200 font-medium text-xs">
                   {file.fileName}
                 </span>
                 <div className="flex items-center gap-2 shrink-0">
-                  {file.starred && <Badge variant="outline" className="text-[10px] text-yellow-400 border-yellow-500/30">⭐ Starred</Badge>}
-                  {file.sharingStatus && file.sharingStatus !== 'Private' && (
-                    <Badge variant="outline" className="text-[10px] text-blue-400 border-blue-500/30">👥 Shared</Badge>
+                  {file.starred && (
+                    <WaBadge variant="warning" appearance="outlined" pill>
+                      Starred
+                    </WaBadge>
                   )}
-                  <span className="text-xs text-gray-400">{file.fileSize || formatBytes(file.fileSizeBytes || 0)}</span>
+                  {file.sharingStatus && file.sharingStatus !== 'Private' && (
+                    <WaBadge variant="brand" appearance="outlined" pill>
+                      Shared
+                    </WaBadge>
+                  )}
+                  <span className="text-xs text-slate-400">{file.fileSize || formatBytes(file.fileSizeBytes || 0)}</span>
                 </div>
               </div>
             ))}
             {files.length > 5 && (
-              <div className="pt-1 text-center text-xs text-gray-500 italic">
+              <div className="pt-1 text-center text-xs text-slate-500 italic">
                 ...and {files.length - 5} more files
               </div>
             )}
@@ -120,35 +136,31 @@ export function TrashConfirmationModal({
         </div>
 
         {/* Info Note */}
-        <p className="text-xs text-gray-400 mb-6 bg-white/5 p-2.5 rounded-lg border border-white/5">
-          ℹ️ Items will be moved to <strong>Google Drive Trash</strong>. You can restore them anytime using the Undo button or directly in Google Drive.
-        </p>
+        <WaCallout variant="neutral" appearance="plain" faIcon={faCircleInfo}>
+          Items will be moved to <strong>Google Drive Trash</strong>. You can restore them anytime using the Undo button or directly in Google Drive.
+        </WaCallout>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-3">
-          <Button
-            variant="ghost"
+        <div className="flex items-center justify-end gap-3 pt-2">
+          <WaButton
+            variant="neutral"
+            appearance="outlined"
             onClick={onCancel}
             disabled={isTrashing}
-            className="text-gray-400 hover:text-white"
           >
             Cancel
-          </Button>
-          <Button
-            variant="destructive"
+          </WaButton>
+          <WaButton
+            variant="danger"
+            appearance="filled"
             onClick={onConfirm}
-            disabled={isTrashing}
-            className="bg-red-600 hover:bg-red-700 text-white font-medium px-5 shadow-lg shadow-red-600/20"
+            loading={isTrashing}
+            startIcon={!isTrashing ? <FontAwesomeIcon icon={faTrashCan} className="w-4 h-4" /> : null}
           >
-            {isTrashing ? (
-              <span className="flex items-center gap-2">
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Trashing...
-              </span>
-            ) : (
-              `Move ${files.length} ${files.length === 1 ? 'File' : 'Files'} to Trash`
-            )}
-          </Button>
+            {isTrashing
+              ? 'Trashing...'
+              : `Move ${files.length} ${files.length === 1 ? 'File' : 'Files'} to Trash`}
+          </WaButton>
         </div>
       </div>
     </div>

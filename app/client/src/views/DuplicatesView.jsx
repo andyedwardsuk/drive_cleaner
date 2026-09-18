@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Copy, RefreshCw, ChevronDown, ChevronRight, Eye, Search, X, Sparkles, Folder } from 'lucide-react'
+import { faClone } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -236,10 +237,10 @@ export default function DuplicatesView() {
     return (
       <div className="space-y-6">
         <Hero
-          icon={Copy}
+          faIcon={faClone}
+          variant="primary"
           title="Duplicates"
           subtitle="Find and remove duplicate files to save space"
-          illustration="📋"
         />
         <div className="p-12 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
           <Copy className="w-16 h-16 text-slate-600 mx-auto mb-4" />
@@ -261,10 +262,10 @@ export default function DuplicatesView() {
     return (
       <div className="space-y-6">
         <Hero
-          icon={Copy}
+          faIcon={faClone}
+          variant="primary"
           title="Duplicates"
           subtitle="Find and remove duplicate files to save space"
-          illustration="📋"
         />
         <div className="p-16 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
           <RefreshCw className="w-8 h-8 animate-spin text-cyan-400 mx-auto mb-4" />
@@ -279,10 +280,10 @@ export default function DuplicatesView() {
     return (
       <div className="space-y-6">
         <Hero
-          icon={Copy}
+          faIcon={faClone}
+          variant="primary"
           title="Duplicates"
           subtitle="Find and remove duplicate files to save space"
-          illustration="📋"
         />
         <div className="p-10 border border-red-500/30 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
           <p className="text-red-400 font-bold mb-2">Error loading duplicates</p>
@@ -303,10 +304,10 @@ export default function DuplicatesView() {
     return (
       <div className="space-y-6">
         <Hero
-          icon={Copy}
+          faIcon={faClone}
+          variant="primary"
           title="Duplicates"
           subtitle="Find and remove duplicate files to save space"
-          illustration="📋"
         />
         <div className="p-12 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
           <Sparkles className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
@@ -320,10 +321,10 @@ export default function DuplicatesView() {
   return (
     <div className="space-y-6">
       <Hero
-        icon={Copy}
+        faIcon={faClone}
+        variant="primary"
         title="Duplicates"
         subtitle="Find and remove duplicate files to save space"
-        illustration="📋"
         actions={
           <Button
             onClick={() => runScan('root', 'user')}

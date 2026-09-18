@@ -1,0 +1,8 @@
+export { WaButton } from './wa-button'
+export { WaBadge } from './wa-badge'
+export { WaCard } from './wa-card'
+export { WaSwitch } from './wa-switch'
+export { WaCallout } from './wa-callout'
+export { WaProgressBar, WaProgressRing } from './wa-progress'
+export { WaTooltip } from './wa-tooltip'
+export { WaDialog } from './wa-dialog'

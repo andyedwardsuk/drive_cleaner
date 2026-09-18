@@ -231,3 +231,4 @@ server-backup/
 # tasks/
 client_secret.json
 .vscode/
+.npmrc

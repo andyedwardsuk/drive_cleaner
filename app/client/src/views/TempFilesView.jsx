@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { FileQuestion, Filter, RefreshCw, Eye, Search, X, Download, Sparkles } from 'lucide-react'
+import { faBroom } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -148,10 +149,10 @@ export default function TempFilesView() {
     return (
       <div className="space-y-6">
         <Hero
-          icon={FileQuestion}
+          faIcon={faBroom}
+          variant="amber"
           title="Temporary Files"
           subtitle="Find and remove system temporary files"
-          illustration="🗂️"
         />
         <div className="p-12 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
           <FileQuestion className="w-16 h-16 text-slate-600 mx-auto mb-4" />
@@ -173,10 +174,10 @@ export default function TempFilesView() {
     return (
       <div className="space-y-6">
         <Hero
-          icon={FileQuestion}
+          faIcon={faBroom}
+          variant="amber"
           title="Temporary Files"
           subtitle="Find and remove system temporary files"
-          illustration="🗂️"
         />
         <div className="p-16 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
           <RefreshCw className="w-8 h-8 animate-spin text-emerald-400 mx-auto mb-4" />
@@ -191,10 +192,10 @@ export default function TempFilesView() {
     return (
       <div className="space-y-6">
         <Hero
-          icon={FileQuestion}
+          faIcon={faBroom}
+          variant="amber"
           title="Temporary Files"
           subtitle="Find and remove system temporary files"
-          illustration="🗂️"
         />
         <div className="p-10 border border-red-500/30 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
           <p className="text-red-400 font-bold mb-2">Error loading temporary files</p>
@@ -215,10 +216,10 @@ export default function TempFilesView() {
     return (
       <div className="space-y-6">
         <Hero
-          icon={FileQuestion}
+          faIcon={faBroom}
+          variant="amber"
           title="Temporary Files"
           subtitle="Find and remove system temporary files"
-          illustration="🗂️"
         />
         <div className="p-12 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
           <Sparkles className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
@@ -232,10 +233,10 @@ export default function TempFilesView() {
   return (
     <div className="space-y-6">
       <Hero
-        icon={FileQuestion}
+        faIcon={faBroom}
+        variant="amber"
         title="Temporary Files"
         subtitle="Find and remove system temporary files"
-        illustration="🗂️"
         actions={
           <Button
             onClick={() => runScan('root', 'user')}

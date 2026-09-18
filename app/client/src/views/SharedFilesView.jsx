@@ -9,6 +9,7 @@ import {
   Sparkles,
   ShieldAlert,
 } from 'lucide-react'
+import { faShareNodes } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -246,7 +247,8 @@ export default function SharedFilesView() {
         title="Shared Files & Permission Auditor"
         subtitle="Audit sharing exposure, detect public links, distinguish ownership, and clean up unneeded shared items"
         badge="Active"
-        illustration="🌐"
+        faIcon={faShareNodes}
+        variant="cyan"
         actions={
           <div className="flex items-center gap-2">
             <Button

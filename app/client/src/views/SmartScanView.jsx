@@ -1,4 +1,5 @@
 import { Scan, FileText, Clock, Copy, Trash2, AlertCircle, CheckCircle, ChevronRight, FileSpreadsheet, Flame, Leaf, ExternalLink, RotateCcw, FolderSearch } from 'lucide-react'
+import { faCircleCheck, faMagnifyingGlassChart } from '@fortawesome/pro-duotone-svg-icons'
 import { useNavigate } from '@tanstack/react-router'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
@@ -297,7 +298,8 @@ export default function SmartScanView() {
           icon={Scan}
           title="Smart Scan"
           subtitle={`Analysed ${data.folder_name || targetLabel}`}
-          illustration="✅"
+          faIcon={faCircleCheck}
+          variant="emerald"
           actions={
             <div className="flex items-center gap-2">
               <Button
@@ -330,7 +332,8 @@ export default function SmartScanView() {
         icon={Scan}
         title="Smart Scan"
         subtitle="Comprehensive cleanup and carbon intelligence scan for your Google Drive"
-        illustration="🔍"
+        faIcon={faMagnifyingGlassChart}
+        variant="primary"
         actions={
           <Button
             onClick={handleStartScan}

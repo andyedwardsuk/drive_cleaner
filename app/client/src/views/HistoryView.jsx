@@ -11,6 +11,7 @@ import {
   HardDrive,
   FileCheck,
 } from 'lucide-react'
+import { faClockRotateLeft } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -76,11 +77,11 @@ export default function HistoryView() {
     <div className="space-y-6">
       {/* Hero Header */}
       <Hero
-        icon={History}
+        faIcon={faClockRotateLeft}
+        variant="primary"
         title="Scan & Action History"
         subtitle="Verifiable audit trail and timeline of all scans, trash operations, and restorations"
         badge="Active"
-        illustration="📋"
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <Button

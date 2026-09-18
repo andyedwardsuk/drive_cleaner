@@ -21,6 +21,7 @@ import {
   List,
   Eye
 } from 'lucide-react'
+import { faFireFlameCurved } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -301,7 +302,8 @@ export default function RotAnalysisView() {
           icon={Flame}
           title="Data ROT Analysis"
           subtitle="Enterprise Redundant, Obsolete, and Trivial governance for Drive"
-          illustration="🔥"
+          faIcon={faFireFlameCurved}
+          variant="rose"
         />
         <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
           <RefreshCw className="w-8 h-8 animate-spin text-rose-500 mx-auto mb-3" />
@@ -318,7 +320,8 @@ export default function RotAnalysisView() {
           icon={Flame}
           title="Data ROT Analysis"
           subtitle="Enterprise Redundant, Obsolete, and Trivial governance for Drive"
-          illustration="🔥"
+          faIcon={faFireFlameCurved}
+          variant="rose"
         />
         <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
           <Sparkles className="w-12 h-12 text-emerald-400 mx-auto mb-4" />
@@ -343,7 +346,8 @@ export default function RotAnalysisView() {
         icon={Flame}
         title="Data ROT Analysis & Hoarding Assessment"
         subtitle="Identify Redundant, Obsolete, and Trivial files and gamify your cleanup with psychological clutter scoring."
-        illustration="🔥"
+        faIcon={faFireFlameCurved}
+        variant="rose"
       />
 
       {/* Hero Metrics Row */}

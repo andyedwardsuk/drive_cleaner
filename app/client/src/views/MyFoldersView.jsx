@@ -14,6 +14,7 @@ import {
   Sparkles,
 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
+import { faFolderTree } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -157,7 +158,8 @@ export default function MyFoldersView() {
         icon={FolderHeart}
         title="My Folders"
         subtitle="Attach, organise, and quickly scan specific Google Drive folders"
-        illustration="📁"
+        faIcon={faFolderTree}
+        variant="emerald"
         actions={
           <Button
             size="lg"

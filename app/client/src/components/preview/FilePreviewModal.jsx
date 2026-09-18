@@ -1,34 +1,32 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  X,
-  ExternalLink,
-  Copy,
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  Trash2,
-  HardDrive,
-  Clock,
-  User,
-  Users,
-  Folder,
-  FileText,
-  FileSpreadsheet,
-  FileCode,
-  Image as ImageIcon,
-  Film,
-  Music,
-  Maximize2,
-  Minimize2,
-  Star,
-  ShieldCheck,
-  Sparkles,
-} from 'lucide-react'
+  faXmark,
+  faArrowUpRightFromSquare,
+  faCopy,
+  faCheck,
+  faChevronLeft,
+  faChevronRight,
+  faTrashCan,
+  faHardDrive,
+  faClock,
+  faUser,
+  faUsers,
+  faFolder,
+  faFileLines,
+  faFileSpreadsheet,
+  faFileCode,
+  faImage,
+  faFilm,
+  faMusic,
+  faExpand,
+  faCompress,
+  faStar,
+} from '@fortawesome/pro-duotone-svg-icons'
 import { useFilePreview } from '@/hooks/useFilePreview'
 import { useFileActions } from '@/hooks/useFileActions'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { WaButton, WaBadge } from '@/components/ui/webawesome'
 import { cn } from '@/lib/utils'
 
 // Helpers
@@ -73,18 +71,18 @@ function formatRelativeTime(dateStr) {
   }
 }
 
-function getFileIcon(mimeType = '') {
-  if (mimeType.includes('image')) return ImageIcon
-  if (mimeType.includes('video')) return Film
-  if (mimeType.includes('audio')) return Music
+function getFileFaIcon(mimeType = '') {
+  if (mimeType.includes('image')) return faImage
+  if (mimeType.includes('video')) return faFilm
+  if (mimeType.includes('audio')) return faMusic
   if (mimeType.includes('spreadsheet') || mimeType.includes('excel') || mimeType.includes('sheet'))
-    return FileSpreadsheet
+    return faFileSpreadsheet
   if (mimeType.includes('document') || mimeType.includes('word') || mimeType.includes('pdf'))
-    return FileText
+    return faFileLines
   if (mimeType.includes('script') || mimeType.includes('json') || mimeType.includes('html'))
-    return FileCode
-  if (mimeType.includes('folder')) return Folder
-  return FileText
+    return faFileCode
+  if (mimeType.includes('folder')) return faFolder
+  return faFileLines
 }
 
 export default function FilePreviewModal() {
@@ -135,7 +133,7 @@ export default function FilePreviewModal() {
 
   if (!isOpen || !activeFile) return null
 
-  const IconComponent = getFileIcon(activeFile.mimeType)
+  const fileFaIcon = getFileFaIcon(activeFile.mimeType)
   const isImage =
     activeFile.mimeType.startsWith('image/') ||
     (activeFile.thumbnailLink && !activeFile.mimeType.includes('folder'))
@@ -186,13 +184,13 @@ export default function FilePreviewModal() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
           transition={{ duration: 0.2 }}
-          className="relative z-10 w-full max-w-5xl max-h-[92vh] flex flex-col rounded-2xl bg-slate-900/95 border border-slate-800 shadow-2xl overflow-hidden backdrop-blur-xl"
+          className="relative z-10 w-full max-w-5xl max-h-[92vh] flex flex-col rounded-3xl bg-slate-900/95 border border-slate-800 shadow-2xl overflow-hidden backdrop-blur-xl"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-800 bg-slate-900/80">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-900/80">
             <div className="flex items-center gap-3 min-w-0 pr-4">
-              <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400 flex-shrink-0">
-                <IconComponent className="w-5 h-5" />
+              <div className="p-2.5 rounded-xl bg-blue-500/15 text-blue-400 flex-shrink-0 border border-blue-500/20">
+                <FontAwesomeIcon icon={fileFaIcon} className="w-5 h-5" />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
@@ -203,7 +201,7 @@ export default function FilePreviewModal() {
                     {activeFile.fileName}
                   </h2>
                   {activeFile.starred && (
-                    <Star className="w-4 h-4 text-amber-400 fill-amber-400 flex-shrink-0" />
+                    <FontAwesomeIcon icon={faStar} className="w-4 h-4 text-amber-400 flex-shrink-0" />
                   )}
                 </div>
                 <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
@@ -217,15 +215,15 @@ export default function FilePreviewModal() {
             {/* Pagination Controls & Close */}
             <div className="flex items-center gap-2 flex-shrink-0">
               {fileList.length > 1 && (
-                <div className="flex items-center gap-1 bg-slate-800/80 rounded-lg p-1 border border-slate-800 mr-2">
+                <div className="flex items-center gap-1 bg-slate-800/80 rounded-xl p-1 border border-slate-800 mr-2">
                   <button
                     type="button"
                     onClick={prevFile}
                     disabled={!hasPrev}
                     aria-label="Previous file"
-                    className="p-1 rounded text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    className="p-1 rounded-lg text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   >
-                    <ChevronLeft className="w-4 h-4" />
+                    <FontAwesomeIcon icon={faChevronLeft} className="w-3.5 h-3.5" />
                   </button>
                   <span className="text-xs text-slate-400 px-1 font-mono">
                     {currentIndex + 1}/{fileList.length}
@@ -235,9 +233,9 @@ export default function FilePreviewModal() {
                     onClick={nextFile}
                     disabled={!hasNext}
                     aria-label="Next file"
-                    className="p-1 rounded text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    className="p-1 rounded-lg text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   >
-                    <ChevronRight className="w-4 h-4" />
+                    <FontAwesomeIcon icon={faChevronRight} className="w-3.5 h-3.5" />
                   </button>
                 </div>
               )}
@@ -246,15 +244,15 @@ export default function FilePreviewModal() {
                 type="button"
                 onClick={closePreview}
                 aria-label="Close preview"
-                className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
               >
-                <X className="w-5 h-5" />
+                <FontAwesomeIcon icon={faXmark} className="w-5 h-5" />
               </button>
             </div>
           </div>
 
           {/* Main Modal Body (Split Preview & Details) */}
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-12 overflow-y-auto divide-y md:divide-y-0 md:divide-x divide-glass-border">
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-12 overflow-y-auto divide-y md:divide-y-0 md:divide-x divide-slate-800">
             {/* Left Column: Live Preview (7 cols) */}
             <div className="md:col-span-7 p-4 sm:p-6 flex flex-col items-center justify-center bg-slate-950/50 min-h-[320px] md:min-h-[460px] relative">
               {isImage && (activeFile.thumbnailLink || activeFile.driveLink) ? (
@@ -274,11 +272,11 @@ export default function FilePreviewModal() {
                     className="absolute bottom-3 right-3 p-1.5 rounded-lg bg-black/60 text-slate-300 hover:text-white backdrop-blur-sm border border-slate-800"
                     title={isZoomed ? 'Zoom out' : 'Zoom in'}
                   >
-                    {isZoomed ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                    <FontAwesomeIcon icon={isZoomed ? faCompress : faExpand} className="w-4 h-4" />
                   </button>
                 </div>
               ) : canEmbed && activeFile.previewLink ? (
-                <div className="w-full h-full min-h-[380px] flex flex-col rounded-xl overflow-hidden border border-slate-800 bg-slate-900/80 relative">
+                <div className="w-full h-full min-h-[380px] flex flex-col rounded-2xl overflow-hidden border border-slate-800 bg-slate-900/80 relative">
                   {!iframeLoaded && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/90 z-10">
                       <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin mb-3" />
@@ -297,7 +295,7 @@ export default function FilePreviewModal() {
                 /* Fallback preview card */
                 <div className="text-center p-8 max-w-md">
                   <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
-                    <IconComponent className="w-10 h-10" />
+                    <FontAwesomeIcon icon={fileFaIcon} className="w-10 h-10" />
                   </div>
                   <h3 className="text-lg font-semibold text-white mb-1">
                     {activeFile.fileName}
@@ -305,13 +303,14 @@ export default function FilePreviewModal() {
                   <p className="text-sm text-slate-400 mb-6">
                     Direct in-app stream not available for this file type. You can inspect all metadata on the right or view directly in Google Drive.
                   </p>
-                  <Button
+                  <WaButton
+                    variant="brand"
+                    appearance="filled"
                     onClick={() => window.open(activeFile.driveLink, '_blank')}
-                    className="gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+                    startIcon={<FontAwesomeIcon icon={faArrowUpRightFromSquare} className="w-4 h-4" />}
                   >
-                    <ExternalLink className="w-4 h-4" />
                     Open in Google Drive
-                  </Button>
+                  </WaButton>
                 </div>
               )}
             </div>
@@ -320,8 +319,8 @@ export default function FilePreviewModal() {
             <div className="md:col-span-5 p-5 sm:p-6 flex flex-col justify-between bg-slate-900/70 space-y-6">
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
-                    <HardDrive className="w-4 h-4 text-blue-400" />
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                    <FontAwesomeIcon icon={faHardDrive} className="w-3.5 h-3.5 text-blue-400" />
                     Storage & Location
                   </h3>
                   <div className="space-y-2.5 text-sm">
@@ -338,7 +337,7 @@ export default function FilePreviewModal() {
                     <div className="flex justify-between items-center py-1 border-b border-slate-800">
                       <span className="text-slate-400">Folder</span>
                       <span className="text-slate-200 flex items-center gap-1.5 truncate max-w-[200px]" title={activeFile.parentName}>
-                        <Folder className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
+                        <FontAwesomeIcon icon={faFolder} className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
                         <span className="truncate">{activeFile.parentName}</span>
                       </span>
                     </div>
@@ -354,8 +353,8 @@ export default function FilePreviewModal() {
 
                 {/* Timeline & Lifecycle */}
                 <div>
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
-                    <Clock className="w-4 h-4 text-amber-400" />
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                    <FontAwesomeIcon icon={faClock} className="w-3.5 h-3.5 text-amber-400" />
                     Timeline & Activity
                   </h3>
                   <div className="space-y-2.5 text-sm">
@@ -392,39 +391,40 @@ export default function FilePreviewModal() {
 
                 {/* Access & Sharing */}
                 <div>
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
-                    <Users className="w-4 h-4 text-emerald-400" />
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                    <FontAwesomeIcon icon={faUsers} className="w-3.5 h-3.5 text-emerald-400" />
                     Access & Ownership
                   </h3>
                   <div className="space-y-2.5 text-sm">
                     <div className="flex justify-between items-center py-1 border-b border-slate-800">
                       <span className="text-slate-400">Owner</span>
                       <span className="text-slate-200 flex items-center gap-1.5 truncate max-w-[200px]" title={activeFile.ownerNames}>
-                        <User className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                        <FontAwesomeIcon icon={faUser} className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
                         <span className="truncate">{activeFile.ownerNames}</span>
                       </span>
                     </div>
 
                     <div className="flex justify-between items-center py-1 border-b border-slate-800">
                       <span className="text-slate-400">Sharing Status</span>
-                      <Badge
+                      <WaBadge
                         variant={
                           activeFile.sharingStatus === 'Private'
-                            ? 'outline'
+                            ? 'neutral'
                             : activeFile.sharingStatus === 'Public'
-                            ? 'destructive'
-                            : 'default'
+                            ? 'danger'
+                            : 'brand'
                         }
-                        className="text-xs"
+                        appearance="outlined"
+                        pill
                       >
                         {activeFile.sharingStatus}
-                      </Badge>
+                      </WaBadge>
                     </div>
                   </div>
                 </div>
 
                 {/* Drive File ID */}
-                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
+                <div className="p-3 rounded-2xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
                   <div className="min-w-0 pr-2">
                     <div className="text-xs text-slate-400 font-mono truncate">
                       ID: {activeFile.fileId}
@@ -436,57 +436,53 @@ export default function FilePreviewModal() {
                     className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors flex-shrink-0"
                     title="Copy File ID"
                   >
-                    {copiedId ? (
-                      <Check className="w-4 h-4 text-emerald-400" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
+                    <FontAwesomeIcon
+                      icon={copiedId ? faCheck : faCopy}
+                      className={cn('w-4 h-4', copiedId ? 'text-emerald-400' : 'text-slate-400')}
+                    />
                   </button>
                 </div>
               </div>
 
               {/* Action Bar */}
-              <div className="pt-4 border-t border-slate-800 space-y-2">
+              <div className="pt-4 border-t border-slate-800 space-y-2.5">
                 <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
+                  <WaButton
+                    variant="neutral"
+                    appearance="outlined"
+                    size="small"
                     onClick={() => window.open(activeFile.driveLink, '_blank')}
-                    className="gap-1.5 text-xs text-slate-200 hover:text-white border-slate-800 hover:bg-slate-800"
+                    startIcon={<FontAwesomeIcon icon={faArrowUpRightFromSquare} className="w-3.5 h-3.5" />}
                   >
-                    <ExternalLink className="w-3.5 h-3.5" />
                     Open in Drive
-                  </Button>
+                  </WaButton>
 
-                  <Button
-                    variant="outline"
-                    size="sm"
+                  <WaButton
+                    variant="neutral"
+                    appearance="outlined"
+                    size="small"
                     onClick={handleCopyLink}
-                    className="gap-1.5 text-xs text-slate-200 hover:text-white border-slate-800 hover:bg-slate-800"
+                    startIcon={
+                      <FontAwesomeIcon
+                        icon={copiedLink ? faCheck : faCopy}
+                        className={cn('w-3.5 h-3.5', copiedLink ? 'text-emerald-400' : 'text-slate-400')}
+                      />
+                    }
                   >
-                    {copiedLink ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
-                        Copied!
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3.5 h-3.5" />
-                        Copy Link
-                      </>
-                    )}
-                  </Button>
+                    {copiedLink ? 'Copied!' : 'Copy Link'}
+                  </WaButton>
                 </div>
 
-                <Button
-                  variant="destructive"
-                  size="sm"
+                <WaButton
+                  variant="danger"
+                  appearance="filled"
+                  size="small"
                   onClick={handleTrashFromPreview}
-                  className="w-full gap-2 bg-red-600/90 hover:bg-red-600 text-white"
+                  startIcon={<FontAwesomeIcon icon={faTrashCan} className="w-4 h-4" />}
+                  className="w-full"
                 >
-                  <Trash2 className="w-4 h-4" />
                   Move to Trash
-                </Button>
+                </WaButton>
               </div>
             </div>
           </div>

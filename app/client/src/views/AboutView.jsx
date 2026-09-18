@@ -1,4 +1,5 @@
 import { Info, Github, Bug, Mail, Shield, CheckCircle2, Cpu, HardDrive } from 'lucide-react'
+import { faCircleInfo } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { APP_VERSION, BUILD_TIMESTAMP, FEATURES } from '@/version'
@@ -7,10 +8,10 @@ export default function AboutView() {
   return (
     <div className="space-y-6">
       <Hero
-        icon={Info}
+        faIcon={faCircleInfo}
+        variant="cyan"
         title="About Drive Cleaner"
         subtitle="Version specifications, architecture summary, and privacy standards"
-        illustration="ℹ️"
       />
 
       <div className="grid gap-6 md:grid-cols-2">
