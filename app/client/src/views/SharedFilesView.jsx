@@ -4,19 +4,21 @@ import {
   Globe,
   ArrowUpRight,
   ArrowDownLeft,
-  Lock,
+  RefreshCw,
   Search,
-  Sparkles,
   ShieldAlert,
+  Clock,
+  CheckCircle2,
 } from 'lucide-react'
 import { faShareNodes } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import FileTable from '@/components/FileTable'
-import { useSmartScan } from '@/hooks/useSmartScan'
+import { useSecurityAudit } from '@/hooks/useSecurityAudit'
 import { useNavigate } from '@tanstack/react-router'
 import SharingAuditorCard from '@/components/sharing/SharingAuditorCard'
+import { cn } from '@/lib/utils'
 
 // Format bytes
 function formatBytes(bytes) {
@@ -27,180 +29,158 @@ function formatBytes(bytes) {
   return `${(bytes / Math.pow(k, i)).toFixed(1)} ${sizes[i]}`
 }
 
+// Determine file category from MIME type or file extension
+function getFileCategory(mimeType = '', fileName = '') {
+  const lowerMime = (mimeType || '').toLowerCase()
+  const lowerName = (fileName || '').toLowerCase()
+  if (lowerMime === 'application/vnd.google-apps.folder') return 'Folder'
+  if (lowerMime.includes('pdf') || lowerName.endsWith('.pdf')) return 'PDF'
+  if (
+    lowerMime.includes('spreadsheet') ||
+    lowerMime.includes('excel') ||
+    lowerName.endsWith('.xlsx') ||
+    lowerName.endsWith('.csv') ||
+    lowerName.endsWith('.sheet')
+  )
+    return 'Spreadsheet'
+  if (
+    lowerMime.includes('document') ||
+    lowerMime.includes('word') ||
+    lowerName.endsWith('.docx') ||
+    lowerName.endsWith('.doc')
+  )
+    return 'Document'
+  if (
+    lowerMime.includes('presentation') ||
+    lowerMime.includes('powerpoint') ||
+    lowerName.endsWith('.pptx')
+  )
+    return 'Presentation'
+  if (lowerMime.startsWith('image/') || /\.(jpg|jpeg|png|gif|webp|svg)$/.test(lowerName))
+    return 'Image'
+  if (lowerMime.startsWith('video/') || /\.(mp4|mov|avi|mkv|webm)$/.test(lowerName))
+    return 'Video'
+  if (lowerMime.startsWith('audio/') || /\.(mp3|wav|ogg|m4a)$/.test(lowerName))
+    return 'Audio'
+  if (
+    lowerMime.includes('zip') ||
+    lowerMime.includes('archive') ||
+    lowerMime.includes('compressed') ||
+    /\.(zip|tar|gz|rar|7z)$/.test(lowerName)
+  )
+    return 'Archive'
+  if (
+    lowerMime.includes('text') ||
+    /\.(txt|md|log|json|xml|html|js|jsx|ts|tsx)$/.test(lowerName)
+  )
+    return 'Text'
+  return 'Other'
+}
+
 export default function SharedFilesView() {
   const navigate = useNavigate()
-  const { scanData, isScanning, startScan } = useSmartScan()
-  const [activeFilter, setActiveFilter] = useState('all') // 'all', 'public', 'by_me', 'with_me', 'private'
+  const {
+    loading,
+    error,
+    refresh,
+    report,
+    publicLinks = [],
+    externalDomainShares = [],
+    staleCollaborators = [],
+    allShared = [],
+  } = useSecurityAudit()
 
-  // Extract shared files from scanData or provide realistic sample data
-  const { allShared, publicFiles, sharedByMe, sharedWithMe, privateFiles } = useMemo(() => {
-    const rawFiles = scanData?.files || []
+  const [activeFilter, setActiveFilter] = useState('all') // 'all', 'public', 'by_me', 'with_me', 'external', 'stale'
 
-    if (rawFiles.length === 0) {
-      // Realistic initial sample files for immediate testing
-      const sample = [
-        {
-          fileId: 'shared-pub-1',
-          fileName: 'Product_Roadmap_2024_Public_Deck.pdf',
-          fileSize: '14.8 MB',
-          fileSizeBytes: 15518924,
-          fileCategory: 'PDF',
-          modifiedDate: '2024-02-18',
-          ownerNames: 'Me',
-          sharingStatus: 'Public',
-          parentName: 'Product Strategy',
-          mimeType: 'application/pdf',
-          isPublic: true,
-          isSharedByMe: true,
-          isSharedWithMe: false,
-        },
-        {
-          fileId: 'shared-pub-2',
-          fileName: 'Brand_Assets_Logo_Pack.zip',
-          fileSize: '48.2 MB',
-          fileSizeBytes: 50541363,
-          fileCategory: 'Archive',
-          modifiedDate: '2023-11-05',
-          ownerNames: 'Me',
-          sharingStatus: 'Public',
-          parentName: 'Marketing Media',
-          mimeType: 'application/zip',
-          isPublic: true,
-          isSharedByMe: true,
-          isSharedWithMe: false,
-        },
-        {
-          fileId: 'shared-byme-1',
-          fileName: 'Q3_Financial_Projections.xlsx',
-          fileSize: '3.4 MB',
-          fileSizeBytes: 3565158,
-          fileCategory: 'Spreadsheet',
-          modifiedDate: '2024-01-22',
-          ownerNames: 'Me',
-          sharingStatus: 'Shared',
-          parentName: 'Finance',
-          mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          isPublic: false,
-          isSharedByMe: true,
-          isSharedWithMe: false,
-        },
-        {
-          fileId: 'shared-byme-2',
-          fileName: 'Client_Contract_NDA_Template.docx',
-          fileSize: '820 KB',
-          fileSizeBytes: 839680,
-          fileCategory: 'Document',
-          modifiedDate: '2023-09-14',
-          ownerNames: 'Me',
-          sharingStatus: 'Shared',
-          parentName: 'Legal',
-          mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          isPublic: false,
-          isSharedByMe: true,
-          isSharedWithMe: false,
-        },
-        {
-          fileId: 'shared-withme-1',
-          fileName: 'External_Consultant_Audit_Report.pdf',
-          fileSize: '22.1 MB',
-          fileSizeBytes: 23173529,
-          fileCategory: 'PDF',
-          modifiedDate: '2023-07-30',
-          ownerNames: 'Sarah Jenkins (external@consulting.co)',
-          sharingStatus: 'Shared',
-          parentName: 'Audits',
-          mimeType: 'application/pdf',
-          isPublic: false,
-          isSharedByMe: false,
-          isSharedWithMe: true,
-        },
-        {
-          fileId: 'shared-withme-2',
-          fileName: 'Vendor_Hardware_Quotes_2023.xlsx',
-          fileSize: '1.9 MB',
-          fileSizeBytes: 1992294,
-          fileCategory: 'Spreadsheet',
-          modifiedDate: '2023-05-12',
-          ownerNames: 'Procurement Vendor (orders@hardware-sys.com)',
-          sharingStatus: 'Shared',
-          parentName: 'IT Operations',
-          mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          isPublic: false,
-          isSharedByMe: false,
-          isSharedWithMe: true,
-        },
-        {
-          fileId: 'priv-1',
-          fileName: 'Personal_Notes_Draft.txt',
-          fileSize: '12 KB',
-          fileSizeBytes: 12288,
-          fileCategory: 'Text',
-          modifiedDate: '2024-03-01',
-          ownerNames: 'Me',
-          sharingStatus: 'Private',
-          parentName: 'Notes',
-          mimeType: 'text/plain',
-          isPublic: false,
-          isSharedByMe: false,
-          isSharedWithMe: false,
-        },
-      ]
+  // Process and normalize files from the live security audit report
+  const {
+    normalizedAll,
+    publicFiles,
+    sharedByMe,
+    sharedWithMe,
+    externalDomainFiles,
+    staleFiles,
+  } = useMemo(() => {
+    const rawFiles = report?.allShared || allShared || []
 
-      const pub = sample.filter((f) => f.isPublic)
-      const byMe = sample.filter((f) => f.isSharedByMe)
-      const withMe = sample.filter((f) => f.isSharedWithMe)
-      const priv = sample.filter((f) => f.sharingStatus === 'Private')
-      const allSh = sample.filter((f) => f.sharingStatus !== 'Private')
-
-      return {
-        allShared: allSh,
-        publicFiles: pub,
-        sharedByMe: byMe,
-        sharedWithMe: withMe,
-        privateFiles: priv,
-      }
-    }
-
-    // Process actual files from scan
     const pub = []
     const byMe = []
     const withMe = []
-    const priv = []
-    const allSh = []
+    const extDom = []
+    const stale = []
+    const allList = []
 
     rawFiles.forEach((file) => {
-      const isShared = file.shared || (file.sharingStatus && file.sharingStatus !== 'Private')
-      const isPublic = file.sharingStatus === 'Public'
+      const fileId = file.fileId || file.id || ''
+      const fileName = file.fileName || file.title || 'Untitled'
+      const mimeType = file.mimeType || ''
+      const sizeBytes = Number(file.sizeBytes || file.fileSizeBytes || file.size || 0)
+      const fileSize = formatBytes(sizeBytes)
+      const fileCategory = getFileCategory(mimeType, fileName)
+      const modifiedDate = file.modifiedDate
+        ? new Date(file.modifiedDate).toLocaleDateString()
+        : 'Unknown'
+      const createdDate = file.createdDate
+        ? new Date(file.createdDate).toLocaleDateString()
+        : 'Unknown'
+      const ownerNames = file.ownerNames || 'You'
+      const isPublic = !!file.isPublic
+      const sharingStatus = isPublic ? 'Public' : 'Shared'
+      const driveLink =
+        file.driveLink || (fileId ? `https://drive.google.com/file/d/${fileId}/view` : '')
+      const parentName = file.parentName || 'My Drive'
 
-      // Check if user is owner
       const isOwner =
         !file.ownerNames ||
+        file.ownerNames.toLowerCase() === 'you' ||
         file.ownerNames.toLowerCase() === 'me' ||
         file.ownerNames.includes('(me)') ||
-        !file.ownerNames.includes('@')
+        file.ownerNames.toLowerCase() === 'owner' ||
+        (file.collaborators &&
+          file.collaborators.length > 0 &&
+          !file.collaborators.some((c) => c.role === 'owner'))
 
-      const enhancedFile = {
+      const normalized = {
         ...file,
+        fileId,
+        fileName,
+        fileSize,
+        fileSizeBytes: sizeBytes,
+        fileCategory,
+        modifiedDate,
+        createdDate,
+        ownerNames,
+        sharingStatus,
+        parentName,
+        driveLink,
+        mimeType,
+        starred: !!file.starred,
         isPublic,
-        isSharedByMe: isShared && isOwner,
-        isSharedWithMe: isShared && !isOwner,
+        isSharedByMe: isOwner,
+        isSharedWithMe: !isOwner,
+        hasExternalShares: !!file.hasExternalShares,
+        isStaleShare: !!file.isStaleShare,
       }
 
-      if (isPublic) pub.push(enhancedFile)
-      if (enhancedFile.isSharedByMe) byMe.push(enhancedFile)
-      if (enhancedFile.isSharedWithMe) withMe.push(enhancedFile)
-      if (!isShared) priv.push(enhancedFile)
-      if (isShared) allSh.push(enhancedFile)
+      allList.push(normalized)
+      if (isPublic) pub.push(normalized)
+      if (isOwner) byMe.push(normalized)
+      if (!isOwner) withMe.push(normalized)
+      if (file.hasExternalShares || (file.externalDomains && file.externalDomains.length > 0)) {
+        extDom.push(normalized)
+      }
+      if (file.isStaleShare) stale.push(normalized)
     })
 
     return {
-      allShared: allSh,
+      normalizedAll: allList,
       publicFiles: pub,
       sharedByMe: byMe,
       sharedWithMe: withMe,
-      privateFiles: priv,
+      externalDomainFiles: extDom,
+      staleFiles: stale,
     }
-  }, [scanData])
+  }, [report?.allShared, allShared])
 
   // Filtered files for table display
   const displayedFiles = useMemo(() => {
@@ -211,22 +191,24 @@ export default function SharedFilesView() {
         return sharedByMe
       case 'with_me':
         return sharedWithMe
-      case 'private':
-        return privateFiles
+      case 'external':
+        return externalDomainFiles
+      case 'stale':
+        return staleFiles
       case 'all':
       default:
-        return allShared
+        return normalizedAll
     }
-  }, [activeFilter, allShared, publicFiles, sharedByMe, sharedWithMe, privateFiles])
+  }, [activeFilter, normalizedAll, publicFiles, sharedByMe, sharedWithMe, externalDomainFiles, staleFiles])
 
   // Aggregate bytes
-  const publicBytes = publicFiles.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0)
-  const sharedByMeBytes = sharedByMe.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0)
-  const sharedWithMeBytes = sharedWithMe.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0)
-  const totalSharedBytes = allShared.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0)
+  const publicBytes = useMemo(() => publicFiles.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0), [publicFiles])
+  const sharedByMeBytes = useMemo(() => sharedByMe.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0), [sharedByMe])
+  const sharedWithMeBytes = useMemo(() => sharedWithMe.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0), [sharedWithMe])
+  const totalSharedBytes = useMemo(() => normalizedAll.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0), [normalizedAll])
 
   const filterTabs = [
-    { id: 'all', label: 'All Shared', count: allShared.length, icon: Users },
+    { id: 'all', label: 'All Shared', count: normalizedAll.length, icon: Users },
     {
       id: 'public',
       label: 'Public Links',
@@ -236,7 +218,18 @@ export default function SharedFilesView() {
     },
     { id: 'by_me', label: 'Shared by Me', count: sharedByMe.length, icon: ArrowUpRight },
     { id: 'with_me', label: 'Shared with Me', count: sharedWithMe.length, icon: ArrowDownLeft },
-    { id: 'private', label: 'Private Only', count: privateFiles.length, icon: Lock },
+    {
+      id: 'external',
+      label: 'External Domains',
+      count: externalDomainFiles.length,
+      icon: ShieldAlert,
+    },
+    {
+      id: 'stale',
+      label: 'Stale Shares (>180d)',
+      count: staleFiles.length,
+      icon: Clock,
+    },
   ]
 
   return (
@@ -257,15 +250,15 @@ export default function SharedFilesView() {
               className="h-11 px-4 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 text-xs font-semibold"
             >
               <Search className="w-4 h-4 mr-2" />
-              Configure Folder
+              Configure Scope
             </Button>
             <Button
-              onClick={startScan}
-              disabled={isScanning}
-              className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-900/40 text-xs"
+              onClick={refresh}
+              disabled={loading}
+              className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-900/40 text-xs transition-all active:scale-95"
             >
-              <Sparkles className="w-4 h-4 mr-2" />
-              {isScanning ? 'Scanning Drive...' : 'Re-Scan Drive'}
+              <RefreshCw className={cn('w-4 h-4 mr-2', loading && 'animate-spin')} />
+              {loading ? 'Auditing Sharing...' : 'Refresh Audit'}
             </Button>
           </div>
         }
@@ -279,11 +272,22 @@ export default function SharedFilesView() {
         sharedByMeBytes={sharedByMeBytes}
         sharedWithMeCount={sharedWithMe.length}
         sharedWithMeBytes={sharedWithMeBytes}
-        totalSharedCount={allShared.length}
+        totalSharedCount={normalizedAll.length}
         totalSharedBytes={totalSharedBytes}
         activeFilter={activeFilter}
         onSelectFilter={setActiveFilter}
       />
+
+      {/* Empty State Banner if zero shared items */}
+      {!loading && normalizedAll.length === 0 && (
+        <div className="flex items-center gap-3 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+          <div>
+            <span className="font-semibold text-emerald-200">No Shared Files Detected: </span>
+            Your scanned Drive items have no external collaborators or public web links active.
+          </div>
+        </div>
+      )}
 
       {/* Filter Tabs & Active Pool Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm shadow-xl">
@@ -330,8 +334,9 @@ export default function SharedFilesView() {
 
       {/* Candidate File Table with Row Selection & Safe Trash */}
       <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm shadow-xl">
-        <FileTable data={displayedFiles} />
+        <FileTable data={displayedFiles} loading={loading} />
       </div>
     </div>
   )
 }
+
