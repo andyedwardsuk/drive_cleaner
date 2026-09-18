@@ -136,6 +136,14 @@ function build() {
   copyFiles(config.serverDir, config.outputDir);
   console.log('✓ Server files copied\n');
 
+  // Copy appsscript.json to dist
+  const appsscriptSrc = path.join(config.serverDir, 'appsscript.json');
+  const appsscriptDest = path.join(config.outputDir, 'appsscript.json');
+  if (fs.existsSync(appsscriptSrc)) {
+    fs.copyFileSync(appsscriptSrc, appsscriptDest);
+    console.log('✓ Copied: appsscript.json');
+  }
+
   // Copy React build output (index.html) to dist
   if (fs.existsSync(config.clientBuildDir)) {
     console.log('📋 Copying React build output...');
