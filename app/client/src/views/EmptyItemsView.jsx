@@ -33,7 +33,7 @@ function TypeFilterChip({ label, icon, active, onClick }) {
     <button
       onClick={onClick}
       className={cn(
-        'inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all',
+        'h-11 inline-flex items-center gap-2 px-3.5 rounded-xl text-xs font-semibold border transition-all',
         active
           ? 'bg-purple-600 border-purple-500 text-white shadow-md shadow-purple-900/30'
           : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white'
@@ -60,10 +60,10 @@ function EmptyItemsSummary({ totalCount, folderCount, fileCount }) {
             Empty Items Found
           </p>
           <p className="text-3xl font-bold text-white tracking-tight">
-            {totalCount} items
+            {totalCount} {totalCount === 1 ? 'item' : 'items'}
           </p>
           <p className="text-xs text-slate-400 mt-1">
-            {folderCount} empty directories • {fileCount} zero-byte files
+            {folderCount} empty {folderCount === 1 ? 'directory' : 'directories'} • {fileCount} zero-byte {fileCount === 1 ? 'file' : 'files'}
           </p>
         </div>
       </div>
@@ -212,49 +212,16 @@ export default function EmptyItemsView() {
         fileCount={fileCount}
       />
 
-      {/* Type Filters & Search Controls (All h-11) */}
-      <div className="p-5 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm space-y-4 shadow-xl">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex flex-wrap gap-2">
-            <TypeFilterChip
-              label={`All Items (${folderCount + fileCount})`}
-              icon={faLayerGroup}
-              active={typeFilter === 'all'}
-              onClick={() => setTypeFilter('all')}
-            />
-            <TypeFilterChip
-              label={`Folders Only (${folderCount})`}
-              icon={faFolderOpen}
-              active={typeFilter === 'folders'}
-              onClick={() => setTypeFilter('folders')}
-            />
-            <TypeFilterChip
-              label={`0-Byte Files (${fileCount})`}
-              icon={faFileSlash}
-              active={typeFilter === 'files'}
-              onClick={() => setTypeFilter('files')}
-            />
-          </div>
-
-          <Button
-            variant="outline"
-            onClick={handleExportCSV}
-            disabled={filteredItems.length === 0}
-            className="w-full sm:w-auto h-11 px-4 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 text-xs font-semibold"
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Export CSV
-          </Button>
-        </div>
-
-        <div className="relative w-full">
+      {/* Search & Filter Toolbar (All h-11) */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="relative w-full sm:w-72">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input
             type="text"
             placeholder="Search empty items..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-11 pl-10 bg-slate-950/80 border-slate-800 rounded-xl text-sm placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-blue-500"
+            className="h-11 pl-10 bg-slate-950/80 border-slate-800 rounded-xl text-sm placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-purple-500"
           />
           {searchQuery && (
             <button
@@ -264,6 +231,37 @@ export default function EmptyItemsView() {
               <X className="h-4 w-4" />
             </button>
           )}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
+          <TypeFilterChip
+            label={`All (${folderCount + fileCount})`}
+            icon={faLayerGroup}
+            active={typeFilter === 'all'}
+            onClick={() => setTypeFilter('all')}
+          />
+          <TypeFilterChip
+            label={`Folders (${folderCount})`}
+            icon={faFolderOpen}
+            active={typeFilter === 'folders'}
+            onClick={() => setTypeFilter('folders')}
+          />
+          <TypeFilterChip
+            label={`Files (${fileCount})`}
+            icon={faFileSlash}
+            active={typeFilter === 'files'}
+            onClick={() => setTypeFilter('files')}
+          />
+
+          <Button
+            variant="outline"
+            onClick={handleExportCSV}
+            disabled={filteredItems.length === 0}
+            className="h-11 px-4 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 text-xs font-semibold shrink-0"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
+          </Button>
         </div>
       </div>
 
@@ -355,6 +353,16 @@ export default function EmptyItemsView() {
             )}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Help / Guidance Footer Card */}
+      <div className="p-5 border border-slate-800/70 rounded-2xl bg-slate-900/40 backdrop-blur-sm">
+        <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+          About Empty Items
+        </h4>
+        <p className="text-xs text-slate-400 leading-relaxed">
+          Empty items include empty directories with no child files, and 0-byte abandoned files. Deleting empty directories and 0-byte stubs keeps your folder hierarchy clean and organized without affecting actual data.
+        </p>
       </div>
     </div>
   )

@@ -58,7 +58,7 @@ function TempFilesSummary({ totalSize, fileCount }) {
             Temporary & System Files Found
           </p>
           <p className="text-3xl font-bold text-white tracking-tight">
-            {fileCount} files
+            {fileCount} {fileCount === 1 ? 'file' : 'files'}
           </p>
           <p className="text-xs text-slate-400 mt-1">
             <span className="text-emerald-300 font-semibold">{formatBytes(totalSize)}</span> of clutter to reclaim
@@ -210,14 +210,14 @@ export default function TempFilesView() {
 
       {/* Search & Export Toolbar (All h-11) */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="relative w-full sm:w-80">
+        <div className="relative w-full sm:w-72">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input
             type="text"
             placeholder="Search temporary files..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-11 pl-10 bg-slate-950/80 border-slate-800 rounded-xl text-sm placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-blue-500"
+            className="h-11 pl-10 bg-slate-950/80 border-slate-800 rounded-xl text-sm placeholder:text-slate-500 focus-visible:ring-1 focus-visible:ring-amber-500"
           />
           {searchQuery && (
             <button
@@ -233,7 +233,7 @@ export default function TempFilesView() {
           variant="outline"
           onClick={handleExportCSV}
           disabled={filteredFiles.length === 0}
-          className="w-full sm:w-auto h-11 px-4 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 text-xs font-semibold"
+          className="w-full sm:w-auto h-11 px-4 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 text-xs font-semibold shrink-0"
         >
           <Download className="h-4 w-4 mr-2" />
           Export CSV
@@ -245,6 +245,7 @@ export default function TempFilesView() {
         <Table>
           <TableHeader>
             <tr className="border-b border-slate-800 bg-slate-950/60 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              <TableHead className="w-12 text-slate-400">Type</TableHead>
               <TableHead
                 className="text-slate-400 cursor-pointer hover:text-slate-200 transition-colors"
                 onClick={() => handleSort('name')}
@@ -264,10 +265,10 @@ export default function TempFilesView() {
           </TableHeader>
           <TableBody className={cn('divide-y divide-slate-800/50 text-sm', loading && filteredFiles.length > 0 && 'opacity-60 transition-opacity duration-150')}>
             {loading && filteredFiles.length === 0 ? (
-              <TableSkeleton rows={8} columnWidths={['w-64', 'w-24', 'w-20', 'w-24', 'w-8']} />
+              <TableSkeleton rows={8} columnWidths={['w-6', 'w-64', 'w-24', 'w-20', 'w-24', 'w-8']} />
             ) : filteredFiles.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="py-14 text-center text-slate-400">
+                <TableCell colSpan={6} className="py-14 text-center text-slate-400">
                   <Sparkles className="w-10 h-10 text-amber-400 mx-auto mb-2" />
                   <p className="font-semibold text-slate-200">No temporary files found</p>
                   <p className="text-xs text-slate-500 mt-1">Your Google Drive is free from cache, .tmp, and system debris!</p>
@@ -279,6 +280,9 @@ export default function TempFilesView() {
                   key={file.file_id || index}
                   className="hover:bg-slate-800/40 transition-colors group"
                 >
+                  <TableCell>
+                    <FileQuestion className="w-5 h-5 text-amber-400" />
+                  </TableCell>
                   <TableCell className="text-slate-200 font-medium">
                     <span className="truncate block max-w-md">{file.file_name}</span>
                   </TableCell>
@@ -320,10 +324,12 @@ export default function TempFilesView() {
         </Table>
       </div>
 
-      {/* Info Card */}
+      {/* Help / Guidance Footer Card */}
       <div className="p-5 border border-slate-800/70 rounded-2xl bg-slate-900/40 backdrop-blur-sm">
-        <h3 className="text-sm font-semibold text-slate-200 mb-1">About Temporary Files</h3>
-        <p className="text-slate-400 text-xs leading-relaxed">
+        <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+          About Temporary Files
+        </h4>
+        <p className="text-xs text-slate-400 leading-relaxed">
           Temporary files include OS desktop files (.DS_Store, Thumbs.db), Office autosaves (~$), and backup files (.bak, .tmp). These files are safe to delete and often leftover from old editing sessions.
         </p>
       </div>
