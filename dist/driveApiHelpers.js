@@ -20,6 +20,9 @@ var DriveApiHelpers = (function () {
   /** MIME type identifier for Google Drive folders */
   const MIME_TYPE_FOLDER = 'application/vnd.google-apps.folder';
 
+  /** Maximum execution time threshold (4 minutes) to avoid GAS 6-minute hard timeout */
+  const MAX_SCAN_TIME_MS = 240 * 1000;
+
   // ============================================
   // PUBLIC API FUNCTIONS
   // ============================================
@@ -27,12 +30,14 @@ var DriveApiHelpers = (function () {
   /**
    * Fetches all file and folder data from specified root
    * Returns data array without writing to sheet (for web app)
+   * Safely monitors execution time to prevent GAS 6-minute timeouts.
    * @param {string} rootFolderId - Root folder ID or 'root'
    * @param {string} corpora - 'drive' (Shared Drive) or 'user' (My Drive)
-   * @returns {Array<Array>} 2D array of file/folder data
+   * @returns {Array<Array>} 2D array of file/folder data with optional safety metadata
    */
   function getFileAndFolderData(rootFolderId, corpora) {
     console.time('getFileAndFolderData');
+    const scanStartTime = Date.now();
 
     const rootFolder = getRootFolderInfo_(rootFolderId);
     const folderPathLookup = new Map([[rootFolder.id, rootFolder.name]]);
@@ -40,9 +45,19 @@ var DriveApiHelpers = (function () {
     let directoryRows = [];
     let foldersToProcess = [rootFolder];
     let foldersRemaining = [];
+    let isTruncated = false;
+    let truncationReason = null;
 
-    // Process folders in batches
+    // Process folders in batches with time safety limit
     while (foldersToProcess.length > 0) {
+      // Check if elapsed time has crossed safety threshold (4 min)
+      if (Date.now() - scanStartTime > MAX_SCAN_TIME_MS) {
+        console.warn(`Safety execution window reached (${(Date.now() - scanStartTime) / 1000}s). Safely finalizing partial results with ${directoryRows.length} items to prevent GAS timeout.`);
+        isTruncated = true;
+        truncationReason = `Safety time limit reached (4 minutes). Scan paused to prevent timeout; ${foldersToProcess.length} subfolders remain unindexed.`;
+        break;
+      }
+
       // Split into batches if needed
       if (foldersToProcess.length > MAX_FOLDERS_PER_QUERY) {
         foldersRemaining = foldersToProcess.splice(MAX_FOLDERS_PER_QUERY);
@@ -51,7 +66,7 @@ var DriveApiHelpers = (function () {
       }
 
       // Fetch items from current batch
-      const items = fetchAllItemsFromFolders_(foldersToProcess, rootFolder.driveId, corpora);
+      const items = fetchAllItemsFromFolders_(foldersToProcess, rootFolder.driveId, corpora, scanStartTime);
 
       // Process items
       const processedData = processItemsIntoRows_(items, foldersToProcess, folderPathLookup);
@@ -62,6 +77,13 @@ var DriveApiHelpers = (function () {
     }
 
     console.timeEnd('getFileAndFolderData');
+
+    // Attach safety metadata to result array
+    directoryRows.isTruncated = isTruncated;
+    directoryRows.truncationReason = truncationReason;
+    directoryRows.remainingFoldersCount = foldersToProcess.length;
+    directoryRows.elapsedTimeMs = Date.now() - scanStartTime;
+
     return directoryRows;
   }
 
@@ -151,28 +173,35 @@ var DriveApiHelpers = (function () {
   }
 
   /**
-   * Fetches all items from folders with pagination
+   * Fetches all items from folders with pagination and time check
    * @param {Array<Object>} folders - Array of {id, name}
    * @param {string} driveId - Shared Drive ID or undefined
    * @param {string} corpora - 'drive' or 'user'
+   * @param {number} [scanStartTime] - Optional scan start time to monitor timeout
    * @returns {Array<Object>} All items found
    * @private
    */
-  function fetchAllItemsFromFolders_(folders, driveId, corpora) {
+  function fetchAllItemsFromFolders_(folders, driveId, corpora, scanStartTime) {
     let allItems = [];
     let pageToken = null;
 
     do {
+      if (scanStartTime && (Date.now() - scanStartTime > MAX_SCAN_TIME_MS)) {
+        console.warn('Safety time reached inside pagination loop.');
+        break;
+      }
       const response = queryDriveApi_(folders, pageToken, driveId, corpora);
-      allItems = allItems.concat(response.items);
-      pageToken = response.nextPageToken;
+      if (response && response.items) {
+        allItems = allItems.concat(response.items);
+      }
+      pageToken = response ? response.nextPageToken : null;
     } while (pageToken);
 
     return allItems;
   }
 
   /**
-   * Queries Drive API for items in specified folders
+   * Queries Drive API for items in specified folders with rate-limit retry
    * @param {Array<Object>} folders - Folders to query
    * @param {string|null} pageToken - Pagination token
    * @param {string} driveId - Shared Drive ID
@@ -200,7 +229,41 @@ var DriveApiHelpers = (function () {
       requestPayload.pageToken = pageToken;
     }
 
-    return Drive.Files.list(requestPayload);
+    return callWithBackoff_(function () {
+      return Drive.Files.list(requestPayload);
+    });
+  }
+
+  /**
+   * Executes Drive API calls with exponential backoff on transient errors
+   * @param {Function} fn - API call function
+   * @param {number} [maxRetries=3] - Maximum retry attempts
+   * @returns {*} Result of fn()
+   * @private
+   */
+  function callWithBackoff_(fn, maxRetries = 3) {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return fn();
+      } catch (err) {
+        const msg = (err && err.message) ? err.message : String(err);
+        const isRetryable = msg.includes('rateLimitExceeded') ||
+                            msg.includes('userRateLimitExceeded') ||
+                            msg.includes('quotaExceeded') ||
+                            msg.includes('403') ||
+                            msg.includes('429') ||
+                            msg.includes('500') ||
+                            msg.includes('503') ||
+                            msg.includes('Backend Error');
+        if (attempt < maxRetries && isRetryable) {
+          const delayMs = Math.min(1000 * Math.pow(2, attempt) + Math.floor(Math.random() * 500), 8000);
+          console.warn(`Drive API rate limit or transient error (${msg}). Retrying in ${delayMs}ms (attempt ${attempt + 1}/${maxRetries})...`);
+          Utilities.sleep(delayMs);
+        } else {
+          throw err;
+        }
+      }
+    }
   }
 
   /**

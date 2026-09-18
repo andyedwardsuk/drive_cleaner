@@ -241,7 +241,25 @@ function runSmartScan(folderId, corpora) {
     // eslint-disable-next-line no-undef
     const recommendations = generateRecommendations(categoryResults);
 
-    // Format final results
+    // Format final results with safety watchdog metadata
+    const isPartial = !!filesData.isTruncated;
+    const partialReason = filesData.truncationReason || null;
+    const remainingFoldersCount = filesData.remainingFoldersCount || 0;
+
+    // If scan was safely truncated at the 4-minute limit, inform the user
+    if (isPartial) {
+      recommendations.unshift({
+        id: 'partial_scan_safety_notice',
+        title: 'High-Volume Drive Safety Protection Active',
+        description: `Drive Cleaner safely analyzed ${structuredFiles.length} files across your drive within Google Apps Script's safety window. You can clean these items now, or select specific folders for targeted cleaning.`,
+        action_text: 'Review Scanned Files',
+        category: 'performance',
+        priority: 'HIGH',
+        savings_bytes: 0,
+        count: structuredFiles.length
+      });
+    }
+
     const scanResults = {
       success: true,
       folder_id: cleanFolderId,
@@ -250,6 +268,10 @@ function runSmartScan(folderId, corpora) {
       total_space_used_bytes: totalSpaceUsed,
       total_potential_savings_bytes: totalSavings,
       scan_date: new Date().toISOString(),
+      is_partial: isPartial,
+      partial_reason: partialReason,
+      remaining_folders_count: remainingFoldersCount,
+      elapsed_time_ms: filesData.elapsedTimeMs || (new Date() - scanStartTime),
       large_files: largeFilesResult,
       old_files: oldFilesResult,
       duplicates: duplicatesResult,

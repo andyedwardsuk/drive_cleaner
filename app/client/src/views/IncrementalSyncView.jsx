@@ -30,6 +30,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { APP_VERSION } from '@/version'
 
 function formatBytes(bytes) {
   if (!bytes || bytes === 0) return '0 B'
@@ -199,7 +200,7 @@ export default function IncrementalSyncView() {
             <span className="text-xs font-medium text-slate-400">Sync Architecture</span>
             <ShieldCheck className="w-4 h-4 text-blue-400" />
           </div>
-          <div className="text-2xl font-bold text-white mt-2 font-mono">v3.0.0</div>
+          <div className="text-2xl font-bold text-white mt-2 font-mono">v{APP_VERSION}</div>
           <p className="text-xs text-slate-400 mt-1">Zero-memory-leak engine</p>
         </div>
       </div>

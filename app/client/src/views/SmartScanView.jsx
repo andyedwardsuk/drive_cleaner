@@ -174,9 +174,25 @@ function ScanResults({ data }) {
           )}
         </div>
 
+        {data.is_partial && (
+          <div className="mb-4 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+            <div className="flex-1 text-xs">
+              <div className="font-semibold text-amber-300">
+                High-Volume Drive Safety Protection Active
+              </div>
+              <p className="text-amber-200/80 mt-0.5">
+                Drive Cleaner safely indexed {totalFiles.toLocaleString()} files across this drive within Google Apps Script&apos;s safety window (4 min). All category results and savings below are ready to review and clean.
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center gap-2 mb-4">
           <CheckCircle className="w-5 h-5 text-emerald-400" />
-          <h2 className="text-xl font-bold text-white">Scan Complete</h2>
+          <h2 className="text-xl font-bold text-white">
+            {data.is_partial ? 'Partial Scan Complete' : 'Scan Complete'}
+          </h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800/60">
