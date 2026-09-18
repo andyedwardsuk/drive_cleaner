@@ -3,30 +3,34 @@
  * Auto-generated build timestamp for cache debugging
  */
 
-export const APP_VERSION = '3.6.1'
+export const APP_VERSION = '3.6.4'
 export const BUILD_TIMESTAMP = new Date().toISOString()
 export const FEATURES = [
-  'Smart Scan',
-  'Enhanced Metadata',
-  'Dashboard',
-  'Storage Analytics',
-  'Google Workspace Files',
-  'My Folders',
-  'Shared Drives Hygiene Hub',
-  'Google Photos & Media Optimization Center',
-  'Sharing Permissions & Security Audit Hub',
+  'Smart Scan Engine',
+  'Enhanced Drive API v2 Metadata',
+  'Dashboard & Quota Telemetry',
+  'Storage Analytics & Visualization',
+  'Google Workspace Files Hub',
+  'My Folders & Multi-Folder Scoping',
+  'Shared Drives (Team Drive) Hygiene Hub',
+  'Google Photos & 4K Media Optimization Center',
+  'Sharing Permissions & Security Exposure Audit Hub',
   'Incremental Sync & Drive Changes API Engine',
-  'UI Theme Overhaul & Accessibility Modernization',
   'Cloud Trash Lifecycle & Permanent Purge Governance',
-  'Complete Design System Polish & WCAG AA Unification',
-  'Succinct Collapsible Navigation & Quick Tool Filter',
-  'Standard Clean Sidebar Headers & UK English Harmonisation',
-  'Minimised Category Dock & Floating Flyout Menus',
-  '2026 Flagship Spatial Architecture & ⌘K Command Engine',
-  'Unified 5-Hub Workspace Architecture & Tab Navigation',
-  'Font Awesome Pro Duotone Vector Iconography',
+  'Smart Auto-Archive Engine & Reversible Restore',
+  'Data ROT Analysis & Psychological Clutter Index',
+  'Cloud Carbon Footprint & Green Gamification',
+  'Kanban Triage Pipeline & Bulk Rules Engine',
+  '24/7 Time-Driven Automation Triggers & HTML Digests',
+  'Smart Folder Reorganizer & Hierarchy Architect',
+  'Google Drive Labels & Taxonomy Studio',
+  'Interactive File Preview & Deep Metadata Inspector',
+  'Unified 5-Hub Spatial Architecture & Tab Navigation',
+  'Global ⌘K Command Palette',
+  'Font Awesome Pro Duotone Iconography',
   'Web Awesome Pro Component Integration',
-  'Sleek Micro-Scrollbars & Clutter-Free Segmented Hubs',
+  'Zero-Shift Web Awesome WaSkeleton Loading States',
+  'Seamless Hash-Based SPA Routing on Google Apps Script',
 ]
 
 /**

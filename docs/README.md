@@ -1,158 +1,76 @@
 # Drive Cleaner - Documentation Index
 
-**Project:** Drive Cleaner
-**Version:** 1.1.0
-**Last Updated:** 2025-11-18
+**Project:** Drive Cleaner  
+**Version:** 3.6.4 (Enterprise Edition)  
+**Last Updated:** 2026-09-18  
+
+👉 **For the main product overview and architecture guide, see the [Root README](../README.md).**
 
 ---
 
-## Quick Navigation
+## 📚 Technical Documentation Map
 
-### 📚 Feature Documentation
+### 1. Architecture & Design
+- **[Main Project README](../README.md)** — Comprehensive suite overview, 5-hub architecture, design system, and roadmap.
+- **[Smart Scan Architecture](./smart-scan-architecture.md)** — Scan engine, multi-category pipelines, and data flow.
+- **[Smart Scan Developer Guide](./smart-scan-guide.md)** — Backend API reference and analyzer implementation details.
+- **[Smart Scan Quick Reference](./smart-scan-quick-reference.md)** — Cheat sheet with code snippets and return payloads.
 
-#### Smart Scan
-- **[Developer Guide](./smart-scan-guide.md)** - Comprehensive API reference, usage examples, integration guide
-- **[Quick Reference](./smart-scan-quick-reference.md)** - 1-page summary with code snippets
-- **[Architecture](./smart-scan-architecture.md)** - Visual diagrams, data flow, component relationships
-
-#### Enhanced Metadata
-- Status: ✅ Complete (Issue #1)
-- Implementation: `dist/utilities/formatters.js`, `dist/utilities/metadataParser.js`
-- Integration: `driveApiHelpers.js`, `listAllFilesAndFolders.js`
-
----
-
-### 📋 Planning & Build Notes
-
-#### Smart Scan
-- **[Feature Plan](./feature-plans/smart-scan-plan.md)** - Implementation plan, architecture design
-- **[Build Notes](./build-notes/smart-scan-build.md)** - Implementation approach, decisions made
-- **[Test Report](./test-reports/smart-scan-test.md)** - Quality checks, JSDoc assessment
-
----
-
-### 🎯 Feature Status
-
-| Feature | Status | Documentation | Issue |
-|---------|--------|---------------|-------|
-| Enhanced Metadata | ✅ Complete | Inline JSDoc | [#1](https://github.com/andyedwardsuk/drive_cleaner/issues/1) |
-| Smart Scan | ✅ Complete | [Guide](./smart-scan-guide.md) | [#2](https://github.com/andyedwardsuk/drive_cleaner/issues/2) |
-| Large Files View | 🔨 Planned | TBD | [#3](https://github.com/andyedwardsuk/drive_cleaner/issues/3) |
-| Kanban Labels | 🔨 Planned | TBD | [#4](https://github.com/andyedwardsuk/drive_cleaner/issues/4) |
-| Storage Analytics | 🔨 Planned | TBD | [#7](https://github.com/andyedwardsuk/drive_cleaner/issues/7) |
-
----
-
-### 🚀 Quick Start
-
-**For Developers:**
-1. Read: [Smart Scan Quick Reference](./smart-scan-quick-reference.md)
-2. Implement: [Smart Scan Developer Guide](./smart-scan-guide.md)
-3. Understand: [Smart Scan Architecture](./smart-scan-architecture.md)
-
-**For Testing:**
-- Web App URL: `https://script.google.com/macros/s/{deploymentId}/exec`
-- Script Editor: `https://script.google.com/d/{scriptId}/edit`
+### 2. Hub Guides & Specifications
+- **Dashboard & Quota Telemetry**: Live Drive quota breakdown, folder browsing, and zero-shift explorer.
+- **Cleanup Center (8 Tools)**:
+  - Smart Scan (`scanEngine.js`, `analyzers.js`)
+  - Duplicates Finder (`analyzers.js`)
+  - Large Files & Stagnant Old Files
+  - Empty Items & Temp Artifacts
+  - 4K Media & Photo Burst Clustering (`mediaOptimizer.js`)
+  - Cloud Trash Lifecycle & Permanent Purge (`trashGovernanceManager.js`)
+- **Organisation Studio (5 Tools)**:
+  - Smart Folder Reorganizer (`folderReorganizer.js`)
+  - Shared Drives Hygiene (`sharedDrivesManager.js`)
+  - Google Drive Labels & Taxonomy (`labelsManager.js`)
+  - My Folders Scoping
+  - Storage Analytics & Growth Telemetry
+- **Security & Governance (4 Tools)**:
+  - Sharing Permissions & External Access Audit (`securityAuditManager.js`)
+  - Data ROT Analysis & Psychological Clutter Index (`rotAnalyzer.js`)
+  - Native Google Workspace Files Hub (`workspaceAnalyzer.js`)
+  - Cloud Carbon Footprint & Green Impact (`carbonAnalyzer.js`)
+- **Operations & Automation (6 Tools)**:
+  - Smart Auto-Archive Engine (`_DriveCleaner_Archive`)
+  - Rule & Bulk Engine (`bulk-actions`)
+  - Kanban Review Pipeline (`kanban-labels`)
+  - 24/7 Time-Driven Automation Triggers & HTML Digests (`triggerManager.js`)
+  - Incremental Sync Engine (`syncManager.js`)
+  - Daily Impact Tracker & Gamification (`daily-impact`)
 
 ---
 
-### 📁 Documentation Structure
+## 🎯 Implementation Status Matrix
 
-```
-docs/
-├── README.md (this file)               # Documentation index
-├── smart-scan-guide.md                 # Smart Scan: Developer guide
-├── smart-scan-quick-reference.md       # Smart Scan: 1-page summary
-├── smart-scan-architecture.md          # Smart Scan: Diagrams & flows
-│
-├── feature-plans/
-│   └── smart-scan-plan.md              # Implementation plan
-│
-├── build-notes/
-│   └── smart-scan-build.md             # Build decisions
-│
-└── test-reports/
-    └── smart-scan-test.md              # Test results
-```
-
----
-
-### 🔧 Project Files
-
-**Backend (Google Apps Script):**
-```
-dist/
-├── driveApiHelpers.js                  # Drive API integration
-├── listAllFilesAndFolders.js           # File listing
-├── webApp.js                           # Web app entry point
-│
-├── smartScan/
-│   ├── scanEngine.js                   # Smart Scan orchestration
-│   ├── analyzers.js                    # 5 analyzer functions
-│   └── recommendations.js              # Recommendation generator
-│
-└── utilities/
-    ├── formatters.js                   # File size, date formatting
-    ├── metadataParser.js               # Metadata transformation
-    └── cacheManager.js                 # Caching utilities
-```
-
-**Frontend (React):**
-```
-app/client/src/
-├── views/
-│   ├── DashboardView.jsx               # Main dashboard
-│   ├── SmartScanView.jsx               # Smart Scan interface
-│   └── ...                             # Other views
-│
-├── components/
-│   ├── FileTable.jsx                   # File listing table
-│   └── ...                             # Other components
-│
-└── hooks/
-    ├── useSmartScan.js                 # Smart Scan hook (to be created)
-    └── ...                             # Other hooks
-```
+| Component | Status | Backend Service | Client Route |
+| :--- | :---: | :--- | :--- |
+| **Dashboard** | ✅ Production | `listAllFilesAndFolders.js` | `#/dashboard` |
+| **Smart Scan** | ✅ Production | `smartScan/scanEngine.js` | `#/clean?tab=smart-scan` |
+| **Duplicates Finder** | ✅ Production | `smartScan/analyzers.js` | `#/clean?tab=duplicates` |
+| **4K & Burst Media** | ✅ Production | `utilities/mediaOptimizer.js` | `#/clean?tab=media-optimizer` |
+| **Trash Governance** | ✅ Production | `utilities/trashGovernanceManager.js` | `#/clean?tab=trash-governance` |
+| **Folder Reorganizer** | ✅ Production | `utilities/folderReorganizer.js` | `#/organise?tab=reorganize` |
+| **Shared Drives** | ✅ Production | `utilities/sharedDrivesManager.js` | `#/organise?tab=shared-drives` |
+| **Drive Labels** | ✅ Production | `utilities/labelsManager.js` | `#/organise?tab=labels` |
+| **Security Audit** | ✅ Production | `utilities/securityAuditManager.js` | `#/security?tab=security-audit` |
+| **Data ROT Analysis** | ✅ Production | `smartScan/rotAnalyzer.js` | `#/security?tab=rot` |
+| **Carbon Footprint** | ✅ Production | `smartScan/carbonAnalyzer.js` | `#/security?tab=carbon` |
+| **Automation Triggers** | ✅ Production | `utilities/triggerManager.js` | `#/operations?tab=triggers` |
+| **Incremental Sync** | ✅ Production | `utilities/syncManager.js` | `#/operations?tab=sync` |
+| **Web Awesome Suite** | ✅ Production | `<wa-switch>`, `<wa-skeleton>`, etc. | Application-wide |
+| **Zero Layout Shift** | ✅ Production | `<wa-skeleton>`, `TableSkeleton` | All 23 views |
 
 ---
 
-### 📖 Learning Path
+## 🚀 Deployment Specifications
 
-1. **New to Project?**
-   - Start: [ROADMAP.md](../ROADMAP.md)
-   - Then: [Smart Scan Quick Reference](./smart-scan-quick-reference.md)
-
-2. **Implementing Features?**
-   - Read: [Smart Scan Developer Guide](./smart-scan-guide.md)
-   - Reference: [Smart Scan Architecture](./smart-scan-architecture.md)
-
-3. **Understanding Architecture?**
-   - View: [Smart Scan Architecture](./smart-scan-architecture.md)
-   - Dive: [Build Notes](./build-notes/smart-scan-build.md)
-
----
-
-### 🤝 Contributing
-
-When adding new features:
-1. Create feature plan in `feature-plans/`
-2. Document build notes in `build-notes/`
-3. Write test report in `test-reports/`
-4. Create comprehensive guide (like Smart Scan)
-5. Update this index
-
----
-
-### 📝 Documentation Standards
-
-Following project conventions:
-- ✅ Single guide per feature (comprehensive)
-- ✅ 1-page quick reference
-- ✅ Visual diagrams/flowcharts
-- ✅ UK English spelling
-- ✅ Consolidated (no multiple scattered docs)
-
----
-
-**Last Updated:** 2025-11-18
-**Maintainer:** Andy Edwards
+- **Platform**: Google Apps Script V8 Engine
+- **Drive API**: Advanced Google Drive Service API v2
+- **Build Output**: `./dist/index.html` (Inlined React SPA via `vite-plugin-singlefile`)
+- **Active Deployment URL**: [Google Apps Script Web App](https://script.google.com/macros/s/AKfycbyMGwEbepgATR-CRv_jvyqHTNA302vqVKNtEQdGR4lL8cSBrsgtT4Cyy8RnhYnivTg3jg/exec)
