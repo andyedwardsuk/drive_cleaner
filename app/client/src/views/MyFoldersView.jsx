@@ -156,7 +156,7 @@ export default function MyFoldersView() {
       <Hero
         icon={FolderHeart}
         title="My Folders"
-        subtitle="Attach, organize, and quickly scan specific Google Drive folders"
+        subtitle="Attach, organise, and quickly scan specific Google Drive folders"
         illustration="📁"
         actions={
           <Button

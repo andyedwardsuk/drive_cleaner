@@ -83,7 +83,7 @@ export function useAutomationTriggers() {
 
         addHistoryEvent({
           type: 'settings',
-          title: 'Synchronized Automation Triggers with Google Apps Script',
+          title: 'Synchronised Automation Triggers with Google Apps Script',
           filesCount: res.activeTriggers?.length || 0,
           bytesAffected: 0
         })

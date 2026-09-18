@@ -135,8 +135,8 @@ export default function SettingsView() {
       <Hero
         icon={Settings}
         title="Settings & Preferences"
-        subtitle="Fine-tune cleanup thresholds, scan behaviors, visual themes, and safe trash policies."
-        badge="v3.2.0 Active"
+        subtitle="Fine-tune cleanup thresholds, scan behaviours, visual themes, and safe trash policies."
+        badge="v3.4.0 Active"
         illustration="⚙️"
       />
 
@@ -178,7 +178,7 @@ export default function SettingsView() {
                 Cleanup & Analysis Thresholds
               </h2>
               <p className="text-sm text-slate-400 mt-1">
-                Customize the rules used by Smart Scan and category views to detect large, old, or cluttered files.
+                Customise the rules used by Smart Scan and category views to detect large, old, or cluttered files.
               </p>
             </div>
 

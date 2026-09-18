@@ -115,7 +115,7 @@ export default function AboutView() {
           <h3 className="text-base font-bold text-white">Privacy & Security Guarantees</h3>
         </div>
         <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-          Drive Cleaner runs directly within your authorized Google Workspace domain and browser session:
+          Drive Cleaner runs directly within your authorised Google Workspace domain and browser session:
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-300">
           <div className="flex items-start gap-2 p-3 rounded-xl bg-slate-950/50 border border-slate-800/60">

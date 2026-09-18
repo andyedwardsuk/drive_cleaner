@@ -103,7 +103,7 @@ export default function IncrementalSyncView() {
         icon={Zap}
         badge="Drive Changes API v2 Engine"
         title="Incremental Sync & Real-Time Engine"
-        subtitle="Sub-second delta synchronization using Google Drive Changes tokens and persistent browser IndexedDB storage. Sync instantly without scanning all files."
+        subtitle="Sub-second delta synchronisation using Google Drive Changes tokens and persistent browser IndexedDB storage. Sync instantly without scanning all files."
         actions={
           <div className="flex flex-wrap items-center gap-3">
             <Button
@@ -372,7 +372,7 @@ export default function IncrementalSyncView() {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-semibold text-white text-sm">
-                          {event.type === 'initial_sync' ? 'Baseline Synchronization' : 'Incremental Delta Sync'}
+                          {event.type === 'initial_sync' ? 'Baseline Synchronisation' : 'Incremental Delta Sync'}
                         </span>
                         <Badge className="text-xs bg-slate-800 text-slate-300 font-mono">
                           Token: {event.token}
@@ -439,7 +439,7 @@ export default function IncrementalSyncView() {
               Drive API Quota Conservation
             </h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Standard full scans consume 10 to 50 paginated API calls per folder hierarchy. Incremental sync queries only Drive Changes with startChangeId, completing in 1 API call per synchronization cycle.
+              Standard full scans consume 10 to 50 paginated API calls per folder hierarchy. Incremental sync queries only Drive Changes with startChangeId, completing in 1 API call per synchronisation cycle.
             </p>
             <div className="space-y-2 pt-2 text-xs">
               <div className="flex justify-between py-1 border-b border-slate-800">

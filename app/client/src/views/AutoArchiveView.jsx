@@ -336,7 +336,7 @@ export default function AutoArchiveView() {
             {config.targetFolderName || '_DriveCleaner_Archive'}
             {config.organizeByYear ? `/${new Date().getFullYear()}` : ''}
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">Automatic subfolder organization</p>
+          <p className="mt-1 text-xs text-muted-foreground">Automatic subfolder organisation</p>
         </motion.div>
       </div>
 

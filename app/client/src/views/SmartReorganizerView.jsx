@@ -64,7 +64,7 @@ export default function SmartReorganizerView() {
 
   const handleApplyCluster = (cluster) => {
     setPendingPlan({
-      title: `Organized ${cluster.fileCount} files into ${cluster.suggestedPath}`,
+      title: `Organised ${cluster.fileCount} files into ${cluster.suggestedPath}`,
       targetPath: cluster.suggestedPath,
       moves: (cluster.sampleFiles || []).map((name, idx) => ({
         fileId: `file_${cluster.id}_${idx}`,
@@ -76,7 +76,7 @@ export default function SmartReorganizerView() {
 
   const handleApplyFullStructure = () => {
     setPendingPlan({
-      title: 'Full Drive Hierarchy Reorganization',
+      title: 'Full Drive Hierarchy Reorganisation',
       targetPath: 'Work, Personal, Media & Assets, Archive',
       moves: [
         { fileId: 'move_1', targetPath: 'Work/Clients/Acme Corp' },
@@ -260,7 +260,7 @@ export default function SmartReorganizerView() {
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-foreground">Current Drive Structure</h4>
-                    <p className="text-xs text-muted-foreground">Unorganized, mixed contexts, deep nesting</p>
+                    <p className="text-xs text-muted-foreground">Unorganised, mixed contexts, deep nesting</p>
                   </div>
                 </div>
                 <Badge variant="outline" className="border-rose-500/30 text-rose-400 text-xs">

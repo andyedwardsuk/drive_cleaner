@@ -121,7 +121,7 @@ export default function DrivePicker({ onFolderSelected, disabled, className }) {
       }
 
       if (!token && isGAS) {
-        alert('Could not obtain an OAuth token. Please ensure Drive Cleaner is authorized in Google Apps Script.')
+        alert('Could not obtain an OAuth token. Please ensure Drive Cleaner is authorised in Google Apps Script.')
         setIsAuthorizing(false)
         return
       }

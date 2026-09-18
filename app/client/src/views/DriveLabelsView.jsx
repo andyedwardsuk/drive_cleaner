@@ -236,7 +236,7 @@ export default function DriveLabelsView() {
     <div className="space-y-8 pb-16">
       <Hero
         title="Google Drive Labels & Taxonomy Hub"
-        subtitle="Organize, govern, and secure files with metadata classification labels, compliance retention badges, and bulk taxonomy tagging."
+        subtitle="Organise, govern, and secure files with metadata classification labels, compliance retention badges, and bulk taxonomy tagging."
         icon={Tags}
       />
 
@@ -593,7 +593,7 @@ export default function DriveLabelsView() {
                 <div>
                   <h3 className="text-lg font-bold">Create Custom Drive Label</h3>
                   <p className="text-xs text-muted-foreground">
-                    Define a new organizational tag with color badge styling
+                    Define a new organisational tag with colour badge styling
                   </p>
                 </div>
               </div>

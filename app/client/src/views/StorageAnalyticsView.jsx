@@ -336,7 +336,7 @@ export default function StorageAnalyticsView() {
             <div>
               <h4 className="font-semibold text-slate-200 mb-0.5">Archive Inactive Documents</h4>
               <p className="text-slate-400 leading-relaxed">
-                Move files unused for over 1-2 years into organized year-based archives using the Auto-Archive Engine.
+                Move files unused for over 1-2 years into organised year-based archives using the Auto-Archive Engine.
               </p>
             </div>
           </div>
