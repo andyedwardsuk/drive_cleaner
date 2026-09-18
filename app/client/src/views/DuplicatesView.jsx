@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { TableSkeleton } from '@/components/ui/TableSkeleton'
 import { cn } from '@/lib/utils'
 
 /**
@@ -257,67 +258,6 @@ export default function DuplicatesView() {
     )
   }
 
-  // Loading state
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <Hero
-          faIcon={faClone}
-          variant="primary"
-          title="Duplicates"
-          subtitle="Find and remove duplicate files to save space"
-        />
-        <div className="p-16 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
-          <RefreshCw className="w-8 h-8 animate-spin text-cyan-400 mx-auto mb-4" />
-          <p className="text-slate-300 text-sm">Scanning your Google Drive for duplicate files...</p>
-        </div>
-      </div>
-    )
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <Hero
-          faIcon={faClone}
-          variant="primary"
-          title="Duplicates"
-          subtitle="Find and remove duplicate files to save space"
-        />
-        <div className="p-10 border border-red-500/30 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
-          <p className="text-red-400 font-bold mb-2">Error loading duplicates</p>
-          <p className="text-slate-400 text-sm mb-6">{error}</p>
-          <Button
-            onClick={() => runScan('root', 'user')}
-            className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold"
-          >
-            Retry
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
-  // No duplicates found
-  if (!data?.duplicates?.groups || data.duplicates.groups.length === 0) {
-    return (
-      <div className="space-y-6">
-        <Hero
-          faIcon={faClone}
-          variant="primary"
-          title="Duplicates"
-          subtitle="Find and remove duplicate files to save space"
-        />
-        <div className="p-12 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
-          <Sparkles className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
-          <p className="text-slate-200 text-lg font-bold mb-1">No duplicate files found</p>
-          <p className="text-sm text-slate-400">Your Google Drive has zero duplicate file clutter!</p>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-6">
       <Hero
@@ -328,13 +268,27 @@ export default function DuplicatesView() {
         actions={
           <Button
             onClick={() => runScan('root', 'user')}
-            className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-900/40"
+            disabled={loading}
+            className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-900/40 disabled:opacity-50"
           >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Refresh Scan
+            <RefreshCw className={cn('w-4 h-4 mr-2', loading && 'animate-spin')} />
+            {loading ? 'Scanning...' : 'Refresh Scan'}
           </Button>
         }
       />
+
+      {error && (
+        <div className="p-4 border border-red-500/30 rounded-2xl bg-red-950/20 text-red-400 text-sm flex items-center justify-between gap-3">
+          <p><strong>Error loading duplicates:</strong> {error}</p>
+          <Button
+            size="sm"
+            onClick={() => runScan('root', 'user')}
+            className="h-8 px-3 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-semibold"
+          >
+            Retry
+          </Button>
+        </div>
+      )}
 
       {/* Summary */}
       <DuplicatesSummary
@@ -409,16 +363,28 @@ export default function DuplicatesView() {
               </TableHead>
             </tr>
           </TableHeader>
-          <TableBody className="divide-y divide-slate-800/50 text-sm">
-            {filteredAndSortedGroups.map((group) => (
-              <DuplicateGroupRow
-                key={group.file_name}
-                group={group}
-                isExpanded={expandedGroups.has(group.file_name)}
-                onToggle={() => toggleGroup(group.file_name)}
-                onPreview={handlePreview}
-              />
-            ))}
+          <TableBody className={cn('divide-y divide-slate-800/50 text-sm', loading && filteredAndSortedGroups.length > 0 && 'opacity-60 transition-opacity duration-150')}>
+            {loading && filteredAndSortedGroups.length === 0 ? (
+              <TableSkeleton rows={6} columnWidths={['w-6', 'w-64', 'w-24', 'w-20', 'w-16']} />
+            ) : filteredAndSortedGroups.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="py-14 text-center">
+                  <Sparkles className="w-10 h-10 text-emerald-400 mx-auto mb-2" />
+                  <p className="font-semibold text-slate-200">No duplicate files found</p>
+                  <p className="text-xs text-slate-500 mt-1">Your Google Drive has zero duplicate file clutter!</p>
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredAndSortedGroups.map((group) => (
+                <DuplicateGroupRow
+                  key={group.file_name}
+                  group={group}
+                  isExpanded={expandedGroups.has(group.file_name)}
+                  onToggle={() => toggleGroup(group.file_name)}
+                  onPreview={handlePreview}
+                />
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

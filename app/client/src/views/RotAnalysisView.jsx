@@ -29,6 +29,8 @@ import { Input } from '@/components/ui/input'
 import { useSmartScan } from '@/hooks/useSmartScan'
 import { useFilePreview } from '@/hooks/useFilePreview'
 import FilePreviewModal from '@/components/preview/FilePreviewModal'
+import { WaSkeleton } from '@/components/ui/webawesome'
+import TableSkeleton from '@/components/ui/TableSkeleton'
 import {
   Table,
   TableBody,
@@ -295,19 +297,100 @@ export default function RotAnalysisView() {
     })
   }, [rot?.items, activeTab, freshnessFilter, searchQuery])
 
-  if (loading) {
+  if (loading && (!rot || rot.count === 0)) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 pb-12">
         <Hero
           icon={Flame}
-          title="Data ROT Analysis"
-          subtitle="Enterprise Redundant, Obsolete, and Trivial governance for Drive"
+          title="Data ROT Analysis & Hoarding Assessment"
+          subtitle="Identify Redundant, Obsolete, and Trivial files and gamify your cleanup with psychological clutter scoring."
           faIcon={faFireFlameCurved}
           variant="rose"
+          actions={
+            <Button disabled size="lg" className="rounded-xl w-[170px] shrink-0">
+              <RefreshCw className="w-4 h-4 mr-2 animate-spin shrink-0" />
+              Analysing...
+            </Button>
+          }
         />
-        <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
-          <RefreshCw className="w-8 h-8 animate-spin text-rose-500 mx-auto mb-3" />
-          <p className="text-slate-300 font-medium">Analysing file decay and digital clutter...</p>
+
+        {/* Top Shimmer Progress Line */}
+        <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-rose-500 via-amber-400 to-rose-500 animate-pulse w-full" />
+        </div>
+
+        {/* Hero Metrics Row Skeletons */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 space-y-4">
+            <WaSkeleton className="h-5 w-32" />
+            <div className="flex justify-center py-6">
+              <WaSkeleton className="h-32 w-32 rounded-full" />
+            </div>
+            <WaSkeleton className="h-4 w-full" />
+          </div>
+          <div className="md:col-span-2 p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 space-y-4">
+            <div className="flex justify-between items-center">
+              <WaSkeleton className="h-6 w-48" />
+              <WaSkeleton className="h-6 w-24 rounded-full" />
+            </div>
+            <WaSkeleton className="h-4 w-3/4" />
+            <div className="grid grid-cols-3 gap-3 pt-4">
+              <WaSkeleton className="h-16 rounded-xl" />
+              <WaSkeleton className="h-16 rounded-xl" />
+              <WaSkeleton className="h-16 rounded-xl" />
+            </div>
+          </div>
+        </div>
+
+        {/* ROT Category Summary Cards Skeletons */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="p-5 rounded-2xl border border-slate-800/80 bg-slate-900/60 space-y-3">
+              <div className="flex justify-between items-center">
+                <WaSkeleton className="h-4 w-28" />
+                <WaSkeleton className="h-4 w-4 rounded" />
+              </div>
+              <WaSkeleton className="h-8 w-20" />
+              <WaSkeleton className="h-3 w-36" />
+            </div>
+          ))}
+        </div>
+
+        {/* Freshness Gradient Decay Skeleton */}
+        <div className="p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 space-y-4">
+          <div className="flex justify-between items-center">
+            <WaSkeleton className="h-5 w-48" />
+            <WaSkeleton className="h-4 w-24" />
+          </div>
+          <WaSkeleton className="h-3.5 w-full rounded-full" />
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-2">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <WaSkeleton key={i} className="h-16 rounded-xl" />
+            ))}
+          </div>
+        </div>
+
+        {/* ROT File Table Skeleton */}
+        <div className="border border-slate-800/80 rounded-2xl overflow-hidden bg-slate-900/60">
+          <div className="p-4 border-b border-slate-800/80 flex items-center justify-between">
+            <WaSkeleton className="h-9 w-64 rounded-xl" />
+            <WaSkeleton className="h-9 w-32 rounded-xl" />
+          </div>
+          <Table>
+            <TableHeader className="bg-slate-950/60">
+              <TableRow className="border-slate-800/80">
+                <TableHead className="w-10"></TableHead>
+                <TableHead>File Name & Location</TableHead>
+                <TableHead>ROT Class</TableHead>
+                <TableHead>Freshness / Age</TableHead>
+                <TableHead>Size</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableSkeleton rows={8} cols={6} />
+            </TableBody>
+          </Table>
         </div>
       </div>
     )
@@ -315,13 +398,19 @@ export default function RotAnalysisView() {
 
   if (!rot || rot.count === 0) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 pb-12">
         <Hero
           icon={Flame}
-          title="Data ROT Analysis"
+          title="Data ROT Analysis & Hoarding Assessment"
           subtitle="Enterprise Redundant, Obsolete, and Trivial governance for Drive"
           faIcon={faFireFlameCurved}
           variant="rose"
+          actions={
+            <Button onClick={() => runScan('root', 'user')} size="lg" className="rounded-xl w-[170px] shrink-0">
+              <RefreshCw className="w-4 h-4 mr-2 shrink-0" />
+              Run Smart Scan
+            </Button>
+          }
         />
         <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
           <Sparkles className="w-12 h-12 text-emerald-400 mx-auto mb-4" />

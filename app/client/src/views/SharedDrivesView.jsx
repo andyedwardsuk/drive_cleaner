@@ -33,6 +33,7 @@ import { useFilePreview } from '@/hooks/useFilePreview'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import { WaSkeleton } from '@/components/ui/webawesome'
 import { cn } from '@/lib/utils'
 
 function formatBytes(bytes) {
@@ -377,9 +378,30 @@ export default function SharedDrivesView() {
               Select a Shared Drive on the left to view its deep hygiene audit.
             </div>
           ) : auditLoading ? (
-            <div className="p-12 text-center rounded-2xl border border-slate-800/80 bg-slate-900/40 text-slate-400 flex flex-col items-center justify-center gap-3">
-              <RefreshCw className="w-6 h-6 animate-spin text-blue-400" />
-              <span>Auditing repository {selectedDrive.name}...</span>
+            <div className="p-6 rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-xl space-y-6">
+              <div className="flex items-start justify-between gap-4 border-b border-slate-800/80 pb-5">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <WaSkeleton className="h-6 w-44" />
+                    <WaSkeleton className="h-5 w-24 rounded-full" />
+                  </div>
+                  <WaSkeleton className="h-4 w-60" />
+                </div>
+                <WaSkeleton className="h-9 w-32 rounded-xl" />
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="p-4 rounded-xl border border-slate-800/80 bg-slate-950/40 space-y-2">
+                    <WaSkeleton className="h-4 w-20" />
+                    <WaSkeleton className="h-7 w-28" />
+                  </div>
+                ))}
+              </div>
+              <div className="p-5 rounded-xl border border-slate-800/80 bg-slate-950/40 space-y-3">
+                <WaSkeleton className="h-5 w-36" />
+                <WaSkeleton className="h-4 w-full" />
+                <WaSkeleton className="h-4 w-3/4" />
+              </div>
             </div>
           ) : !auditReport ? (
             <div className="p-12 text-center rounded-2xl border border-slate-800/80 bg-slate-900/40 text-slate-400">

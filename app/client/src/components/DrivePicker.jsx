@@ -11,12 +11,10 @@ export default function DrivePicker({ onFolderSelected, disabled, className }) {
   const [pickerApiLoaded, setPickerApiLoaded] = useState(false)
   const [oauthToken, setOauthToken] = useState(null)
   const [isAuthorizing, setIsAuthorizing] = useState(false)
+  const isGAS = typeof google !== 'undefined' && google?.script?.run
 
   // Load Google Picker API
   useEffect(() => {
-    // Check if we're in Google Apps Script environment
-    const isGAS = typeof google !== 'undefined' && google.script && google.script.run
-
     if (isGAS) {
       // In GAS, we need to get the OAuth token from the server
       loadGASPicker()

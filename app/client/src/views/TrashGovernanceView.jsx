@@ -32,6 +32,7 @@ import { useFilePreview, normalizeFileMetadata } from '@/hooks/useFilePreview'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
+import { TableSkeleton } from '@/components/ui/TableSkeleton'
 import { cn } from '@/lib/utils'
 
 function getCategoryIcon(category) {
@@ -475,45 +476,48 @@ export default function TrashGovernanceView() {
         </AnimatePresence>
 
         {/* Trashed Files Table */}
-        <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-sm">
-          {loading ? (
-            <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
-              <RefreshCw className="h-8 w-8 animate-spin text-blue-400" />
-              <p className="text-sm">Auditing Google Drive Trash lifecycle & storage...</p>
-            </div>
-          ) : filteredFiles.length === 0 ? (
-            <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
-              <ShieldCheck className="h-12 w-12 text-slate-600" />
-              <p className="text-base font-medium text-slate-300">No items match your filter</p>
-              <p className="text-xs text-slate-500">
-                {overview.files?.length === 0
-                  ? 'Your Google Drive Trash is completely clean!'
-                  : 'Try selecting a different filter tab or clearing your search.'}
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto custom-scrollbar">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-800 bg-slate-950/60 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                    <th className="py-3.5 px-4 w-10">
-                      <input
-                        type="checkbox"
-                        checked={isAllVisibleSelected}
-                        onChange={handleToggleSelectAll}
-                        className="rounded border-slate-700 bg-slate-900 text-blue-600 focus:ring-blue-500/20 cursor-pointer"
-                      />
-                    </th>
-                    <th className="py-3.5 px-4">Item Name</th>
-                    <th className="py-3.5 px-4">Category</th>
-                    <th className="py-3.5 px-4">Size</th>
-                    <th className="py-3.5 px-4">Days in Trash</th>
-                    <th className="py-3.5 px-4">Auto-Purge Countdown</th>
-                    <th className="py-3.5 px-4 text-right">Actions</th>
+        <div className="relative bg-slate-900/60 border border-slate-800/80 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-sm">
+          {loading && (
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 animate-pulse z-30 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+          )}
+          <div className="overflow-x-auto custom-scrollbar">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-slate-800 bg-slate-950/60 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  <th className="py-3.5 px-4 w-10">
+                    <input
+                      type="checkbox"
+                      checked={isAllVisibleSelected}
+                      onChange={handleToggleSelectAll}
+                      disabled={loading}
+                      className="rounded border-slate-700 bg-slate-900 text-blue-600 focus:ring-blue-500/20 cursor-pointer disabled:opacity-40"
+                    />
+                  </th>
+                  <th className="py-3.5 px-4">Item Name</th>
+                  <th className="py-3.5 px-4">Category</th>
+                  <th className="py-3.5 px-4">Size</th>
+                  <th className="py-3.5 px-4">Days in Trash</th>
+                  <th className="py-3.5 px-4">Auto-Purge Countdown</th>
+                  <th className="py-3.5 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className={cn('divide-y divide-slate-800/50 text-sm', loading && filteredFiles.length > 0 && 'opacity-60 transition-opacity duration-150')}>
+                {loading && filteredFiles.length === 0 ? (
+                  <TableSkeleton rows={8} columnWidths={['w-4', 'w-56', 'w-20', 'w-16', 'w-24', 'w-32', 'w-16']} />
+                ) : filteredFiles.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-20 text-center">
+                      <ShieldCheck className="h-12 w-12 text-slate-600 mx-auto mb-3" />
+                      <p className="text-base font-medium text-slate-300">No items match your filter</p>
+                      <p className="text-xs text-slate-500 mt-1">
+                        {overview.files?.length === 0
+                          ? 'Your Google Drive Trash is completely clean!'
+                          : 'Try selecting a different filter tab or clearing your search.'}
+                      </p>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800/50 text-sm">
-                  {filteredFiles.map((file) => {
+                ) : (
+                  filteredFiles.map((file) => {
                     const CategoryIcon = getCategoryIcon(file.category)
                     const isSelected = selectedIds.has(file.id)
 
@@ -637,11 +641,11 @@ export default function TrashGovernanceView() {
                         </td>
                       </tr>
                     )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Modal 1: Selective Permanent Purge Confirmation */}

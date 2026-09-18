@@ -51,6 +51,7 @@ import { Badge } from '@/components/ui/badge'
 import { useFileActions } from '@/hooks/useFileActions'
 import { TrashConfirmationModal } from './actions/TrashConfirmationModal'
 import { UndoToast } from './actions/UndoToast'
+import { TableSkeleton } from '@/components/ui/TableSkeleton'
 
 // Helper to copy text to clipboard
 const copyToClipboard = (text) => {
@@ -129,7 +130,7 @@ const exportToJSON = (data) => {
   window.URL.revokeObjectURL(url)
 }
 
-export default function FileTable({ data = [] }) {
+export default function FileTable({ data = [], loading = false }) {
   const [sorting, setSorting] = useState([])
   const [globalFilter, setGlobalFilter] = useState('')
   const [columnFilters, setColumnFilters] = useState([])
@@ -514,7 +515,10 @@ export default function FileTable({ data = [] }) {
       )}
 
       {/* Table */}
-      <div className="rounded-2xl border border-slate-800/80 bg-slate-900/40 backdrop-blur-xl overflow-hidden shadow-lg">
+      <div className="relative rounded-2xl border border-slate-800/80 bg-slate-900/40 backdrop-blur-xl overflow-hidden shadow-lg">
+        {loading && (
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 animate-pulse z-30 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+        )}
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -539,8 +543,10 @@ export default function FileTable({ data = [] }) {
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
+          <TableBody className={cn(loading && table.getRowModel().rows?.length > 0 && 'opacity-60 transition-opacity duration-150')}>
+            {loading && !table.getRowModel().rows?.length ? (
+              <TableSkeleton rows={8} columnWidths={['w-4', 'w-5', 'w-56', 'w-16', 'w-20', 'w-28', 'w-24', 'w-16', 'w-6']} />
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                   {row.getVisibleCells().map((cell) => {
@@ -562,8 +568,8 @@ export default function FileTable({ data = [] }) {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                <TableCell colSpan={columns.length} className="h-24 text-center text-slate-400">
+                  No files found.
                 </TableCell>
               </TableRow>
             )}

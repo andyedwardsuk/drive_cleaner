@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { TableSkeleton } from '@/components/ui/TableSkeleton'
 import { cn } from '@/lib/utils'
 
 /**
@@ -265,67 +266,6 @@ export default function LargeFilesView() {
     )
   }
 
-  // Loading state
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <Hero
-          faIcon={faHardDrive}
-          variant="primary"
-          title="Large Files"
-          subtitle="Find and manage files taking up the most space"
-        />
-        <div className="p-16 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
-          <RefreshCw className="w-8 h-8 animate-spin text-blue-400 mx-auto mb-4" />
-          <p className="text-slate-300 text-sm">Scanning your Drive for large files...</p>
-        </div>
-      </div>
-    )
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <Hero
-          faIcon={faHardDrive}
-          variant="primary"
-          title="Large Files"
-          subtitle="Find and manage files taking up the most space"
-        />
-        <div className="p-10 border border-red-500/30 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
-          <p className="text-red-400 font-bold mb-2">Error loading large files</p>
-          <p className="text-slate-400 text-sm mb-6">{error}</p>
-          <Button
-            onClick={() => runScan('root', 'user')}
-            className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold"
-          >
-            Retry
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
-  // No large files found
-  if (!data?.large_files?.items || data.large_files.items.length === 0) {
-    return (
-      <div className="space-y-6">
-        <Hero
-          faIcon={faHardDrive}
-          variant="primary"
-          title="Large Files"
-          subtitle="Find and manage files taking up the most space"
-        />
-        <div className="p-12 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
-          <Sparkles className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
-          <p className="text-slate-200 text-lg font-bold mb-1">No large files found</p>
-          <p className="text-sm text-slate-400">Your Google Drive is exceptionally lean and well-optimised!</p>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-6">
       <Hero
@@ -336,13 +276,27 @@ export default function LargeFilesView() {
         actions={
           <Button
             onClick={() => runScan('root', 'user')}
-            className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-900/40"
+            disabled={loading}
+            className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-900/40 disabled:opacity-50"
           >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Refresh Scan
+            <RefreshCw className={cn('w-4 h-4 mr-2', loading && 'animate-spin')} />
+            {loading ? 'Scanning...' : 'Refresh Scan'}
           </Button>
         }
       />
+
+      {error && (
+        <div className="p-4 border border-red-500/30 rounded-2xl bg-red-950/20 text-red-400 text-sm flex items-center justify-between gap-3">
+          <p><strong>Error loading large files:</strong> {error}</p>
+          <Button
+            size="sm"
+            onClick={() => runScan('root', 'user')}
+            className="h-8 px-3 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-semibold"
+          >
+            Retry
+          </Button>
+        </div>
+      )}
 
       {/* Storage Summary */}
       <StorageSummary
@@ -432,34 +386,40 @@ export default function LargeFilesView() {
       </div>
 
       {/* Files Table */}
-      {filteredFiles.length === 0 ? (
-        <div className="p-12 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
-          <p className="text-slate-400 text-sm">No files match the selected filters or search query.</p>
-        </div>
-      ) : (
-        <div className="border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm overflow-hidden shadow-xl">
-          <Table>
-            <TableHeader>
-              <tr className="border-b border-slate-800 bg-slate-950/60 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                <TableHead className="w-12 text-slate-400">Type</TableHead>
-                <TableHead
-                  className="text-slate-400 cursor-pointer hover:text-slate-200 transition-colors"
-                  onClick={() => handleSort('name')}
-                >
-                  Name {sortBy === 'name' && (sortOrder === 'desc' ? '↓' : '↑')}
-                </TableHead>
-                <TableHead
-                  className="text-slate-400 cursor-pointer hover:text-slate-200 transition-colors"
-                  onClick={() => handleSort('size')}
-                >
-                  Size {sortBy === 'size' && (sortOrder === 'desc' ? '↓' : '↑')}
-                </TableHead>
-                <TableHead className="text-slate-400">Criteria</TableHead>
-                <TableHead className="text-slate-400 text-right w-20">Preview</TableHead>
-              </tr>
-            </TableHeader>
-            <TableBody className="divide-y divide-slate-800/50 text-sm">
-              {filteredFiles.map((file, index) => (
+      <div className="border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm overflow-hidden shadow-xl">
+        <Table>
+          <TableHeader>
+            <tr className="border-b border-slate-800 bg-slate-950/60 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              <TableHead className="w-12 text-slate-400">Type</TableHead>
+              <TableHead
+                className="text-slate-400 cursor-pointer hover:text-slate-200 transition-colors"
+                onClick={() => handleSort('name')}
+              >
+                Name {sortBy === 'name' && (sortOrder === 'desc' ? '↓' : '↑')}
+              </TableHead>
+              <TableHead
+                className="text-slate-400 cursor-pointer hover:text-slate-200 transition-colors"
+                onClick={() => handleSort('size')}
+              >
+                Size {sortBy === 'size' && (sortOrder === 'desc' ? '↓' : '↑')}
+              </TableHead>
+              <TableHead className="text-slate-400">Criteria</TableHead>
+              <TableHead className="text-slate-400 text-right w-20">Preview</TableHead>
+            </tr>
+          </TableHeader>
+          <TableBody className={cn('divide-y divide-slate-800/50 text-sm', loading && filteredFiles.length > 0 && 'opacity-60 transition-opacity duration-150')}>
+            {loading && filteredFiles.length === 0 ? (
+              <TableSkeleton rows={8} columnWidths={['w-6', 'w-64', 'w-24', 'w-28', 'w-8']} />
+            ) : filteredFiles.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="py-14 text-center text-slate-400">
+                  <Sparkles className="w-10 h-10 text-emerald-400 mx-auto mb-2" />
+                  <p className="font-semibold text-slate-200">No large files match your filters</p>
+                  <p className="text-xs text-slate-500 mt-1">Try adjusting the size threshold or search query.</p>
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredFiles.map((file, index) => (
                 <TableRow
                   key={file.file_id || index}
                   className="hover:bg-slate-800/40 transition-colors group"
@@ -497,11 +457,11 @@ export default function LargeFilesView() {
                     </Button>
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   )
 }

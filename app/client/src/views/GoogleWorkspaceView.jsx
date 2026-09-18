@@ -21,6 +21,8 @@ import { Input } from '@/components/ui/input'
 import { useSmartScan } from '@/hooks/useSmartScan'
 import { useFilePreview } from '@/hooks/useFilePreview'
 import FilePreviewModal from '@/components/preview/FilePreviewModal'
+import { WaSkeleton } from '@/components/ui/webawesome'
+import TableSkeleton from '@/components/ui/TableSkeleton'
 import {
   Table,
   TableBody,
@@ -235,8 +237,77 @@ export default function GoogleWorkspaceView() {
     }
   }
 
+  if (loading && !workspaceData) {
+    return (
+      <div className="space-y-6">
+        <Hero
+          icon={FileSpreadsheet}
+          title="Google Workspace Files"
+          subtitle="Scanning and categorising Docs, Sheets, Slides, Forms, and native Google files..."
+          faIcon={faClockRotateLeft}
+          variant="amber"
+          actions={
+            <Button disabled size="lg" className="rounded-xl w-[170px] shrink-0">
+              <RefreshCw className="w-4 h-4 mr-2 animate-spin shrink-0" />
+              Analysing...
+            </Button>
+          }
+        />
+
+        {/* Top Shimmer Progress Line */}
+        <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-blue-500 via-indigo-400 to-blue-500 animate-pulse w-full" />
+        </div>
+
+        {/* Top Stat Skeletons */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="p-5 border rounded-2xl bg-slate-900/60 border-slate-800/80 space-y-3">
+              <div className="flex items-center justify-between">
+                <WaSkeleton className="h-4 w-28" />
+                <WaSkeleton className="h-4 w-4 rounded" />
+              </div>
+              <WaSkeleton className="h-7 w-20" />
+              <WaSkeleton className="h-3 w-36" />
+            </div>
+          ))}
+        </div>
+
+        {/* Filter Toolbar Skeleton */}
+        <div className="p-5 border rounded-2xl bg-slate-900/60 border-slate-800/80 space-y-4">
+          <WaSkeleton className="h-10 w-full sm:w-80 rounded-xl" />
+          <div className="flex gap-2">
+            <WaSkeleton className="h-9 w-24 rounded-lg" />
+            <WaSkeleton className="h-9 w-24 rounded-lg" />
+            <WaSkeleton className="h-9 w-24 rounded-lg" />
+          </div>
+        </div>
+
+        {/* Table Skeleton */}
+        <div className="border border-slate-800/80 rounded-2xl overflow-hidden bg-slate-900/60">
+          <Table>
+            <TableHeader className="bg-slate-950/60">
+              <TableRow className="border-slate-800/80">
+                <TableHead className="w-12"></TableHead>
+                <TableHead>File Name</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Sharing</TableHead>
+                <TableHead>Last Viewed</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableSkeleton rows={8} cols={7} />
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+    )
+  }
+
   // No scan run yet
-  if (!data && !loading && !error) {
+  if (!workspaceData && !loading && !error) {
     return (
       <div className="space-y-6">
         <Hero
@@ -245,6 +316,12 @@ export default function GoogleWorkspaceView() {
           subtitle="Analyse your Docs, Sheets, Slides, Forms, and native Google files"
           faIcon={faFileLines}
           variant="primary"
+          actions={
+            <Button onClick={() => runScan('root', 'user')} size="lg" className="rounded-xl w-[170px] shrink-0">
+              <RefreshCw className="w-4 h-4 mr-2 shrink-0" />
+              Run Smart Scan
+            </Button>
+          }
         />
         <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
           <FileSpreadsheet className="w-16 h-16 text-blue-400 mx-auto mb-4 opacity-70" />
@@ -256,25 +333,6 @@ export default function GoogleWorkspaceView() {
             <RefreshCw className="w-4 h-4 mr-2" />
             Run Smart Scan
           </Button>
-        </div>
-      </div>
-    )
-  }
-
-  // Loading state
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <Hero
-          icon={FileSpreadsheet}
-          title="Google Workspace Files"
-          subtitle="Analysing Google Workspace files..."
-          faIcon={faClockRotateLeft}
-          variant="amber"
-        />
-        <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
-          <RefreshCw className="w-8 h-8 text-blue-400 animate-spin mx-auto mb-4" />
-          <p className="text-slate-300">Scanning and categorising Workspace files...</p>
         </div>
       </div>
     )

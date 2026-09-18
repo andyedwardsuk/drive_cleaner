@@ -22,6 +22,7 @@ import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useSmartScan } from '@/hooks/useSmartScan'
+import { WaSkeleton } from '@/components/ui/webawesome'
 
 /**
  * Format bytes to readable string
@@ -73,19 +74,73 @@ export default function CarbonFootprintView() {
 
   const carbon = data?.carbon_footprint || null
 
-  if (loading) {
+  if (loading && (!carbon || carbon.storage_gb === 0)) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 pb-12">
         <Hero
           icon={Leaf}
-          title="Cloud Carbon Footprint"
+          title="Cloud Carbon Footprint & Green Impact"
           subtitle="Estimate emissions and transform digital cleanup into climate action"
           faIcon={faLeaf}
           variant="emerald"
+          actions={
+            <Button disabled size="lg" className="rounded-xl w-[170px] shrink-0">
+              <RefreshCw className="w-4 h-4 mr-2 animate-spin shrink-0" />
+              Calculating...
+            </Button>
+          }
         />
-        <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
-          <RefreshCw className="w-8 h-8 animate-spin text-emerald-500 mx-auto mb-3" />
-          <p className="text-slate-300 font-medium">Calculating energy consumption & carbon emissions...</p>
+
+        {/* Top Shimmer Progress Line */}
+        <div className="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 animate-pulse w-full" />
+        </div>
+
+        {/* Main Carbon Summary Card Skeleton */}
+        <div className="p-6 md:p-8 rounded-2xl border border-slate-800/80 bg-slate-900/60 space-y-4">
+          <div className="flex justify-between items-center">
+            <WaSkeleton className="h-6 w-36 rounded-full" />
+            <WaSkeleton className="h-4 w-40" />
+          </div>
+          <div className="space-y-2">
+            <WaSkeleton className="h-10 w-48" />
+            <WaSkeleton className="h-4 w-96 max-w-full" />
+          </div>
+          <WaSkeleton className="h-8 w-72 max-w-full rounded-lg" />
+        </div>
+
+        {/* Tangible Real-World Equivalents Skeleton */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <WaSkeleton className="h-5 w-56" />
+            <WaSkeleton className="h-4 w-32" />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="p-5 rounded-2xl border border-slate-800/80 bg-slate-900/60 space-y-3">
+                <div className="flex justify-between">
+                  <WaSkeleton className="h-4 w-24" />
+                  <WaSkeleton className="h-4 w-4 rounded" />
+                </div>
+                <WaSkeleton className="h-8 w-28" />
+                <WaSkeleton className="h-3 w-32" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Carbon Breakdown Skeleton */}
+        <div className="p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 space-y-4">
+          <div className="flex justify-between items-center">
+            <WaSkeleton className="h-5 w-48" />
+            <WaSkeleton className="h-4 w-20" />
+          </div>
+          <WaSkeleton className="h-3.5 w-full rounded-full" />
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+            {[1, 2, 3, 4].map((i) => (
+              <WaSkeleton key={i} className="h-16 rounded-xl" />
+            ))}
+          </div>
         </div>
       </div>
     )
@@ -93,13 +148,19 @@ export default function CarbonFootprintView() {
 
   if (!carbon || carbon.storage_gb === 0) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 pb-12">
         <Hero
           icon={Leaf}
-          title="Cloud Carbon Footprint"
+          title="Cloud Carbon Footprint & Green Impact"
           subtitle="Estimate emissions and transform digital cleanup into climate action"
           faIcon={faLeaf}
           variant="emerald"
+          actions={
+            <Button onClick={() => runScan('root', 'user')} size="lg" className="rounded-xl w-[170px] shrink-0">
+              <RefreshCw className="w-4 h-4 mr-2 shrink-0" />
+              Run Smart Scan
+            </Button>
+          }
         />
         <div className="p-12 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-sm text-center">
           <Globe className="w-12 h-12 text-emerald-400 mx-auto mb-4" />

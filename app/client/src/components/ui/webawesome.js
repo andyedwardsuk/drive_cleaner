@@ -6,3 +6,5 @@ export { WaCallout } from './wa-callout'
 export { WaProgressBar, WaProgressRing } from './wa-progress'
 export { WaTooltip } from './wa-tooltip'
 export { WaDialog } from './wa-dialog'
+export { WaSkeleton } from './wa-skeleton'
+

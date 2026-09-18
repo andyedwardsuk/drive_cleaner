@@ -10,6 +10,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Hero from '@/components/Hero'
 import { Button } from '@/components/ui/button'
+import { WaSkeleton } from '@/components/ui/webawesome'
 import { useQuota } from '@/hooks/useQuota'
 import { useNavigate } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
@@ -63,18 +64,53 @@ export default function StorageAnalyticsView() {
   const navigate = useNavigate()
   const { data, loading, error, fetchQuota } = useQuota()
 
-  if (loading) {
+  if (loading && !data?.data) {
     return (
       <div className="space-y-6">
         <Hero
           faIcon={faChartPie}
           variant="cyan"
           title="Storage Analytics"
-          subtitle="Visual breakdown of your Drive storage usage"
+          subtitle="Visual breakdown of your Google Drive storage quota and allocation"
+          actions={
+            <Button
+              disabled
+              className="h-11 px-5 rounded-xl bg-blue-600 text-white font-semibold text-xs shadow-lg shadow-blue-900/40 opacity-50"
+            >
+              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+              Loading Quota...
+            </Button>
+          }
         />
-        <div className="p-16 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
-          <RefreshCw className="w-8 h-8 animate-spin text-blue-400 mx-auto mb-4" />
-          <p className="text-slate-300 text-sm">Loading Google Drive storage metrics...</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="p-6 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm shadow-lg">
+              <div className="flex items-start gap-4">
+                <WaSkeleton className="w-12 h-12 rounded-xl" />
+                <div className="flex-1 space-y-2">
+                  <WaSkeleton className="h-3 w-20" />
+                  <WaSkeleton className="h-7 w-28" />
+                  <WaSkeleton className="h-3 w-16" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="p-6 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm shadow-lg h-80 flex flex-col justify-between">
+            <WaSkeleton className="h-5 w-48" />
+            <div className="flex items-center justify-center">
+              <WaSkeleton className="w-44 h-44 rounded-full" />
+            </div>
+            <WaSkeleton className="h-4 w-32 mx-auto" />
+          </div>
+          <div className="p-6 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm shadow-lg h-80 flex flex-col justify-between">
+            <WaSkeleton className="h-5 w-48" />
+            <div className="flex items-center justify-center">
+              <WaSkeleton className="w-44 h-44 rounded-full" />
+            </div>
+            <WaSkeleton className="h-4 w-32 mx-auto" />
+          </div>
         </div>
       </div>
     )

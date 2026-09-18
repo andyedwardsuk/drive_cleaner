@@ -352,17 +352,17 @@ export default function DashboardView() {
             <Button
               type="submit"
               disabled={loading}
-              className="h-11 px-6 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl shadow-md shadow-blue-600/25 shrink-0 flex items-center justify-center gap-2"
+              className="h-11 w-[140px] shrink-0 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl shadow-md shadow-blue-600/25 flex items-center justify-center gap-2 transition-colors"
             >
               {loading ? (
                 <>
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                  Loading...
+                  <RefreshCw className="h-4 w-4 animate-spin shrink-0" />
+                  <span>Loading...</span>
                 </>
               ) : (
                 <>
-                  <FolderSearch className="h-4 w-4" />
-                  Load Folder
+                  <FolderSearch className="h-4 w-4 shrink-0" />
+                  <span>Load Folder</span>
                 </>
               )}
             </Button>
@@ -390,13 +390,8 @@ export default function DashboardView() {
         </div>
       )}
 
-      {loading ? (
-        <div className="flex items-center justify-center p-12">
-          <RefreshCw className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      ) : (
-        <FileTable data={data} />
-      )}
+      {/* Persistent FileTable with in-place skeleton loading */}
+      <FileTable data={data} loading={loading} />
     </div>
   )
 }
