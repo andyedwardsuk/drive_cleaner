@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import FolderSelector from '@/components/FolderSelector'
 import { useSmartScan } from '@/hooks/useSmartScan'
 import { getDriveFolderUrl } from '@/lib/driveUtils'
+import { cn } from '@/lib/utils'
 
 /**
  * Format bytes to human readable format
@@ -234,35 +235,91 @@ function ScanResults({ data }) {
       {/* Recommendations */}
       {data.recommendations && data.recommendations.length > 0 && (
         <div className="p-6 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm shadow-xl">
-          <h3 className="text-base font-semibold text-white mb-4">Actionable Recommendations</h3>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-base font-semibold text-white">Actionable Recommendations</h3>
+              <p className="text-xs text-slate-400 mt-0.5">Prioritised cleanup actions based on your Drive analysis</p>
+            </div>
+            <Badge variant="secondary" className="bg-slate-800 text-slate-300 border-slate-700">
+              {data.recommendations.length} Suggestions
+            </Badge>
+          </div>
           <div className="space-y-3">
-            {data.recommendations.map((rec, index) => (
-              <div
-                key={index}
-                className="flex items-start gap-3 p-4 rounded-xl bg-slate-950/60 border border-slate-800/60"
-              >
-                <Badge
-                  variant={
-                    rec.priority === 'high'
-                      ? 'destructive'
-                      : rec.priority === 'medium'
-                      ? 'default'
-                      : 'secondary'
-                  }
-                  className="mt-0.5 uppercase text-[10px]"
+            {data.recommendations.map((rec, index) => {
+              const title = rec.title || rec.message || 'Suggested Cleanup Action'
+              const description = rec.description || null
+              const savings = rec.estimated_savings_bytes || rec.space_savings_bytes || 0
+              const count = rec.affected_files_count || rec.file_count || 0
+              const category = rec.category || ''
+
+              // Map category to view navigation path
+              const categoryPathMap = {
+                temp_files: '/temp-files',
+                duplicates: '/duplicates',
+                empty_items: '/empty-items',
+                old_files: '/old-files',
+                large_files: '/large-files',
+                workspace_files: '/workspace-files',
+                rot_analysis: '/rot-analysis',
+              }
+              const targetPath = categoryPathMap[category]
+
+              return (
+                <div
+                  key={rec.recommendation_id || index}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-slate-950/60 border border-slate-800/60 hover:border-slate-700 transition-colors"
                 >
-                  {rec.priority}
-                </Badge>
-                <div className="flex-1">
-                  <p className="text-sm text-slate-200">{rec.message}</p>
-                  {rec.space_savings_bytes > 0 && (
-                    <p className="text-xs text-emerald-400 font-medium mt-1">
-                      Reclaimable: {formatBytes(rec.space_savings_bytes)}
-                    </p>
+                  <div className="flex items-start gap-3 min-w-0 flex-1">
+                    <Badge
+                      variant={
+                        rec.priority === 'high'
+                          ? 'destructive'
+                          : rec.priority === 'medium'
+                          ? 'default'
+                          : 'secondary'
+                      }
+                      className={cn(
+                        'mt-0.5 uppercase text-[10px] font-bold tracking-wider shrink-0',
+                        rec.priority === 'high' ? 'bg-red-500/20 text-red-300 border-red-500/30' :
+                        rec.priority === 'medium' ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' :
+                        'bg-slate-800 text-slate-300 border-slate-700'
+                      )}
+                    >
+                      {rec.priority}
+                    </Badge>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <h4 className="text-sm font-semibold text-white tracking-tight">{title}</h4>
+                        {count > 0 && (
+                          <span className="text-[11px] text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded-md border border-slate-700/50">
+                            {count} {count === 1 ? 'file' : 'files'}
+                          </span>
+                        )}
+                        {savings > 0 && (
+                          <span className="text-[11px] font-medium text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                            Save {formatBytes(savings)}
+                          </span>
+                        )}
+                      </div>
+                      {description && (
+                        <p className="text-xs text-slate-400 leading-relaxed max-w-2xl">{description}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {targetPath && (
+                    <Button
+                      size="sm"
+                      onClick={() => navigate({ to: targetPath })}
+                      className="h-9 px-4 rounded-lg bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30 hover:border-blue-500 text-xs font-semibold shrink-0 transition-all group"
+                    >
+                      <span>Review & Clean</span>
+                      <ChevronRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-0.5 transition-transform" />
+                    </Button>
                   )}
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       )}

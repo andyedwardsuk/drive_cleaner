@@ -200,8 +200,12 @@ function generateRecommendations(scanResults) {
       return b.estimated_savings_bytes - a.estimated_savings_bytes;
     });
 
-    // Return top 5 recommendations
-    return sortedRecommendations.slice(0, 5);
+    // Return top 5 recommendations with both title/message and savings fields for complete compatibility
+    return sortedRecommendations.slice(0, 5).map(r => ({
+      ...r,
+      message: r.title || r.message,
+      space_savings_bytes: r.estimated_savings_bytes || r.space_savings_bytes || 0
+    }));
   } catch (error) {
     console.error(`Error in generateRecommendations: ${error.message}`);
     return [];
