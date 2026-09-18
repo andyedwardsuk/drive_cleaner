@@ -41,36 +41,38 @@ export default function Hero({
       <div className="absolute -top-16 -right-16 w-56 h-56 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-6">
-        {/* Icon/Illustration Emblem */}
-        <div className="flex-shrink-0">
-          {activeIcon ? (
-            <IconBadge icon={activeIcon} variant={variant} size="xl" />
-          ) : typeof illustration === 'string' ? (
-            <div className="text-4xl md:text-5xl select-none">{illustration}</div>
-          ) : null}
-        </div>
-
-        {/* Text Content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-center gap-3 mb-1.5">
-            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">{title}</h1>
-            {badge && (
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/15 text-blue-300 border border-blue-500/30">
-                {badge}
-              </span>
-            )}
+      <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex items-center gap-5 min-w-0">
+          {/* Icon/Illustration Emblem */}
+          <div className="flex-shrink-0">
+            {activeIcon ? (
+              <IconBadge icon={activeIcon} variant={variant} size="xl" />
+            ) : typeof illustration === 'string' ? (
+              <div className="text-4xl md:text-5xl select-none">{illustration}</div>
+            ) : null}
           </div>
-          <p className="text-sm md:text-base text-slate-300 max-w-2xl leading-relaxed">{subtitle}</p>
 
-          {/* Actions & Children */}
-          {(actions || children) && (
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              {actions}
-              {children}
+          {/* Text Content */}
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-3 mb-1">
+              <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">{title}</h1>
+              {badge && (
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/15 text-blue-300 border border-blue-500/30">
+                  {badge}
+                </span>
+              )}
             </div>
-          )}
+            <p className="text-sm md:text-base text-slate-300 max-w-2xl leading-relaxed">{subtitle}</p>
+          </div>
         </div>
+
+        {/* Actions on same line (desktop) */}
+        {(actions || children) && (
+          <div className="flex-shrink-0 flex flex-wrap items-center gap-3">
+            {actions}
+            {children}
+          </div>
+        )}
       </div>
     </div>
   )
