@@ -347,7 +347,18 @@ function ScanResults({ data }) {
  * Smart Scan View - Main component
  */
 export default function SmartScanView() {
-  const { data, loading, error, targetFolder, recentFolders, setTargetFolder, runScan, reset } = useSmartScan()
+  const {
+    data,
+    loading,
+    error,
+    targetFolder,
+    recentFolders,
+    setTargetFolder,
+    runScan,
+    reset,
+    scanProgress,
+    stopAndAnalyze
+  } = useSmartScan()
 
   const handleStartScan = () => {
     const id = targetFolder?.id || 'root'
@@ -435,12 +446,40 @@ export default function SmartScanView() {
       />
 
       {loading && (
-        <div className="p-12 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm text-center shadow-lg">
-          <div className="animate-pulse">
-            <p className="text-slate-200 font-medium mb-2">Analysing files in {targetLabel}...</p>
-            <p className="text-xs text-slate-400">
-              Analysing size distribution, duplicates, staleness, Google Workspace files, and carbon footprint.
-            </p>
+        <div className="p-8 border border-blue-500/30 rounded-2xl bg-slate-900/80 backdrop-blur-md text-center shadow-xl relative overflow-hidden">
+          {/* Animated top progress bar */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-slate-800 overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 animate-pulse w-full shadow-[0_0_12px_rgba(59,130,246,0.8)]" />
+          </div>
+
+          <div className="max-w-md mx-auto space-y-4">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-400 border border-blue-500/30">
+              <FontAwesomeIcon icon={faHourglassHalf} className="animate-spin text-xl text-blue-400" />
+            </div>
+
+            <div>
+              <h3 className="text-base font-bold text-white mb-1">
+                {scanProgress?.filesProcessed > 0
+                  ? `${scanProgress.filesProcessed.toLocaleString()} Files Indexed`
+                  : `Connecting to ${targetLabel}...`}
+              </h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                {scanProgress?.statusText || `Analyzing ${targetLabel} across folders, duplicates, and carbon footprint.`}
+              </p>
+            </div>
+
+            {scanProgress?.filesProcessed > 0 && (
+              <div className="pt-2 flex justify-center">
+                <Button
+                  onClick={stopAndAnalyze}
+                  variant="outline"
+                  size="sm"
+                  className="h-9 px-4 rounded-xl border-amber-500/40 text-amber-300 hover:bg-amber-500/10 text-xs font-semibold transition-all active:scale-95"
+                >
+                  <span>Stop & Review Current Files ({scanProgress.filesProcessed.toLocaleString()})</span>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}

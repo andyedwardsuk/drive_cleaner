@@ -491,6 +491,214 @@ function calculateSpaceSavings_(categoryResults) {
 }
 
 /**
+ * Executes a single chunk of Smart Scan directory indexing.
+ * Called iteratively by the client to scan large drives without hitting GAS 6-minute limits.
+ *
+ * @param {string|Object} optionsPayload - JSON string or object { folderId, corpora, queue, pathLookup, chunkIndex, timeBudgetMs }
+ * @returns {string} JSON string of chunk result
+ */
+function runSmartScanChunk(optionsPayload) {
+  const chunkStartTime = Date.now();
+  try {
+    let opts = optionsPayload;
+    if (typeof optionsPayload === 'string') {
+      try {
+        opts = JSON.parse(optionsPayload);
+      } catch (e) {
+        opts = {};
+      }
+    }
+    opts = opts || {};
+
+    const rawFolderId = opts.folderId || 'root';
+    let cleanFolderId = rawFolderId.trim();
+    if (!cleanFolderId || cleanFolderId.toLowerCase() === 'root') {
+      cleanFolderId = 'root';
+    } else if (cleanFolderId.includes('/')) {
+      const match = cleanFolderId.match(/folders\/([A-Za-z0-9_-]+)/) || cleanFolderId.match(/[?&]id=([A-Za-z0-9_-]+)/);
+      if (match && match[1]) cleanFolderId = match[1];
+    }
+
+    const corpora = opts.corpora || 'user';
+    const chunkIndex = Number(opts.chunkIndex || 0);
+    const timeBudgetMs = Number(opts.timeBudgetMs || 45000); // 45 seconds default
+
+    // Call DriveApiHelpers.fetchDirectoryBatch
+    const batchResult = DriveApiHelpers.fetchDirectoryBatch({
+      rootFolderId: cleanFolderId,
+      corpora: corpora,
+      queue: opts.queue,
+      pathLookup: opts.pathLookup,
+      timeBudgetMs: timeBudgetMs,
+      maxItems: 3000
+    });
+
+    // Convert raw rows to structured file objects
+    const structuredFiles = createAnalysisContext_(batchResult.items || []);
+
+    const response = {
+      success: true,
+      isComplete: !!batchResult.isComplete,
+      chunkIndex: chunkIndex,
+      folderId: cleanFolderId,
+      folderName: (batchResult.rootFolderInfo && batchResult.rootFolderInfo.name) ? batchResult.rootFolderInfo.name : 'Target Folder',
+      files: structuredFiles,
+      remainingQueue: batchResult.remainingQueue || [],
+      pathLookup: batchResult.pathLookup || {},
+      skippedFolders: batchResult.skippedFolders || [],
+      chunkFilesCount: structuredFiles.length,
+      remainingFoldersCount: (batchResult.remainingQueue || []).length,
+      elapsedMs: Date.now() - chunkStartTime,
+      error: null
+    };
+
+    return JSON.stringify(response);
+  } catch (err) {
+    console.error(`Error in runSmartScanChunk: ${err.message}`, err.stack);
+    return JSON.stringify({
+      success: false,
+      isComplete: false,
+      chunkIndex: 0,
+      folderId: 'unknown',
+      folderName: 'Target Folder',
+      files: [],
+      remainingQueue: [],
+      pathLookup: {},
+      skippedFolders: [],
+      chunkFilesCount: 0,
+      remainingFoldersCount: 0,
+      elapsedMs: Date.now() - chunkStartTime,
+      error: err.message || 'Chunk scan encountered an error'
+    });
+  }
+}
+
+/**
+ * Finalizes Smart Scan analysis across all accumulated files from chunks.
+ * Executes all 7 analyzers, calculates savings, ROT clutter, carbon footprint, and smart recommendations.
+ *
+ * @param {Array|string} filesPayload - Array or JSON string of accumulated structured files
+ * @param {string} [folderId='root'] - Target folder ID
+ * @param {string} [folderName='My Drive'] - Target folder display name
+ * @param {string|Object} [extraMeta] - Optional additional metadata
+ * @returns {string} JSON string of complete ScanResultsProps
+ */
+function finishSmartScan(filesPayload, folderId, folderName, extraMeta) {
+  const finishStartTime = Date.now();
+  try {
+    let structuredFiles = filesPayload;
+    if (typeof filesPayload === 'string') {
+      try {
+        structuredFiles = JSON.parse(filesPayload);
+      } catch (e) {
+        structuredFiles = [];
+      }
+    }
+    structuredFiles = Array.isArray(structuredFiles) ? structuredFiles : [];
+
+    const cleanFolderId = folderId || 'root';
+    const targetFolderName = folderName || (cleanFolderId === 'root' ? 'My Drive' : 'Drive Folder');
+
+    console.log(`Finalizing Smart Scan on ${structuredFiles.length} files...`);
+
+    if (structuredFiles.length === 0) {
+      return JSON.stringify({
+        success: true,
+        folder_id: cleanFolderId,
+        folder_name: targetFolderName,
+        total_files_scanned: 0,
+        total_space_used_bytes: 0,
+        total_potential_savings_bytes: 0,
+        scan_date: new Date().toISOString(),
+        large_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Large Files', category_type: 'large_files' },
+        old_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Old Files', category_type: 'old_files' },
+        duplicates: { count: 0, total_size_bytes: 0, items: [], category_name: 'Duplicate Files', category_type: 'duplicates' },
+        empty_items: { count: 0, total_size_bytes: 0, items: [], category_name: 'Empty Items', category_type: 'empty_items' },
+        temp_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Temporary Files', category_type: 'temp_files' },
+        workspace_files: { count: 0, total_size_bytes: 0, items: [], category_name: 'Google Workspace Files', category_type: 'workspace_files', type_breakdown: {}, unused_breakdown: { six_months: 0, one_year: 0, two_years: 0 }, sharing_breakdown: { shared: 0, private: 0, unknown: 0 } },
+        rot_analysis: { count: 0, total_size_bytes: 0, category_name: 'Data ROT Analysis', category_type: 'rot_analysis', breakdown: { redundant: { count: 0, total_size_bytes: 0 }, obsolete: { count: 0, total_size_bytes: 0 }, trivial: { count: 0, total_size_bytes: 0 } }, clutter_index: { score: 0, target: 20, breakdown: { rot_ratio: 0, disorganization: 0, inertia: 0, data_gravity: 0 } }, hoarding_score: { total_score: 0, rating: { level: 'Minimal', color: 'green', icon: '✨' }, components: { clutter_volume: 0, disorganization: 0, accumulation: 0, attachment: 0 } }, freshness_distribution: { fresh: { count: 0, percentage: 0 }, aging: { count: 0, percentage: 0 }, stale: { count: 0, percentage: 0 }, rotting: { count: 0, percentage: 0 }, decayed: { count: 0, percentage: 0 } }, items: [] },
+        carbon_footprint: { storage_gb: 0, annual_energy_kwh: 0, annual_co2_kg: 0, annual_co2_tonnes: 0, equivalents: { headline: '0 smartphone charges', car_miles: 0, car_km: 0, smartphone_charges: 0, tree_years: 0, burgers: 0, laptop_hours: 0, coffee_cups: 0 }, breakdown_by_type: {}, potential_savings: { cleanup_gb: 0, co2_saved_kg: 0, energy_saved_kwh: 0, equivalents: { headline: '0 smartphone charges', car_miles: 0, car_km: 0, smartphone_charges: 0, tree_years: 0, burgers: 0 } }, eco_rating: { level: 'Eco Champion', color: 'emerald', icon: '🌟', badge: 'Minimal Carbon Impact', message: 'No storage footprint.' }, achievements: [] },
+        recommendations: [],
+        error: null
+      });
+    }
+
+    // Run all analyzers
+    // eslint-disable-next-line no-undef
+    const largeFilesResult = analyzeLargeFiles(structuredFiles);
+    // eslint-disable-next-line no-undef
+    const oldFilesResult = analyzeOldFiles(structuredFiles);
+    // eslint-disable-next-line no-undef
+    const emptyItemsResult = analyzeEmptyItems(structuredFiles);
+    // eslint-disable-next-line no-undef
+    const tempFilesResult = analyzeTempFiles(structuredFiles);
+    // eslint-disable-next-line no-undef
+    const duplicatesResult = analyzeDuplicates(structuredFiles);
+    // eslint-disable-next-line no-undef
+    const workspaceFilesResult = analyzeWorkspaceFiles(structuredFiles);
+    // eslint-disable-next-line no-undef
+    const rotAnalysisResult = analyzeROT(structuredFiles);
+
+    // Calculate total space used
+    const totalSpaceUsed = structuredFiles.reduce(function (sum, file) {
+      return sum + (file.size_bytes || 0);
+    }, 0);
+
+    const categoryResults = {
+      large_files: largeFilesResult,
+      old_files: oldFilesResult,
+      empty_items: emptyItemsResult,
+      temp_files: tempFilesResult,
+      duplicates: duplicatesResult,
+      workspace_files: workspaceFilesResult,
+      rot_analysis: rotAnalysisResult
+    };
+
+    // Calculate total potential savings
+    // eslint-disable-next-line no-undef
+    const totalSavings = calculateTotalSavings(categoryResults);
+
+    // Run Carbon Footprint Analyzer
+    // eslint-disable-next-line no-undef
+    const carbonFootprintResult = analyzeCarbonFootprint(structuredFiles, totalSavings);
+
+    // Generate recommendations
+    // eslint-disable-next-line no-undef
+    const recommendations = generateRecommendations(categoryResults);
+
+    const scanResults = {
+      success: true,
+      folder_id: cleanFolderId,
+      folder_name: targetFolderName,
+      total_files_scanned: structuredFiles.length,
+      total_space_used_bytes: totalSpaceUsed,
+      total_potential_savings_bytes: totalSavings,
+      scan_date: new Date().toISOString(),
+      is_partial: false,
+      elapsed_time_ms: Date.now() - finishStartTime,
+      large_files: largeFilesResult,
+      old_files: oldFilesResult,
+      duplicates: duplicatesResult,
+      empty_items: emptyItemsResult,
+      temp_files: tempFilesResult,
+      workspace_files: workspaceFilesResult,
+      rot_analysis: rotAnalysisResult,
+      carbon_footprint: carbonFootprintResult,
+      recommendations: recommendations,
+      error: null
+    };
+
+    return JSON.stringify(scanResults);
+  } catch (error) {
+    console.error(`Error in finishSmartScan: ${error.message}`, error.stack);
+    return JSON.stringify({
+      success: false,
+      error: error.message || 'Failed to finalize Smart Scan analysis'
+    });
+  }
+}
+
+/**
  * Test wrapper for Smart Scan - scans My Drive root
  * Simple function to test Smart Scan from Apps Script editor without parameters
  *
@@ -504,4 +712,6 @@ function testSmartScan() {
 
 // Export public functions to global scope for GAS
 globalThis.runSmartScan = runSmartScan;
+globalThis.runSmartScanChunk = runSmartScanChunk;
+globalThis.finishSmartScan = finishSmartScan;
 globalThis.testSmartScan = testSmartScan;

@@ -87,6 +87,109 @@ var DriveApiHelpers = (function () {
     return directoryRows;
   }
 
+  /**
+   * Fetches a chunk of file/folder data within a controlled time budget.
+   * Enables continuous resumable progressive scanning for high-volume enterprise drives.
+   *
+   * @param {Object} options
+   * @param {string} options.rootFolderId - Root folder ID or 'root'
+   * @param {string} options.corpora - 'drive' or 'user'
+   * @param {Array<Object>} [options.queue] - Remaining folder queue [{ id, name }]
+   * @param {Object} [options.pathLookup] - Object map of folder ID to full path
+   * @param {number} [options.timeBudgetMs=45000] - Safe time window per batch in ms
+   * @param {number} [options.maxItems=2500] - Target item limit per batch
+   * @returns {Object} Batch result with remainingQueue, pathLookup, and completion flag
+   */
+  function fetchDirectoryBatch(options) {
+    const opts = options || {};
+    const rootFolderId = opts.rootFolderId || 'root';
+    const corpora = opts.corpora || 'user';
+    const timeBudgetMs = opts.timeBudgetMs || 45000;
+    const maxItems = opts.maxItems || 2500;
+    const batchStartTime = Date.now();
+
+    const rootFolder = getRootFolderInfo_(rootFolderId);
+
+    // Initialize or restore folder path lookup map
+    const pathLookupMap = opts.pathLookup && typeof opts.pathLookup === 'object'
+      ? new Map(Object.entries(opts.pathLookup))
+      : new Map([[rootFolder.id, rootFolder.name]]);
+
+    // Initialize or restore folders to process
+    let foldersToProcess = Array.isArray(opts.queue) && opts.queue.length > 0
+      ? opts.queue.slice()
+      : [rootFolder];
+
+    let foldersRemaining = [];
+    let directoryRows = [];
+    const skippedFolders = [];
+
+    // Process folders in batches while within time budget and item limit
+    while (foldersToProcess.length > 0) {
+      // Check if time budget or item limit exceeded
+      if ((Date.now() - batchStartTime >= timeBudgetMs) || (directoryRows.length >= maxItems)) {
+        console.log(`Chunk limit reached (${(Date.now() - batchStartTime) / 1000}s, ${directoryRows.length} items). Returning partial batch.`);
+        break;
+      }
+
+      // Split into query batches
+      if (foldersToProcess.length > MAX_FOLDERS_PER_QUERY) {
+        foldersRemaining = foldersToProcess.splice(MAX_FOLDERS_PER_QUERY);
+      } else {
+        foldersRemaining = [];
+      }
+
+      try {
+        const items = fetchAllItemsFromFolders_(foldersToProcess, rootFolder.driveId, corpora, batchStartTime);
+        const processedData = processItemsIntoRows_(items, foldersToProcess, pathLookupMap);
+
+        // Queue newly discovered subfolders
+        foldersToProcess = [...foldersRemaining, ...processedData.childFolders];
+        directoryRows = directoryRows.concat(processedData.rows);
+      } catch (folderErr) {
+        console.warn(`Error querying folder chunk: ${folderErr.message}`);
+        foldersToProcess.forEach(function (f) {
+          skippedFolders.push({ id: f.id, name: f.name, error: folderErr.message });
+        });
+        foldersToProcess = foldersRemaining;
+      }
+    }
+
+    const isComplete = (foldersToProcess.length === 0);
+
+    // Convert Map back to plain object for clean JSON serialization
+    const pathLookupObj = {};
+    pathLookupMap.forEach(function (val, key) {
+      pathLookupObj[key] = val;
+    });
+
+    // Save session checkpoint to UserProperties
+    try {
+      const checkpoint = {
+        folderId: rootFolder.id,
+        folderName: rootFolder.name,
+        remainingFoldersCount: foldersToProcess.length,
+        itemsInBatch: directoryRows.length,
+        isComplete: isComplete,
+        timestamp: Date.now()
+      };
+      PropertiesService.getUserProperties().setProperty('dc_scan_checkpoint', JSON.stringify(checkpoint));
+    } catch (pe) {
+      console.warn('Could not write scan checkpoint to user properties: ' + pe.message);
+    }
+
+    return {
+      success: true,
+      items: directoryRows,
+      remainingQueue: foldersToProcess,
+      pathLookup: pathLookupObj,
+      isComplete: isComplete,
+      skippedFolders: skippedFolders,
+      rootFolderInfo: rootFolder,
+      batchElapsedMs: Date.now() - batchStartTime
+    };
+  }
+
   // ============================================
   // PRIVATE HELPER FUNCTIONS
   // ============================================
@@ -336,7 +439,8 @@ var DriveApiHelpers = (function () {
   // ============================================
 
   return {
-    getFileAndFolderData: getFileAndFolderData
+    getFileAndFolderData: getFileAndFolderData,
+    fetchDirectoryBatch: fetchDirectoryBatch
   };
 
 })();

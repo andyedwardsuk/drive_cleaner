@@ -54,11 +54,13 @@ export const useSmartScanStore = create((set, get) => ({
   targetFolder: { id: 'root', name: 'My Drive', corpora: 'user' },
   recentFolders: getSavedRecentFolders(),
 
+  scanProgress: null,
+  stopAndAnalyze: () => {},
   setData: (data) => set({ data }),
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
   setTargetFolder: (folder) => set({ targetFolder: { ...get().targetFolder, ...folder } }),
-  reset: () => set({ data: null, loading: false, error: null }),
+  reset: () => set({ data: null, loading: false, error: null, scanProgress: null }),
 
   /**
    * Run Smart Scan on a folder
@@ -81,7 +83,18 @@ export const useSmartScanStore = create((set, get) => ({
 
     // Development mode - return mock data
     if (!isGAS) {
-      set({ loading: true, error: null, data: null })
+      set({
+        loading: true,
+        error: null,
+        data: null,
+        scanProgress: {
+          isScanning: true,
+          chunkIndex: 0,
+          filesProcessed: 42,
+          remainingFolders: 3,
+          statusText: 'Simulating Smart Scan in local dev mode...'
+        }
+      })
       setTimeout(() => {
         set({
           data: {
@@ -565,6 +578,7 @@ export const useSmartScanStore = create((set, get) => ({
             ],
           },
           loading: false,
+          scanProgress: null,
         })
 
         // Log scan event in history
@@ -585,55 +599,154 @@ export const useSmartScanStore = create((set, get) => ({
       return
     }
 
-    // Production mode - call Google Apps Script
-    set({ loading: true, error: null, data: null })
+    // Production mode - call Google Apps Script with chunked progressive runner
+    set({
+      loading: true,
+      error: null,
+      data: null,
+      scanProgress: {
+        isScanning: true,
+        chunkIndex: 0,
+        filesProcessed: 0,
+        remainingFolders: 1,
+        statusText: `Connecting to Google Drive (${resolvedName})...`
+      }
+    })
 
-    google.script.run
-      .withSuccessHandler((result) => {
-        let parsedResult = result
-        if (typeof result === 'string') {
-          try {
-            parsedResult = JSON.parse(result)
-          } catch (e) {
-            console.error('Failed to parse scan results JSON:', e)
-            set({ error: 'Failed to parse scan results', data: null, loading: false })
+    let accumulatedFiles = []
+    let shouldStop = false
+
+    // Attach cancel / stop trigger to store
+    get().stopAndAnalyze = () => {
+      shouldStop = true
+      set({
+        scanProgress: {
+          ...(get().scanProgress || {}),
+          statusText: `Stopping scan. Finalizing analysis on ${accumulatedFiles.length} files...`
+        }
+      })
+    }
+
+    const finalizeAnalysis = (filesToAnalyze) => {
+      set({
+        scanProgress: {
+          isScanning: true,
+          chunkIndex: 0,
+          filesProcessed: filesToAnalyze.length,
+          remainingFolders: 0,
+          statusText: `Synthesizing Smart Scan recommendations for ${filesToAnalyze.length} files...`
+        }
+      })
+
+      google.script.run
+        .withSuccessHandler((finishRes) => {
+          let parsed = finishRes
+          if (typeof finishRes === 'string') {
+            try {
+              parsed = JSON.parse(finishRes)
+            } catch (e) {
+              parsed = null
+            }
+          }
+          if (parsed && parsed.success) {
+            const folderName = get().targetFolder?.name || 'Drive Folder'
+            const filesCount = parsed.total_files_scanned || filesToAnalyze.length
+            const savings = parsed.total_potential_savings_bytes || 0
+
+            addHistoryEvent({
+              type: 'scan',
+              title: `Smart Scan Completed: ${folderName}`,
+              folderName: folderName,
+              filesCount: filesCount,
+              bytesAffected: savings,
+              status: 'success',
+              details: {
+                largeFilesFound: parsed.large_files?.items?.length || 0,
+                duplicatesFound: parsed.duplicates?.items?.length || 0,
+                rotScore: parsed.rot_analysis?.clutter_index?.score || 0,
+              },
+            })
+
+            set({ data: parsed, loading: false, scanProgress: null, error: null })
+          } else {
+            console.error('finishSmartScan failed:', parsed)
+            set({ error: parsed?.error || 'Failed to finalize scan analysis', loading: false, scanProgress: null })
+          }
+        })
+        .withFailureHandler((err) => {
+          console.error('finishSmartScan error:', err)
+          set({ error: err.message || 'Failed to finalize scan results', loading: false, scanProgress: null })
+        })
+        .finishSmartScan(JSON.stringify(filesToAnalyze), targetId, resolvedName)
+    }
+
+    const executeChunk = (chunkIndex, queue, pathLookup) => {
+      const payload = {
+        folderId: targetId,
+        corpora: targetCorpora,
+        chunkIndex: chunkIndex,
+        queue: queue || null,
+        pathLookup: pathLookup || null,
+        timeBudgetMs: 45000
+      }
+
+      google.script.run
+        .withSuccessHandler((rawChunkRes) => {
+          let chunk = rawChunkRes
+          if (typeof rawChunkRes === 'string') {
+            try {
+              chunk = JSON.parse(rawChunkRes)
+            } catch (e) {
+              console.error('Failed to parse chunk response', e)
+              chunk = null
+            }
+          }
+
+          if (!chunk || !chunk.success) {
+            console.warn('Chunk returned unsuccessful result:', chunk)
+            if (accumulatedFiles.length > 0) {
+              finalizeAnalysis(accumulatedFiles)
+            } else {
+              set({ error: chunk?.error || 'Scan failed to access folder', loading: false, scanProgress: null })
+            }
             return
           }
-        }
 
-        console.log('Smart Scan received:', parsedResult ? { success: parsedResult.success, totalFiles: parsedResult.total_files_scanned } : null)
+          const newFiles = chunk.files || []
+          accumulatedFiles = accumulatedFiles.concat(newFiles)
 
-        if (parsedResult && parsedResult.success) {
-          const folderName = get().targetFolder?.name || 'Drive Folder'
-          const filesCount = parsedResult.files?.length || parsedResult.total_files_scanned || 0
-          const savings = parsedResult.total_potential_savings_bytes || 0
-
-          // Log scan event in history
-          addHistoryEvent({
-            type: 'scan',
-            title: `Smart Scan Completed: ${folderName}`,
-            folderName: folderName,
-            filesCount: filesCount,
-            bytesAffected: savings,
-            status: 'success',
-            details: {
-              largeFilesFound: parsedResult.large_files?.items?.length || 0,
-              duplicatesFound: parsedResult.duplicates?.items?.length || 0,
-              rotScore: parsedResult.rot_analysis?.clutter_index?.score || 0,
-            },
+          set({
+            scanProgress: {
+              isScanning: true,
+              chunkIndex: chunkIndex + 1,
+              filesProcessed: accumulatedFiles.length,
+              remainingFolders: chunk.remainingFoldersCount || 0,
+              statusText: `Indexed ${accumulatedFiles.length} files... (${chunk.remainingFoldersCount || 0} subfolders in queue)`
+            }
           })
 
-          set({ data: parsedResult, loading: false, error: null })
-        } else {
-          console.error('Smart Scan returned unsucessful result:', parsedResult)
-          set({ error: parsedResult?.error || 'Scan failed', data: null, loading: false })
-        }
-      })
-      .withFailureHandler((err) => {
-        console.error('Smart Scan error in withFailureHandler:', err)
-        set({ error: err.message || 'Failed to run Smart Scan', data: null, loading: false })
-      })
-      .runSmartScan(targetId, targetCorpora)
+          // Check if scan is complete or user asked to stop
+          if (chunk.isComplete || shouldStop) {
+            finalizeAnalysis(accumulatedFiles)
+          } else {
+            // Process next chunk
+            executeChunk(chunkIndex + 1, chunk.remainingQueue, chunk.pathLookup)
+          }
+        })
+        .withFailureHandler((err) => {
+          console.error(`Chunk ${chunkIndex} error:`, err)
+          if (accumulatedFiles.length > 0) {
+            console.log(`Finalizing analysis on ${accumulatedFiles.length} files despite chunk network error.`)
+            finalizeAnalysis(accumulatedFiles)
+          } else {
+            set({ error: err.message || 'Failed to scan folder', loading: false, scanProgress: null })
+          }
+        })
+        .runSmartScanChunk(JSON.stringify(payload))
+    }
+
+    // Launch initial chunk
+    executeChunk(0, null, null)
   },
 }))
 
@@ -659,6 +772,8 @@ export function useSmartScan() {
   const setTargetFolder = useSmartScanStore((state) => state.setTargetFolder)
   const runScan = useSmartScanStore((state) => state.runScan)
   const reset = useSmartScanStore((state) => state.reset)
+  const scanProgress = useSmartScanStore((state) => state.scanProgress)
+  const stopAndAnalyze = useSmartScanStore((state) => state.stopAndAnalyze)
 
   return {
     data,
@@ -669,6 +784,8 @@ export function useSmartScan() {
     setTargetFolder,
     runScan,
     reset,
+    scanProgress,
+    stopAndAnalyze,
   }
 }
 
