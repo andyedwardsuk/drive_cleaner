@@ -28,6 +28,8 @@ import {
   ChevronRight,
   TrendingDown
 } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPhotoFilm } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { useMediaOptimizer } from '@/hooks/useMediaOptimizer'
 import { useFilePreview } from '@/hooks/useFilePreview'
@@ -86,35 +88,14 @@ export default function MediaOptimizerView() {
   }
 
   return (
-    <div className="space-y-8 pb-16">
+    <div className="space-y-6 pb-16">
       {/* Hero Header */}
       <Hero
-        title="Google Photos & Media Optimisation Centre"
-        subtitle="Analyse heavy 4K videos, cluster rapid photo bursts, identify uncompressed RAW/ProRes assets, and reclaim cloud storage."
-        icon={Film}
-      >
-        <div className="flex flex-wrap items-center gap-3 mt-4">
-          <Button
-            variant="outline"
-            onClick={refresh}
-            disabled={loading}
-            className="h-11 px-4 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white"
-          >
-            <RefreshCw className={cn('w-4 h-4 mr-2', loading && 'animate-spin')} />
-            Refresh Media Audit
-          </Button>
-
-          <Button
-            variant="outline"
-            onClick={handleExportManifest}
-            disabled={loading || allMedia.length === 0}
-            className="h-11 px-4 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white"
-          >
-            <Download className="w-4 h-4 mr-2" />
-            Export Optimisation Manifest (CSV)
-          </Button>
-        </div>
-      </Hero>
+        title="Media Optimiser"
+        subtitle="Analyse heavy 4K videos, cluster rapid photo bursts, and identify uncompressed RAW assets"
+        faIcon={faPhotoFilm}
+        variant="purple"
+      />
 
       {/* Action Toast */}
       <AnimatePresence>
@@ -291,8 +272,28 @@ export default function MediaOptimizerView() {
           </button>
         </div>
 
-        {/* Search & Layout Toggles */}
-        <div className="flex items-center gap-3">
+        {/* Search & Layout Toggles & Actions */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Button
+            variant="outline"
+            onClick={refresh}
+            disabled={loading}
+            className="h-11 px-3.5 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold"
+          >
+            <RefreshCw className={cn('w-3.5 h-3.5 mr-2', loading && 'animate-spin')} />
+            Refresh
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={handleExportManifest}
+            disabled={loading || allMedia.length === 0}
+            className="h-11 px-3.5 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold"
+          >
+            <Download className="w-3.5 h-3.5 mr-2" />
+            Export CSV
+          </Button>
+
           <div className="relative min-w-[200px] flex-1 md:flex-initial">
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <Input

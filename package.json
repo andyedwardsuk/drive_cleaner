@@ -1,6 +1,6 @@
 {
   "name": "drive_cleaner",
-  "version": "3.6.6",
+  "version": "3.6.7",
   "description": "Google Apps Script JavaScript Project with JSDoc",
   "scripts": {
     "build": "node build.js",

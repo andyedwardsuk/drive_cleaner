@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import IconBadge from '@/components/common/IconBadge'
 
@@ -29,12 +28,9 @@ export default function Hero({
   const activeIcon = faIcon || Icon || (typeof illustration === 'object' ? illustration : null)
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
+    <div
       className={cn(
-        'relative overflow-hidden rounded-2xl p-6 md:p-8 mb-6',
+        'relative overflow-hidden rounded-2xl p-6 md:p-8',
         'bg-gradient-to-b from-slate-900/85 via-slate-900/60 to-slate-950/70',
         'border border-slate-800/80 border-t-white/10',
         'backdrop-blur-xl shadow-xl shadow-black/20',
@@ -76,6 +72,6 @@ export default function Hero({
           )}
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }

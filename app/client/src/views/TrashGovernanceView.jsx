@@ -26,6 +26,8 @@ import {
   Sparkles,
   ArrowUpDown
 } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrashCan } from '@fortawesome/pro-duotone-svg-icons'
 import Hero from '@/components/Hero'
 import { useTrashGovernance } from '@/hooks/useTrashGovernance'
 import { useFilePreview, normalizeFileMetadata } from '@/hooks/useFilePreview'
@@ -152,38 +154,38 @@ export default function TrashGovernanceView() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 p-6 md:p-10">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Toast / Notification Banner */}
-        <AnimatePresence>
-          {actionMessage && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className={cn(
-                'fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl border backdrop-blur-xl transition-all',
-                actionMessage.type === 'error'
-                  ? 'bg-red-950/90 border-red-500/50 text-red-200'
-                  : 'bg-emerald-950/90 border-emerald-500/50 text-emerald-200'
-              )}
-            >
-              {actionMessage.type === 'error' ? (
-                <AlertOctagon className="h-5 w-5 text-red-400" />
-              ) : (
-                <CheckCircle2 className="h-5 w-5 text-emerald-400" />
-              )}
-              <span className="text-sm font-medium">{actionMessage.text}</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
+    <div className="space-y-6 pb-16">
+      {/* Toast / Notification Banner */}
+      <AnimatePresence>
+        {actionMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className={cn(
+              'fixed top-6 right-6 z-50 flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-2xl border backdrop-blur-xl transition-all',
+              actionMessage.type === 'error'
+                ? 'bg-red-950/90 border-red-500/50 text-red-200'
+                : 'bg-emerald-950/90 border-emerald-500/50 text-emerald-200'
+            )}
+          >
+            {actionMessage.type === 'error' ? (
+              <AlertOctagon className="h-5 w-5 text-red-400" />
+            ) : (
+              <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+            )}
+            <span className="text-sm font-medium">{actionMessage.text}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        {/* Hero Section */}
-        <Hero
-          title="Trash Lifecycle & Purge Governance"
-          subtitle="Audit trapped storage in Google Drive Trash, track the 30-day auto-purge countdown, restore misplaced files, and execute safe permanent purges."
-          badge="v3.1.0 Hub"
-        />
+      {/* Hero Section */}
+      <Hero
+        title="Cloud Trash Governance"
+        subtitle="Audit trapped storage in Google Drive Trash and execute safe permanent purges"
+        faIcon={faTrashCan}
+        variant="rose"
+      />
 
         {/* 4 Stat Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -836,7 +838,6 @@ export default function TrashGovernanceView() {
             </div>
           )}
         </AnimatePresence>
-      </div>
     </div>
   )
 }
