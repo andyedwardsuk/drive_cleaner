@@ -590,10 +590,23 @@ export const useSmartScanStore = create((set, get) => ({
 
     google.script.run
       .withSuccessHandler((result) => {
-        if (result && result.success) {
+        let parsedResult = result
+        if (typeof result === 'string') {
+          try {
+            parsedResult = JSON.parse(result)
+          } catch (e) {
+            console.error('Failed to parse scan results JSON:', e)
+            set({ error: 'Failed to parse scan results', data: null, loading: false })
+            return
+          }
+        }
+
+        console.log('Smart Scan received:', parsedResult ? { success: parsedResult.success, totalFiles: parsedResult.total_files_scanned } : null)
+
+        if (parsedResult && parsedResult.success) {
           const folderName = get().targetFolder?.name || 'Drive Folder'
-          const filesCount = result.files?.length || result.total_files_scanned || 0
-          const savings = result.total_potential_savings_bytes || 0
+          const filesCount = parsedResult.files?.length || parsedResult.total_files_scanned || 0
+          const savings = parsedResult.total_potential_savings_bytes || 0
 
           // Log scan event in history
           addHistoryEvent({
@@ -604,19 +617,20 @@ export const useSmartScanStore = create((set, get) => ({
             bytesAffected: savings,
             status: 'success',
             details: {
-              largeFilesFound: result.analyzers?.largeFiles?.items?.length || 0,
-              duplicatesFound: result.analyzers?.duplicates?.items?.length || 0,
-              rotScore: result.analyzers?.rotAnalysis?.score || 0,
+              largeFilesFound: parsedResult.large_files?.items?.length || 0,
+              duplicatesFound: parsedResult.duplicates?.items?.length || 0,
+              rotScore: parsedResult.rot_analysis?.clutter_index?.score || 0,
             },
           })
 
-          set({ data: result, loading: false })
+          set({ data: parsedResult, loading: false, error: null })
         } else {
-          set({ error: result?.error || 'Scan failed', data: null, loading: false })
+          console.error('Smart Scan returned unsucessful result:', parsedResult)
+          set({ error: parsedResult?.error || 'Scan failed', data: null, loading: false })
         }
       })
       .withFailureHandler((err) => {
-        console.error('Smart Scan error:', err)
+        console.error('Smart Scan error in withFailureHandler:', err)
         set({ error: err.message || 'Failed to run Smart Scan', data: null, loading: false })
       })
       .runSmartScan(targetId, targetCorpora)

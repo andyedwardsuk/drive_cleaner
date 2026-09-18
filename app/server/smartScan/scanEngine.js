@@ -79,11 +79,11 @@ function runSmartScan(folderId, corpora) {
 
     // Validate inputs
     if (!folderId || typeof folderId !== 'string') {
-      return {
+      return JSON.stringify({
         success: false,
         error: 'Folder ID is required and must be a string',
         scan_date: scanStartTime.toISOString()
-      };
+      });
     }
 
     // Sanitize folderId if passed as a full URL or ID
@@ -138,7 +138,7 @@ function runSmartScan(folderId, corpora) {
 
     if (!filesData || filesData.length === 0) {
       console.log('No files found in folder');
-      return {
+      return JSON.stringify({
         success: true,
         folder_id: cleanFolderId,
         folder_name: folderName,
@@ -156,7 +156,7 @@ function runSmartScan(folderId, corpora) {
         carbon_footprint: { storage_gb: 0, annual_energy_kwh: 0, annual_co2_kg: 0, annual_co2_tonnes: 0, equivalents: { headline: '0 smartphone charges', car_miles: 0, car_km: 0, smartphone_charges: 0, tree_years: 0, burgers: 0, laptop_hours: 0, coffee_cups: 0 }, breakdown_by_type: {}, potential_savings: { cleanup_gb: 0, co2_saved_kg: 0, energy_saved_kwh: 0, equivalents: { headline: '0 smartphone charges', car_miles: 0, car_km: 0, smartphone_charges: 0, tree_years: 0, burgers: 0 } }, eco_rating: { level: 'Eco Champion', color: 'emerald', icon: '🌟', badge: 'Minimal Carbon Impact', message: 'No storage footprint.' }, achievements: [] },
         recommendations: [],
         error: null
-      };
+      });
     }
 
     console.log(`Retrieved ${filesData.length} items`);
@@ -167,7 +167,7 @@ function runSmartScan(folderId, corpora) {
 
     if (structuredFiles.length === 0) {
       console.warn('No valid files after creating analysis context');
-      return {
+      return JSON.stringify({
         success: true,
         folder_id: cleanFolderId,
         folder_name: folderName,
@@ -185,7 +185,7 @@ function runSmartScan(folderId, corpora) {
         carbon_footprint: { storage_gb: 0, annual_energy_kwh: 0, annual_co2_kg: 0, annual_co2_tonnes: 0, equivalents: { headline: '0 smartphone charges', car_miles: 0, car_km: 0, smartphone_charges: 0, tree_years: 0, burgers: 0, laptop_hours: 0, coffee_cups: 0 }, breakdown_by_type: {}, potential_savings: { cleanup_gb: 0, co2_saved_kg: 0, energy_saved_kwh: 0, equivalents: { headline: '0 smartphone charges', car_miles: 0, car_km: 0, smartphone_charges: 0, tree_years: 0, burgers: 0 } }, eco_rating: { level: 'Eco Champion', color: 'emerald', icon: '🌟', badge: 'Minimal Carbon Impact', message: 'No storage footprint.' }, achievements: [] },
         recommendations: [],
         error: null
-      };
+      });
     }
 
     // Run all analyzers
@@ -266,12 +266,13 @@ function runSmartScan(folderId, corpora) {
     console.log(`Smart Scan complete in ${scanDuration.toFixed(2)} seconds`);
     console.log(`Total potential savings: ${totalSavings} bytes`);
 
-    return scanResults;
+    // Return as JSON string to guarantee reliable serialization across google.script.run
+    return JSON.stringify(scanResults);
   } catch (error) {
     console.error(`Error in runSmartScan: ${error.message}`);
     console.error(error.stack);
 
-    return {
+    return JSON.stringify({
       success: false,
       folder_id: folderId || 'unknown',
       folder_name: 'Unknown Folder',
@@ -289,7 +290,7 @@ function runSmartScan(folderId, corpora) {
       carbon_footprint: { storage_gb: 0, annual_energy_kwh: 0, annual_co2_kg: 0, annual_co2_tonnes: 0, equivalents: { headline: '0 smartphone charges', car_miles: 0, car_km: 0, smartphone_charges: 0, tree_years: 0, burgers: 0, laptop_hours: 0, coffee_cups: 0 }, breakdown_by_type: {}, potential_savings: { cleanup_gb: 0, co2_saved_kg: 0, energy_saved_kwh: 0, equivalents: { headline: '0 smartphone charges', car_miles: 0, car_km: 0, smartphone_charges: 0, tree_years: 0, burgers: 0 } }, eco_rating: { level: 'Eco Champion', color: 'emerald', icon: '🌟', badge: 'Minimal Carbon Impact', message: 'No storage footprint.' }, achievements: [] },
       recommendations: [],
       error: error.message
-    };
+    });
   }
 }
 
@@ -475,7 +476,8 @@ function calculateSpaceSavings_(categoryResults) {
  */
 function testSmartScan() {
   console.log('Running Smart Scan test on My Drive root...');
-  return runSmartScan('root', 'user');
+  const res = runSmartScan('root', 'user');
+  return typeof res === 'string' ? JSON.parse(res) : res;
 }
 
 // Export public functions to global scope for GAS

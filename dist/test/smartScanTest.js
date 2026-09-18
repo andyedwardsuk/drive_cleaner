@@ -131,8 +131,8 @@ function testSmartScanSampleFolder() {
 
   try {
     // Run Smart Scan on My Drive root
-    // eslint-disable-next-line no-undef
-    const scanResults = runSmartScan('root', 'user');
+    const rawResults = runSmartScan('root', 'user');
+    const scanResults = typeof rawResults === 'string' ? JSON.parse(rawResults) : rawResults;
 
     console.log('Scan Results:', JSON.stringify(scanResults, null, 2));
 
