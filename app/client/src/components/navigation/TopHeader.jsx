@@ -1,4 +1,5 @@
 import { useRouterState, Link } from '@tanstack/react-router'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   Search,
   Scan,
@@ -34,7 +35,11 @@ export default function TopHeader({ onOpenCommandPalette }) {
         </span>
         <ChevronRight className="w-3.5 h-3.5 text-slate-600 shrink-0 hidden sm:inline" />
         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800/50 border border-slate-700/40 text-xs font-semibold text-slate-100 truncate">
-          <CurrentIcon className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+          {routeInfo.faIcon ? (
+            <FontAwesomeIcon icon={routeInfo.faIcon} className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+          ) : (
+            <CurrentIcon className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+          )}
           <span className="truncate">{routeInfo.label}</span>
         </div>
       </div>

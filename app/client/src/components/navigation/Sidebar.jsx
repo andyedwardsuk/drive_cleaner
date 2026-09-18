@@ -1,19 +1,19 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useRouterState } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  Home,
-  Trash2,
-  FolderTree,
-  ShieldAlert,
-  Layers,
-  Settings,
-  Info,
-  ChevronLeft,
-  ChevronRight,
-  Sparkles,
-  Command,
-} from 'lucide-react'
+  faGaugeHigh,
+  faTrashCan,
+  faFolderTree,
+  faShieldCheck,
+  faLayerGroup,
+  faGear,
+  faCircleInfo,
+  faChevronLeft,
+  faChevronRight,
+  faSparkles,
+} from '@fortawesome/pro-duotone-svg-icons'
 import { PRIMARY_HUBS } from '@/config/navigationItems'
 import { APP_VERSION } from '@/version'
 import { cn } from '@/lib/utils'
@@ -111,7 +111,7 @@ export default function Sidebar() {
           {!collapsed ? (
             <Link to="/dashboard" className="flex items-center gap-2.5 min-w-0 group">
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 border border-blue-400/30 group-hover:scale-105 transition-transform shrink-0">
-                <Sparkles className="w-4 h-4" />
+                <FontAwesomeIcon icon={faSparkles} className="w-4 h-4 text-white" />
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="text-sm font-bold text-white tracking-tight truncate flex items-center gap-1.5">
@@ -126,7 +126,7 @@ export default function Sidebar() {
           ) : (
             <Link to="/dashboard" className="mx-auto" title="Drive Cleaner">
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 border border-blue-400/30 shrink-0">
-                <Sparkles className="w-4 h-4" />
+                <FontAwesomeIcon icon={faSparkles} className="w-4 h-4 text-white" />
               </div>
             </Link>
           )}
@@ -139,7 +139,7 @@ export default function Sidebar() {
               title="Minimise sidebar"
               className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/80 transition-colors shrink-0"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <FontAwesomeIcon icon={faChevronLeft} className="w-3.5 h-3.5" />
             </motion.button>
           )}
         </div>
@@ -158,7 +158,6 @@ export default function Sidebar() {
             {/* Primary 5 Hubs List */}
             <div className="space-y-1.5">
               {PRIMARY_HUBS.map((hub) => {
-                const Icon = hub.icon
                 const active = isHubActive(hub)
 
                 return (
@@ -185,7 +184,11 @@ export default function Sidebar() {
                           : 'bg-slate-800/80 text-slate-400 group-hover:text-slate-200'
                       )}
                     >
-                      <Icon className="w-4 h-4" />
+                      <FontAwesomeIcon
+                        icon={hub.faIcon}
+                        className="w-4 h-4"
+                        style={{ '--fa-secondary-opacity': '0.45' }}
+                      />
                     </div>
 
                     <div className="flex-1 min-w-0">
@@ -219,7 +222,11 @@ export default function Sidebar() {
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
                 )}
               >
-                <Settings className="w-4 h-4 text-slate-400" />
+                <FontAwesomeIcon
+                  icon={faGear}
+                  className="w-4 h-4 text-slate-400"
+                  style={{ '--fa-secondary-opacity': '0.45' }}
+                />
                 <span>Settings</span>
               </Link>
               <Link
@@ -231,7 +238,11 @@ export default function Sidebar() {
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
                 )}
               >
-                <Info className="w-4 h-4 text-slate-400" />
+                <FontAwesomeIcon
+                  icon={faCircleInfo}
+                  className="w-4 h-4 text-slate-400"
+                  style={{ '--fa-secondary-opacity': '0.45' }}
+                />
                 <span>About</span>
               </Link>
 
@@ -253,14 +264,13 @@ export default function Sidebar() {
               title="Expand sidebar"
               className="w-10 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
             >
-              <ChevronRight className="h-4 w-4" />
+              <FontAwesomeIcon icon={faChevronRight} className="w-3.5 h-3.5" />
             </motion.button>
 
             <div className="w-8 h-px bg-slate-800/80 my-1" />
 
             {/* 5 Primary Hub Icons */}
             {PRIMARY_HUBS.map((hub) => {
-              const Icon = hub.icon
               const active = isHubActive(hub)
               const isHovered = activeFlyout?.hub?.id === hub.id
 
@@ -279,7 +289,18 @@ export default function Sidebar() {
                         : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                     )}
                   >
-                    <Icon className="h-4.5 w-4.5" />
+                    <FontAwesomeIcon
+                      icon={hub.faIcon}
+                      className={cn(
+                        'w-4 h-4 transition-transform duration-150 group-hover:scale-110',
+                        active ? 'text-blue-400' : 'text-slate-400 group-hover:text-slate-200'
+                      )}
+                      style={{
+                        '--fa-primary-color': active ? '#60a5fa' : '#cbd5e1',
+                        '--fa-secondary-color': active ? '#2563eb' : '#64748b',
+                        '--fa-secondary-opacity': '0.45',
+                      }}
+                    />
                     {active && (
                       <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-blue-400 rounded-r-full" />
                     )}
@@ -299,11 +320,22 @@ export default function Sidebar() {
               className={cn(
                 'w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 relative group',
                 currentPath === '/settings'
-                  ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                  ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30 shadow-md shadow-blue-500/20'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
               )}
             >
-              <Settings className="h-4.5 w-4.5" />
+              <FontAwesomeIcon
+                icon={faGear}
+                className={cn(
+                  'w-4 h-4 transition-transform duration-150 group-hover:scale-110',
+                  currentPath === '/settings' ? 'text-blue-400' : 'text-slate-400 group-hover:text-slate-200'
+                )}
+                style={{
+                  '--fa-primary-color': currentPath === '/settings' ? '#60a5fa' : '#cbd5e1',
+                  '--fa-secondary-color': currentPath === '/settings' ? '#2563eb' : '#64748b',
+                  '--fa-secondary-opacity': '0.45',
+                }}
+              />
               {currentPath === '/settings' && (
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-blue-400 rounded-r-full" />
               )}
@@ -370,7 +402,7 @@ export default function Sidebar() {
                   className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all group"
                 >
                   <span className="truncate">{subTab.label}</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-blue-400 transition-colors" />
+                  <FontAwesomeIcon icon={faChevronRight} className="w-3 h-3 text-slate-500 group-hover:text-blue-400 transition-colors" />
                 </Link>
               ))}
             </div>

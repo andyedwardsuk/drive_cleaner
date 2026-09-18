@@ -29,6 +29,16 @@ import {
   Film,
   Zap,
 } from 'lucide-react'
+import {
+  faGaugeHigh,
+  faTrashCan,
+  faFolderTree,
+  faShieldCheck,
+  faLayerGroup,
+  faGear,
+  faCircleInfo,
+  faSparkles,
+} from '@fortawesome/pro-duotone-svg-icons'
 
 // Primary 5-Hub Navigation for Clean, Modern Navigation
 export const PRIMARY_HUBS = [
@@ -37,6 +47,7 @@ export const PRIMARY_HUBS = [
     label: 'Dashboard',
     path: '/dashboard',
     icon: Home,
+    faIcon: faGaugeHigh,
     description: 'Drive overview, folder explorer, and storage telemetry',
     badge: null,
   },
@@ -45,6 +56,7 @@ export const PRIMARY_HUBS = [
     label: 'Cleanup Center',
     path: '/clean',
     icon: Trash2,
+    faIcon: faTrashCan,
     description: 'Smart scan, duplicates, 4K media, and trash purge',
     badge: '8 Tools',
     subTabs: [
@@ -63,6 +75,7 @@ export const PRIMARY_HUBS = [
     label: 'Organisation Studio',
     path: '/organise',
     icon: FolderTree,
+    faIcon: faFolderTree,
     description: 'Folder architect, shared drives, and taxonomy',
     badge: '5 Tools',
     subTabs: [
@@ -78,6 +91,7 @@ export const PRIMARY_HUBS = [
     label: 'Security & Governance',
     path: '/security',
     icon: ShieldAlert,
+    faIcon: faShieldCheck,
     description: 'Exposure audits, external sharing, and ROT',
     badge: '4 Tools',
     subTabs: [
@@ -92,6 +106,7 @@ export const PRIMARY_HUBS = [
     label: 'Operations & Automation',
     path: '/operations',
     icon: Layers,
+    faIcon: faLayerGroup,
     description: 'Bulk rules, kanban triage, triggers, and sync',
     badge: '6 Tools',
     subTabs: [
@@ -429,6 +444,7 @@ export function getRouteInfo(pathname) {
     label: 'Dashboard',
     path: '/dashboard',
     icon: Home,
+    faIcon: faGaugeHigh,
     categoryTitle: 'Core',
     description: 'Drive overview and storage telemetry',
   }
