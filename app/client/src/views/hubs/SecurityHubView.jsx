@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useRouterState, useNavigate } from '@tanstack/react-router'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  ShieldAlert,
-  Share2,
-  FileClock,
-  Leaf,
-} from 'lucide-react'
+  faShieldCheck,
+  faShareNodes,
+  faFileShield,
+  faLeaf,
+} from '@fortawesome/pro-duotone-svg-icons'
 import { cn } from '@/lib/utils'
 
 // View Components
@@ -18,28 +19,25 @@ const SECURITY_TABS = [
   {
     id: 'audit',
     label: 'Security & Exposure',
-    icon: ShieldAlert,
-    badge: 'Audit',
+    faIcon: faShieldCheck,
     component: SecurityAuditView,
   },
   {
     id: 'sharing',
     label: 'External Collaborators',
-    icon: Share2,
+    faIcon: faShareNodes,
     component: SharedFilesView,
   },
   {
     id: 'rot',
     label: 'ROT Classification',
-    icon: FileClock,
-    badge: 'Compliance',
+    faIcon: faFileShield,
     component: RotAnalysisView,
   },
   {
     id: 'carbon',
     label: 'Carbon Footprint',
-    icon: Leaf,
-    badge: 'Impact',
+    faIcon: faLeaf,
     component: CarbonFootprintView,
   },
 ]
@@ -75,9 +73,8 @@ export default function SecurityHubView() {
   return (
     <div className="space-y-6">
       {/* 2026 Segmented Navigation Bar */}
-      <div className="p-1.5 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-2xl shadow-xl flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth glass-specular-sm">
+      <div className="p-1.5 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-2xl shadow-xl grid grid-cols-2 xl:grid-cols-4 gap-1.5 glass-specular-sm">
         {SECURITY_TABS.map((tab) => {
-          const Icon = tab.icon
           const isActive = activeTab === tab.id
 
           return (
@@ -86,18 +83,21 @@ export default function SecurityHubView() {
               type="button"
               onClick={() => handleTabChange(tab.id)}
               className={cn(
-                'flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 active-spring shrink-0',
+                'flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 active-spring text-center w-full min-w-0',
                 isActive
                   ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25 border border-blue-400/30'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent'
               )}
             >
-              <Icon className={cn('w-4 h-4 shrink-0', isActive ? 'text-white' : 'text-slate-400')} />
-              <span>{tab.label}</span>
+              <FontAwesomeIcon
+                icon={tab.faIcon}
+                className={cn('w-3.5 h-3.5 shrink-0', isActive ? 'text-white' : 'text-blue-400')}
+              />
+              <span className="truncate">{tab.label}</span>
               {tab.badge && (
                 <span
                   className={cn(
-                    'px-1.5 py-0.2 text-[9px] font-bold rounded-full border',
+                    'hidden 2xl:inline-block px-1.5 py-0.2 text-[9px] font-bold rounded-full border shrink-0',
                     isActive
                       ? 'bg-blue-700/60 text-white border-blue-400/40'
                       : 'bg-slate-800 text-slate-300 border-slate-700'

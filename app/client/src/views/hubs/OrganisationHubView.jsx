@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useRouterState, useNavigate } from '@tanstack/react-router'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  FolderTree,
-  FolderSync,
-  Building2,
-  FileSpreadsheet,
-  Tag,
-} from 'lucide-react'
+  faFolderTree,
+  faSitemap,
+  faBuildings,
+  faFileSpreadsheet,
+  faTags,
+} from '@fortawesome/pro-duotone-svg-icons'
 import { cn } from '@/lib/utils'
 
 // View Components
@@ -20,33 +21,31 @@ const ORGANISATION_TABS = [
   {
     id: 'folders',
     label: 'Folder Explorer',
-    icon: FolderTree,
+    faIcon: faFolderTree,
     component: MyFoldersView,
   },
   {
     id: 'reorganizer',
     label: 'Smart Reorganiser',
-    icon: FolderSync,
-    badge: 'Hierarchy',
+    faIcon: faSitemap,
     component: SmartReorganizerView,
   },
   {
     id: 'shared-drives',
     label: 'Shared Drives',
-    icon: Building2,
-    badge: 'Enterprise',
+    faIcon: faBuildings,
     component: SharedDrivesView,
   },
   {
     id: 'workspace',
     label: 'Google Workspace',
-    icon: FileSpreadsheet,
+    faIcon: faFileSpreadsheet,
     component: GoogleWorkspaceView,
   },
   {
     id: 'labels',
     label: 'Drive Labels',
-    icon: Tag,
+    faIcon: faTags,
     component: DriveLabelsView,
   },
 ]
@@ -82,9 +81,8 @@ export default function OrganisationHubView() {
   return (
     <div className="space-y-6">
       {/* 2026 Segmented Navigation Bar */}
-      <div className="p-1.5 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-2xl shadow-xl flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth glass-specular-sm">
+      <div className="p-1.5 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-2xl shadow-xl grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-1.5 glass-specular-sm">
         {ORGANISATION_TABS.map((tab) => {
-          const Icon = tab.icon
           const isActive = activeTab === tab.id
 
           return (
@@ -93,18 +91,21 @@ export default function OrganisationHubView() {
               type="button"
               onClick={() => handleTabChange(tab.id)}
               className={cn(
-                'flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 active-spring shrink-0',
+                'flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 active-spring text-center w-full min-w-0',
                 isActive
                   ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25 border border-blue-400/30'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent'
               )}
             >
-              <Icon className={cn('w-4 h-4 shrink-0', isActive ? 'text-white' : 'text-slate-400')} />
-              <span>{tab.label}</span>
+              <FontAwesomeIcon
+                icon={tab.faIcon}
+                className={cn('w-3.5 h-3.5 shrink-0', isActive ? 'text-white' : 'text-blue-400')}
+              />
+              <span className="truncate">{tab.label}</span>
               {tab.badge && (
                 <span
                   className={cn(
-                    'px-1.5 py-0.2 text-[9px] font-bold rounded-full border',
+                    'hidden 2xl:inline-block px-1.5 py-0.2 text-[9px] font-bold rounded-full border shrink-0',
                     isActive
                       ? 'bg-blue-700/60 text-white border-blue-400/40'
                       : 'bg-slate-800 text-slate-300 border-slate-700'

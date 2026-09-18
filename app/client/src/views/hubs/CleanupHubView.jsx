@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react'
 import { useRouterState, useNavigate } from '@tanstack/react-router'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  Scan,
-  Copy,
-  FileDigit,
-  Clock,
-  FolderX,
-  FileQuestion,
-  Film,
-  Trash2,
-  Sparkles,
-} from 'lucide-react'
+  faMagnifyingGlassChart,
+  faClone,
+  faFileZipper,
+  faClock,
+  faFolderOpen,
+  faBroom,
+  faPhotoFilm,
+  faTrashCan,
+} from '@fortawesome/pro-duotone-svg-icons'
 import { cn } from '@/lib/utils'
 
 // View Components
@@ -27,52 +27,49 @@ const CLEANUP_TABS = [
   {
     id: 'smart-scan',
     label: 'Smart Scan',
-    icon: Scan,
-    badge: 'Auto Audit',
+    faIcon: faMagnifyingGlassChart,
     component: SmartScanView,
   },
   {
     id: 'duplicates',
-    label: 'Duplicate Files',
-    icon: Copy,
+    label: 'Duplicates',
+    faIcon: faClone,
     component: DuplicatesView,
   },
   {
     id: 'large-files',
     label: 'Large Files',
-    icon: FileDigit,
+    faIcon: faFileZipper,
     component: LargeFilesView,
   },
   {
     id: 'old-files',
     label: 'Old Files',
-    icon: Clock,
+    faIcon: faClock,
     component: OldFilesView,
   },
   {
     id: 'empty-items',
     label: 'Empty Items',
-    icon: FolderX,
+    faIcon: faFolderOpen,
     component: EmptyItemsView,
   },
   {
     id: 'temp-files',
-    label: 'Temporary Files',
-    icon: FileQuestion,
+    label: 'Temp Files',
+    faIcon: faBroom,
     component: TempFilesView,
   },
   {
     id: 'media-optimizer',
     label: 'Media Optimiser',
-    icon: Film,
-    badge: '4K/Photos',
+    faIcon: faPhotoFilm,
     component: MediaOptimizerView,
   },
   {
     id: 'trash-governance',
     label: 'Cloud Trash',
-    icon: Trash2,
-    badge: 'Purge',
+    faIcon: faTrashCan,
     component: TrashGovernanceView,
   },
 ]
@@ -107,9 +104,8 @@ export default function CleanupHubView() {
   return (
     <div className="space-y-6">
       {/* 2026 Segmented Navigation Bar */}
-      <div className="p-1.5 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-2xl shadow-xl flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth glass-specular-sm">
+      <div className="p-1.5 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-2xl shadow-xl grid grid-cols-2 sm:grid-cols-4 2xl:grid-cols-8 gap-1.5 glass-specular-sm">
         {CLEANUP_TABS.map((tab) => {
-          const Icon = tab.icon
           const isActive = activeTab === tab.id
 
           return (
@@ -118,18 +114,21 @@ export default function CleanupHubView() {
               type="button"
               onClick={() => handleTabChange(tab.id)}
               className={cn(
-                'flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 active-spring shrink-0',
+                'flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 active-spring text-center w-full min-w-0',
                 isActive
                   ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25 border border-blue-400/30'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent'
               )}
             >
-              <Icon className={cn('w-4 h-4 shrink-0', isActive ? 'text-white' : 'text-slate-400')} />
-              <span>{tab.label}</span>
+              <FontAwesomeIcon
+                icon={tab.faIcon}
+                className={cn('w-3.5 h-3.5 shrink-0', isActive ? 'text-white' : 'text-blue-400')}
+              />
+              <span className="truncate">{tab.label}</span>
               {tab.badge && (
                 <span
                   className={cn(
-                    'px-1.5 py-0.2 text-[9px] font-bold rounded-full border',
+                    'hidden 2xl:inline-block px-1.5 py-0.2 text-[9px] font-bold rounded-full border shrink-0',
                     isActive
                       ? 'bg-blue-700/60 text-white border-blue-400/40'
                       : 'bg-slate-800 text-slate-300 border-slate-700'
