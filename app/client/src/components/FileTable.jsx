@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 
 import { useFilePreview } from '@/hooks/useFilePreview'
+import { cn } from '@/lib/utils'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -519,8 +520,16 @@ export default function FileTable({ data = [] }) {
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
+                  const isActions = header.column.id === 'actions'
+                  const isSelect = header.column.id === 'select'
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead
+                      key={header.id}
+                      className={cn(
+                        isActions && 'sticky right-0 bg-slate-900/95 backdrop-blur-md z-20 shadow-[-8px_0_14px_-4px_rgba(0,0,0,0.7)] text-right',
+                        isSelect && 'sticky left-0 bg-slate-900/95 backdrop-blur-md z-20 shadow-[8px_0_14px_-4px_rgba(0,0,0,0.7)]'
+                      )}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(header.column.columnDef.header, header.getContext())}
@@ -534,11 +543,21 @@ export default function FileTable({ data = [] }) {
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    const isActions = cell.column.id === 'actions'
+                    const isSelect = cell.column.id === 'select'
+                    return (
+                      <TableCell
+                        key={cell.id}
+                        className={cn(
+                          isActions && 'sticky right-0 bg-slate-900/95 backdrop-blur-md z-10 shadow-[-8px_0_14px_-4px_rgba(0,0,0,0.7)] text-right',
+                          isSelect && 'sticky left-0 bg-slate-900/95 backdrop-blur-md z-10 shadow-[8px_0_14px_-4px_rgba(0,0,0,0.7)]'
+                        )}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    )
+                  })}
                 </TableRow>
               ))
             ) : (

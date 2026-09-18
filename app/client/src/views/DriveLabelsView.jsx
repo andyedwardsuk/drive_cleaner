@@ -460,7 +460,7 @@ export default function DriveLabelsView() {
               <p className="mt-1 text-xs">Try selecting a different label chip or clearing your search.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto custom-scrollbar">
               <table className="w-full text-left text-sm">
                 <thead className="border-b border-border/50 bg-muted/40 text-xs font-semibold uppercase text-muted-foreground">
                   <tr>

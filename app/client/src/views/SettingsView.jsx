@@ -45,6 +45,7 @@ import { WaSwitch, WaCallout, WaButton, WaBadge } from '@/components/ui/webaweso
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { APP_VERSION } from '@/version'
 
 export default function SettingsView() {
   const {
@@ -162,7 +163,7 @@ export default function SettingsView() {
         variant="primary"
         title="Settings & Preferences"
         subtitle="Fine-tune cleanup thresholds, scan behaviours, visual themes, and safe trash policies."
-        badge="v3.4.0 Active"
+        badge={`v${APP_VERSION} Active`}
       />
 
       {/* Tabs bar */}

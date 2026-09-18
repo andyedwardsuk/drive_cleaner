@@ -134,7 +134,7 @@ export default function ImpactTrendsChart({ dailyLogs = [] }) {
       </div>
 
       {/* SVG Chart */}
-      <div className="w-full overflow-x-auto">
+      <div className="w-full overflow-x-auto custom-scrollbar">
         <svg
           viewBox={`0 0 ${svgWidth} ${svgHeight}`}
           className="w-full h-48 overflow-visible"

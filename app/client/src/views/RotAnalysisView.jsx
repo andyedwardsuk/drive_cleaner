@@ -500,7 +500,7 @@ export default function RotAnalysisView() {
         {/* Controls Bar */}
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
           {/* Tabs */}
-          <div className="flex items-center gap-1.5 p-1 bg-white/5 rounded-lg border border-white/10 overflow-x-auto">
+          <div className="flex items-center gap-1.5 p-1 bg-white/5 rounded-lg border border-white/10 overflow-x-auto no-scrollbar scroll-smooth">
             <button
               type="button"
               onClick={() => setActiveTab('all')}

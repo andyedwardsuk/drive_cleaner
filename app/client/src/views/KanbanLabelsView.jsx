@@ -222,7 +222,7 @@ export default function KanbanLabelsView() {
       </div>
 
       {/* 4-Column Kanban Board Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto pb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto custom-scrollbar pb-4">
         {columns.map((col) => {
           const colCards = filteredCards.filter((card) => card.columnId === col.id)
           return (

@@ -451,7 +451,7 @@ export default function SecurityAuditView() {
 
         {/* Audit Table */}
         <div className="rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-sm overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-left text-xs">
               <thead className="border-b border-slate-800/80 bg-slate-950/80 text-slate-400 font-medium">
                 <tr>

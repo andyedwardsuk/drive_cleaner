@@ -78,7 +78,7 @@ export default function SecurityHubView() {
   return (
     <div className="space-y-6">
       {/* 2026 Segmented Navigation Bar */}
-      <div className="p-1.5 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-2xl shadow-xl flex items-center gap-1.5 overflow-x-auto custom-scrollbar glass-specular-sm">
+      <div className="p-1.5 rounded-2xl bg-slate-900/80 border border-slate-800/90 backdrop-blur-2xl shadow-xl flex items-center gap-1.5 overflow-x-auto no-scrollbar scroll-smooth glass-specular-sm">
         {SECURITY_TABS.map((tab) => {
           const Icon = tab.icon
           const isActive = activeTab === tab.id

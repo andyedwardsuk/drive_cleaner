@@ -70,7 +70,7 @@ export default function AboutView() {
               <span className="text-slate-400">Architect:</span> Andy Edwards
             </p>
             <p>
-              <span className="text-slate-400">Frontend Stack:</span> React 18, TanStack Router, Tailwind CSS, Framer Motion, Recharts
+              <span className="text-slate-400">Frontend Stack:</span> React 18, Web Awesome Pro, Font Awesome Pro Duotone, TanStack Router, Tailwind CSS, Framer Motion
             </p>
             <p>
               <span className="text-slate-400">Storage & Caching:</span> Browser IndexedDB (Zero-Memory Leaks) + Google Apps Script CacheService
