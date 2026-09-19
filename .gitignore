@@ -197,6 +197,7 @@ global-functions-audit.json
 # Test screenshots and artifacts
 src/tests/e2e/screenshots/
 *.png
+!assets/marketplace/*.png
 error-*.png
 **/screenshots/
 **/snapshots/

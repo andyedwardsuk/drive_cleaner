@@ -5,6 +5,7 @@
   "scripts": {
     "build": "node build.js",
     "build:dev": "node build.js --dev",
+    "preflight": "node scripts/preflight-check.js",
     "push": "pnpm run build && clasp push",
     "push:dev": "pnpm run build:dev && clasp push",
     "push:watch": "pnpm run build && clasp push --watch",
