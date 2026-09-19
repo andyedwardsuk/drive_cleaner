@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faTrashCan,
@@ -8,16 +8,28 @@ import {
   faTriangleExclamation,
   faCircleInfo,
 } from '@fortawesome/pro-duotone-svg-icons'
+import { RefreshCw } from 'lucide-react'
 import { WaButton, WaBadge, WaCallout } from '@/components/ui/webawesome'
 
 export function TrashConfirmationModal({
   isOpen,
+  open,
   files = [],
   onConfirm,
   onCancel,
   isTrashing = false,
+  trashProgress = null,
 }) {
-  if (!isOpen || files.length === 0) return null
+  const visible = isOpen ?? open
+  const [acknowledged, setAcknowledged] = useState(false)
+
+  const isLargeBatch = files.length > 25
+
+  useEffect(() => {
+    setAcknowledged(false)
+  }, [visible, files.length])
+
+  if (!visible || files.length === 0) return null
 
   const totalBytes = files.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0)
   const formatBytes = (bytes) => {
@@ -135,9 +147,51 @@ export function TrashConfirmationModal({
           </div>
         </div>
 
+        {/* Live Progress Bar during Trashing */}
+        {isTrashing && (
+          <div className="p-4 rounded-2xl bg-blue-950/40 border border-blue-500/30 space-y-2.5 animate-in fade-in-0">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-blue-300 font-medium flex items-center gap-2">
+                <RefreshCw className="w-3.5 h-3.5 text-blue-400 animate-spin" />
+                {trashProgress && trashProgress.total > 0
+                  ? `Processing batch: ${trashProgress.processed} of ${trashProgress.total} items`
+                  : 'Starting batch request...'}
+              </span>
+              <span className="text-blue-400 font-mono font-bold">
+                {trashProgress ? `${trashProgress.percent}%` : '0%'}
+              </span>
+            </div>
+            <div className="w-full h-2 rounded-full bg-slate-800/80 overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-500 rounded-full transition-all duration-300 ease-out"
+                style={{ width: `${trashProgress ? Math.max(5, trashProgress.percent) : 10}%` }}
+              />
+            </div>
+            <p className="text-[11px] text-slate-400 leading-relaxed">
+              Items are chunked safely in 25-item batches with backoff to protect Drive API limits.
+            </p>
+          </div>
+        )}
+
+        {/* Large Batch Safety Confirmation Checkbox */}
+        {isLargeBatch && !isTrashing && (
+          <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200/90 flex items-start gap-2.5">
+            <input
+              type="checkbox"
+              id="confirm-large-batch"
+              checked={acknowledged}
+              onChange={(e) => setAcknowledged(e.target.checked)}
+              className="mt-0.5 rounded border-amber-500/40 bg-slate-900 text-amber-500 focus:ring-amber-500/20 cursor-pointer"
+            />
+            <label htmlFor="confirm-large-batch" className="cursor-pointer select-none leading-relaxed">
+              <strong>Batch Safety Confirmation:</strong> I understand that moving {files.length} items will be processed in background chunks. All files remain in Drive Trash and can be undone within 30 days.
+            </label>
+          </div>
+        )}
+
         {/* Info Note */}
         <WaCallout variant="neutral" appearance="plain" faIcon={faCircleInfo}>
-          Items will be moved to <strong>Google Drive Trash</strong>. You can restore them anytime using the Undo button or directly in Google Drive.
+          Items will be moved to <strong>Google Drive Trash</strong>. You can restore them anytime using the Undo button, the Safety Vault, or directly in Google Drive.
         </WaCallout>
 
         {/* Action Buttons */}
@@ -154,11 +208,12 @@ export function TrashConfirmationModal({
             variant="danger"
             appearance="filled"
             onClick={onConfirm}
+            disabled={isTrashing || (isLargeBatch && !acknowledged)}
             loading={isTrashing}
             startIcon={!isTrashing ? <FontAwesomeIcon icon={faTrashCan} className="w-4 h-4" /> : null}
           >
             {isTrashing
-              ? 'Trashing...'
+              ? (trashProgress ? `Trashing (${trashProgress.percent}%)...` : 'Trashing...')
               : `Move ${files.length} ${files.length === 1 ? 'File' : 'Files'} to Trash`}
           </WaButton>
         </div>

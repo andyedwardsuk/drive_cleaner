@@ -142,6 +142,7 @@ export default function FileTable({ data = [], loading = false }) {
   const {
     isTrashing,
     isRestoring,
+    trashProgress,
     confirmModalOpen,
     filesPendingTrash,
     requestTrash,
@@ -639,6 +640,7 @@ export default function FileTable({ data = [], loading = false }) {
         onConfirm={executeTrash}
         onCancel={cancelTrash}
         isTrashing={isTrashing}
+        trashProgress={trashProgress}
       />
 
       {/* Undo Toast Banner */}

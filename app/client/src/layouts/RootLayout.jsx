@@ -4,6 +4,7 @@ import Sidebar from '@/components/navigation/Sidebar'
 import TopHeader from '@/components/navigation/TopHeader'
 import CommandPalette from '@/components/navigation/CommandPalette'
 import FilePreviewModal from '@/components/preview/FilePreviewModal'
+import SafetyVaultBanner from '@/components/actions/SafetyVaultBanner'
 
 /**
  * RootLayout - 2026 Spatial Glassmorphism Layout
@@ -45,6 +46,9 @@ export default function RootLayout() {
       <div className="relative z-10 flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         {/* Top Workspace Header Bar */}
         <TopHeader onOpenCommandPalette={() => setCommandPaletteOpen(true)} />
+
+        {/* Persistent Safety Vault Multi-Session Undo Banner */}
+        <SafetyVaultBanner />
 
         {/* Viewport Canvas */}
         <main className="flex-1 overflow-y-auto custom-scrollbar">

@@ -12,6 +12,8 @@ export function useFileActions() {
   const [filesPendingTrash, setFilesPendingTrash] = useState([])
   const [undoToast, setUndoToast] = useState(null) // { files: [], countdown: number }
 
+  const [trashProgress, setTrashProgress] = useState(null) // { processed: number, total: number, percent: number }
+
   const timerRef = useRef(null)
   const { recordCleanupAction } = useDailyImpact()
 
@@ -46,6 +48,7 @@ export function useFileActions() {
   const cancelTrash = useCallback(() => {
     setConfirmModalOpen(false)
     setFilesPendingTrash([])
+    setTrashProgress(null)
   }, [])
 
   // Cleanup undo timer
@@ -62,14 +65,22 @@ export function useFileActions() {
     setIsTrashing(true)
     const filesToTrash = [...filesPendingTrash]
     const fileIds = filesToTrash.map((f) => f.fileId)
+    const totalBytes = filesToTrash.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0)
+
+    setTrashProgress({ processed: 0, total: fileIds.length, percent: 0 })
 
     try {
-      const result = await fileActionsService.trashFiles(fileIds)
+      const payload = {
+        fileIds,
+        totalBytes,
+        folderName: filesToTrash[0]?.parentName || 'Drive Folder',
+      }
 
-      if (result.success) {
-        // Calculate total bytes saved
-        const totalBytes = filesToTrash.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0)
+      const result = await fileActionsService.trashFiles(payload, (prog) => {
+        setTrashProgress(prog)
+      })
 
+      if (result.success || (result.trashedCount > 0)) {
         // Record in Daily Impact Tracker & streaks
         recordCleanupAction({
           filesDeleted: result.trashedCount,
@@ -104,12 +115,15 @@ export function useFileActions() {
           })
         )
 
+        // Dispatch Safety Vault update event so banners/caches refresh
+        window.dispatchEvent(new CustomEvent('drive_cleaner_safety_vault_updated'))
+
         // Setup undo toast with configured duration
         const userSettings = getSettings()
         const undoSeconds = userSettings?.safety?.undoTimeoutSeconds || 10
         if (timerRef.current) clearInterval(timerRef.current)
         setUndoToast({
-          files: filesToTrash,
+          files: filesToTrash.filter((f) => (result.trashedIds || fileIds).includes(f.fileId)),
           countdown: undoSeconds,
           totalBytes,
         })
@@ -124,13 +138,21 @@ export function useFileActions() {
           })
         }, 1000)
 
+        if (result.errors && result.errors.length > 0) {
+          console.warn(`Some files (${result.errors.length}) could not be moved to trash:`, result.errors)
+        }
+
         onSuccess?.(result)
+      } else {
+        const errMsg = result.errors?.[0]?.error || 'Failed to move files to trash'
+        alert(`Error moving files to trash: ${errMsg}`)
       }
     } catch (err) {
       console.error('Failed to trash files:', err)
       alert(`Error moving files to trash: ${err.message}`)
     } finally {
       setIsTrashing(false)
+      setTrashProgress(null)
     }
   }, [filesPendingTrash, recordCleanupAction, clearSelection])
 
@@ -142,10 +164,14 @@ export function useFileActions() {
     const filesToRestore = undoToast.files
     const fileIds = filesToRestore.map((f) => f.fileId)
 
-    try {
-      const result = await fileActionsService.untrashFiles(fileIds)
+    setTrashProgress({ processed: 0, total: fileIds.length, percent: 0 })
 
-      if (result.success) {
+    try {
+      const result = await fileActionsService.untrashFiles(fileIds, (prog) => {
+        setTrashProgress(prog)
+      })
+
+      if (result.success || (result.restoredCount > 0)) {
         if (timerRef.current) clearInterval(timerRef.current)
         setUndoToast(null)
 
@@ -171,12 +197,19 @@ export function useFileActions() {
             detail: { files: filesToRestore },
           })
         )
+
+        // Dispatch Safety Vault update
+        window.dispatchEvent(new CustomEvent('drive_cleaner_safety_vault_updated'))
+      } else {
+        const errMsg = result.errors?.[0]?.error || 'Failed to restore files from trash'
+        alert(`Error restoring files: ${errMsg}`)
       }
     } catch (err) {
       console.error('Failed to restore files:', err)
       alert(`Error restoring files: ${err.message}`)
     } finally {
       setIsRestoring(false)
+      setTrashProgress(null)
     }
   }, [undoToast])
 
@@ -192,6 +225,7 @@ export function useFileActions() {
     clearSelection,
     isTrashing,
     isRestoring,
+    trashProgress,
     confirmModalOpen,
     filesPendingTrash,
     requestTrash,

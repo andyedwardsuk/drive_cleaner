@@ -31,6 +31,31 @@ var TrashGovernanceManager = (function () {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 
+  function callWithBackoff_(fn, maxRetries = 3) {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return fn();
+      } catch (err) {
+        const msg = (err && err.message) ? err.message : String(err);
+        const isRetryable = msg.includes('rateLimitExceeded') ||
+                            msg.includes('userRateLimitExceeded') ||
+                            msg.includes('quotaExceeded') ||
+                            msg.includes('403') ||
+                            msg.includes('429') ||
+                            msg.includes('500') ||
+                            msg.includes('503') ||
+                            msg.includes('Backend Error');
+        if (attempt < maxRetries && isRetryable) {
+          const delayMs = Math.min(1000 * Math.pow(2, attempt) + Math.floor(Math.random() * 500), 8000);
+          console.warn(`Trash API transient error (${msg}). Retrying in ${delayMs}ms (attempt ${attempt + 1}/${maxRetries})...`);
+          Utilities.sleep(delayMs);
+        } else {
+          throw err;
+        }
+      }
+    }
+  }
+
   function detectCategory(mimeType, title) {
     if (!mimeType) mimeType = '';
     const lowerMime = mimeType.toLowerCase();
@@ -280,11 +305,13 @@ var TrashGovernanceManager = (function () {
     for (let i = 0; i < fileIds.length; i++) {
       const id = fileIds[i];
       try {
-        if (typeof Drive !== 'undefined' && Drive.Files && Drive.Files.untrash) {
-          Drive.Files.untrash(id);
-        } else {
-          DriveApp.getFileById(id).setTrashed(false);
-        }
+        callWithBackoff_(function () {
+          if (typeof Drive !== 'undefined' && Drive.Files && Drive.Files.untrash) {
+            Drive.Files.untrash(id);
+          } else {
+            DriveApp.getFileById(id).setTrashed(false);
+          }
+        });
         restored.push(id);
       } catch (err) {
         try {
@@ -321,12 +348,14 @@ var TrashGovernanceManager = (function () {
     for (let i = 0; i < fileIds.length; i++) {
       const id = fileIds[i];
       try {
-        if (typeof Drive !== 'undefined' && Drive.Files && Drive.Files.remove) {
-          Drive.Files.remove(id);
-          purged.push(id);
-        } else {
-          failed.push({ id: id, error: 'Permanent removal requires Advanced Drive API v2 service' });
-        }
+        callWithBackoff_(function () {
+          if (typeof Drive !== 'undefined' && Drive.Files && Drive.Files.remove) {
+            Drive.Files.remove(id);
+            purged.push(id);
+          } else {
+            failed.push({ id: id, error: 'Permanent removal requires Advanced Drive API v2 service' });
+          }
+        });
       } catch (err) {
         failed.push({ id: id, error: err.message });
       }

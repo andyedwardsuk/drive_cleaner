@@ -139,11 +139,65 @@ var DriveCleanerWebApp = (function () {
   }
 
   /**
-   * Moves a list of files to Google Drive Trash
-   * @param {Array<string>} fileIds - Array of file IDs to trash
+   * Executes Drive API calls with exponential backoff on transient errors
+   * @param {Function} fn - API call function
+   * @param {number} [maxRetries=3] - Maximum retry attempts
+   * @returns {*} Result of fn()
+   */
+  function callWithBackoff_(fn, maxRetries = 3) {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return fn();
+      } catch (err) {
+        const msg = (err && err.message) ? err.message : String(err);
+        const isRetryable = msg.includes('rateLimitExceeded') ||
+                            msg.includes('userRateLimitExceeded') ||
+                            msg.includes('quotaExceeded') ||
+                            msg.includes('403') ||
+                            msg.includes('429') ||
+                            msg.includes('500') ||
+                            msg.includes('503') ||
+                            msg.includes('Backend Error');
+        if (attempt < maxRetries && isRetryable) {
+          const delayMs = Math.min(1000 * Math.pow(2, attempt) + Math.floor(Math.random() * 500), 8000);
+          console.warn(`Drive API transient error (${msg}). Retrying in ${delayMs}ms (attempt ${attempt + 1}/${maxRetries})...`);
+          Utilities.sleep(delayMs);
+        } else {
+          throw err;
+        }
+      }
+    }
+  }
+
+  /**
+   * Moves a list of files to Google Drive Trash with backoff and Safety Vault logging
+   * @param {Array<string>|Object|string} payload - Array of file IDs or { fileIds, totalBytes, folderName }
    * @returns {Object} {success: boolean, trashedCount: number, failedCount: number, trashedIds: Array<string>, errors: Array<Object>}
    */
-  function trashFiles(fileIds) {
+  function trashFiles(payload) {
+    let fileIds = payload;
+    let totalBytes = 0;
+    let folderName = 'Drive Folder';
+
+    if (typeof payload === 'string') {
+      try {
+        const parsed = JSON.parse(payload);
+        if (Array.isArray(parsed)) {
+          fileIds = parsed;
+        } else if (parsed && Array.isArray(parsed.fileIds)) {
+          fileIds = parsed.fileIds;
+          totalBytes = parsed.totalBytes || 0;
+          folderName = parsed.folderName || 'Drive Folder';
+        }
+      } catch (e) {
+        fileIds = [payload];
+      }
+    } else if (payload && !Array.isArray(payload) && Array.isArray(payload.fileIds)) {
+      fileIds = payload.fileIds;
+      totalBytes = payload.totalBytes || 0;
+      folderName = payload.folderName || 'Drive Folder';
+    }
+
     if (!fileIds || !Array.isArray(fileIds)) {
       return { success: false, error: 'Invalid fileIds array' };
     }
@@ -154,11 +208,13 @@ var DriveCleanerWebApp = (function () {
     for (let i = 0; i < fileIds.length; i++) {
       const id = fileIds[i];
       try {
-        if (typeof Drive !== 'undefined' && Drive.Files && Drive.Files.trash) {
-          Drive.Files.trash(id);
-        } else {
-          DriveApp.getFileById(id).setTrashed(true);
-        }
+        callWithBackoff_(function () {
+          if (typeof Drive !== 'undefined' && Drive.Files && Drive.Files.trash) {
+            Drive.Files.trash(id);
+          } else {
+            DriveApp.getFileById(id).setTrashed(true);
+          }
+        });
         trashed.push(id);
       } catch (err) {
         try {
@@ -167,6 +223,24 @@ var DriveCleanerWebApp = (function () {
         } catch (fallbackErr) {
           failed.push({ id: id, error: err.message || fallbackErr.message });
         }
+      }
+    }
+
+    // Safety Vault: Record successful trashed files to user properties for multi-session undo
+    if (trashed.length > 0) {
+      try {
+        const vaultRecord = {
+          batchId: 'vault_' + Date.now(),
+          timestamp: new Date().toISOString(),
+          fileIds: trashed,
+          count: trashed.length,
+          totalBytes: totalBytes,
+          folderName: folderName,
+          status: 'active'
+        };
+        PropertiesService.getUserProperties().setProperty('dc_safety_vault_last_batch', JSON.stringify(vaultRecord));
+      } catch (vaultErr) {
+        console.warn('Could not save safety vault snapshot:', vaultErr);
       }
     }
 
@@ -180,11 +254,19 @@ var DriveCleanerWebApp = (function () {
   }
 
   /**
-   * Restores a list of files from Google Drive Trash (Undo operation)
-   * @param {Array<string>} fileIds - Array of file IDs to untrash
+   * Restores a list of files from Google Drive Trash (Undo operation) with backoff
+   * @param {Array<string>|string} payload - Array of file IDs or JSON string
    * @returns {Object} {success: boolean, restoredCount: number, failedCount: number, restoredIds: Array<string>, errors: Array<Object>}
    */
-  function untrashFiles(fileIds) {
+  function untrashFiles(payload) {
+    let fileIds = payload;
+    if (typeof payload === 'string') {
+      try {
+        fileIds = JSON.parse(payload);
+      } catch (e) {
+        fileIds = [payload];
+      }
+    }
     if (!fileIds || !Array.isArray(fileIds)) {
       return { success: false, error: 'Invalid fileIds array' };
     }
@@ -195,11 +277,13 @@ var DriveCleanerWebApp = (function () {
     for (let i = 0; i < fileIds.length; i++) {
       const id = fileIds[i];
       try {
-        if (typeof Drive !== 'undefined' && Drive.Files && Drive.Files.untrash) {
-          Drive.Files.untrash(id);
-        } else {
-          DriveApp.getFileById(id).setTrashed(false);
-        }
+        callWithBackoff_(function () {
+          if (typeof Drive !== 'undefined' && Drive.Files && Drive.Files.untrash) {
+            Drive.Files.untrash(id);
+          } else {
+            DriveApp.getFileById(id).setTrashed(false);
+          }
+        });
         restored.push(id);
       } catch (err) {
         try {
@@ -218,6 +302,80 @@ var DriveCleanerWebApp = (function () {
       restoredIds: restored,
       errors: failed
     };
+  }
+
+  /**
+   * Retrieves active Safety Vault status from user properties
+   * @returns {Object} Safety vault batch details or { hasActiveBatch: false }
+   */
+  function getSafetyVaultStatus() {
+    try {
+      const raw = PropertiesService.getUserProperties().getProperty('dc_safety_vault_last_batch');
+      if (!raw) return { hasActiveBatch: false, batch: null };
+      const parsed = JSON.parse(raw);
+      if (!parsed || parsed.status !== 'active') {
+        return { hasActiveBatch: false, batch: null };
+      }
+      // Check if batch is within 48 hours
+      const elapsedMs = Date.now() - new Date(parsed.timestamp).getTime();
+      if (elapsedMs > 48 * 60 * 60 * 1000) {
+        return { hasActiveBatch: false, batch: null };
+      }
+      return { hasActiveBatch: true, batch: parsed };
+    } catch (e) {
+      console.error('Error in getSafetyVaultStatus:', e);
+      return { hasActiveBatch: false, batch: null, error: e.message };
+    }
+  }
+
+  /**
+   * Restores all files in the current Safety Vault batch back to Google Drive
+   * @returns {Object} Restoration result
+   */
+  function restoreSafetyVaultBatch() {
+    try {
+      const raw = PropertiesService.getUserProperties().getProperty('dc_safety_vault_last_batch');
+      if (!raw) return { success: false, error: 'No active Safety Vault batch found' };
+      const parsed = JSON.parse(raw);
+      if (!parsed || !parsed.fileIds || parsed.fileIds.length === 0) {
+        return { success: false, error: 'Safety Vault batch contains no files' };
+      }
+
+      const result = untrashFiles(parsed.fileIds);
+      parsed.status = 'restored';
+      parsed.restoredAt = new Date().toISOString();
+      PropertiesService.getUserProperties().setProperty('dc_safety_vault_last_batch', JSON.stringify(parsed));
+
+      return {
+        success: result.success,
+        restoredCount: result.restoredCount,
+        restoredIds: result.restoredIds,
+        errors: result.errors,
+        batch: parsed
+      };
+    } catch (e) {
+      console.error('Error in restoreSafetyVaultBatch:', e);
+      return { success: false, error: e.message };
+    }
+  }
+
+  /**
+   * Dismisses the current active Safety Vault batch
+   * @returns {Object} { success: boolean }
+   */
+  function dismissSafetyVaultBatch() {
+    try {
+      const raw = PropertiesService.getUserProperties().getProperty('dc_safety_vault_last_batch');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        parsed.status = 'dismissed';
+        PropertiesService.getUserProperties().setProperty('dc_safety_vault_last_batch', JSON.stringify(parsed));
+      }
+      return { success: true };
+    } catch (e) {
+      console.error('Error in dismissSafetyVaultBatch:', e);
+      return { success: false, error: e.message };
+    }
   }
 
   /**
@@ -439,6 +597,9 @@ var DriveCleanerWebApp = (function () {
     getDriveQuota: getDriveQuota,
     trashFiles: trashFiles,
     untrashFiles: untrashFiles,
+    getSafetyVaultStatus: getSafetyVaultStatus,
+    restoreSafetyVaultBatch: restoreSafetyVaultBatch,
+    dismissSafetyVaultBatch: dismissSafetyVaultBatch,
     archiveFiles: archiveFiles,
     unarchiveFiles: unarchiveFiles
   };
@@ -569,6 +730,33 @@ function archiveFiles(payload) {
  */
 function unarchiveFiles(payload) {
   return DriveCleanerWebApp.unarchiveFiles(payload);
+}
+
+/**
+ * Retrieves active Safety Vault status from user properties
+ * Called from React app via google.script.run
+ * @returns {Object} Safety vault batch details or { hasActiveBatch: false }
+ */
+function getSafetyVaultStatus() {
+  return DriveCleanerWebApp.getSafetyVaultStatus();
+}
+
+/**
+ * Restores all files in the current Safety Vault batch back to Google Drive
+ * Called from React app via google.script.run
+ * @returns {Object} Restoration result
+ */
+function restoreSafetyVaultBatch() {
+  return DriveCleanerWebApp.restoreSafetyVaultBatch();
+}
+
+/**
+ * Dismisses the current active Safety Vault batch
+ * Called from React app via google.script.run
+ * @returns {Object} { success: boolean }
+ */
+function dismissSafetyVaultBatch() {
+  return DriveCleanerWebApp.dismissSafetyVaultBatch();
 }
 
 // ============================================

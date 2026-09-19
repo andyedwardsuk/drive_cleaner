@@ -44,6 +44,7 @@ export default function KanbanLabelsView() {
 
   const {
     isTrashing,
+    trashProgress,
     confirmModalOpen,
     filesPendingTrash,
     cancelTrash,
@@ -242,6 +243,7 @@ export default function KanbanLabelsView() {
         onConfirm={executeTrash}
         onCancel={cancelTrash}
         isTrashing={isTrashing}
+        trashProgress={trashProgress}
       />
 
       {undoToast && (
