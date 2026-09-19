@@ -12,12 +12,14 @@ import {
 import { getRouteInfo } from '@/config/navigationItems'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { useLicense } from '@/hooks/useLicense'
 
-export default function TopHeader({ onOpenCommandPalette }) {
+export default function TopHeader({ onOpenCommandPalette, onOpenUpgrade }) {
   const router = useRouterState()
   const currentPath = router.location.pathname
   const routeInfo = getRouteInfo(currentPath)
   const CurrentIcon = routeInfo.icon
+  const { isPro, monthlyUsage } = useLicense()
 
   return (
     <header className="sticky top-0 z-30 h-14 w-full bg-slate-950/70 backdrop-blur-2xl border-b border-slate-800/80 px-4 md:px-8 flex items-center justify-between transition-all">
@@ -69,6 +71,32 @@ export default function TopHeader({ onOpenCommandPalette }) {
         >
           <Search className="w-4 h-4" />
         </button>
+
+        {/* Commercial Plan / Quota Badge */}
+        {isPro ? (
+          <button
+            type="button"
+            onClick={onOpenUpgrade}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-indigo-500/20 border border-amber-500/35 text-amber-300 text-xs font-semibold hover:border-amber-400 transition-all shadow-sm cursor-pointer"
+            title="Drive Cleaner Professional Active (Click for License Details)"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span className="text-[11px] font-bold tracking-wide">PRO</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={onOpenUpgrade}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-blue-500/50 text-slate-300 hover:text-white text-xs transition-all cursor-pointer group"
+            title={`Free Plan: ${monthlyUsage?.cleaned || 0} / ${monthlyUsage?.limit || 100} files cleaned this month. Click to upgrade.`}
+          >
+            <span className="w-2 h-2 rounded-full bg-blue-400 shrink-0" />
+            <span className="text-[11px] font-medium hidden sm:inline">Free Plan</span>
+            <span className="text-[10px] font-mono text-slate-400 group-hover:text-blue-300">
+              {monthlyUsage ? `${monthlyUsage.cleaned}/${monthlyUsage.limit}` : '0/100'}
+            </span>
+          </button>
+        )}
 
         {/* Live Google Drive API Beacon */}
         <div

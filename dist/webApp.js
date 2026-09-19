@@ -242,6 +242,15 @@ var DriveCleanerWebApp = (function () {
       } catch (vaultErr) {
         console.warn('Could not save safety vault snapshot:', vaultErr);
       }
+
+      // Record cleanup quota against monthly limits
+      if (typeof recordCleanupQuota_ === 'function') {
+        try {
+          recordCleanupQuota_(trashed.length);
+        } catch (quotaErr) {
+          console.warn('Could not record cleanup quota:', quotaErr);
+        }
+      }
     }
 
     return {
@@ -601,7 +610,27 @@ var DriveCleanerWebApp = (function () {
     restoreSafetyVaultBatch: restoreSafetyVaultBatch,
     dismissSafetyVaultBatch: dismissSafetyVaultBatch,
     archiveFiles: archiveFiles,
-    unarchiveFiles: unarchiveFiles
+    unarchiveFiles: unarchiveFiles,
+    getLicenseState: function () {
+      return typeof getLicenseState_ === 'function'
+        ? getLicenseState_()
+        : { tier: 'free', isPro: false, monthlyUsage: { cleaned: 0, limit: 100, remaining: 100, percent: 0 } };
+    },
+    activateLicenseKey: function (key) {
+      return typeof activateLicenseKey_ === 'function'
+        ? activateLicenseKey_(key)
+        : { success: false, error: 'License manager not loaded' };
+    },
+    deactivateLicenseKey: function () {
+      return typeof deactivateLicenseKey_ === 'function'
+        ? deactivateLicenseKey_()
+        : { success: false, error: 'License manager not loaded' };
+    },
+    checkCleanupQuota: function (fileCount) {
+      return typeof checkCleanupQuota_ === 'function'
+        ? checkCleanupQuota_(fileCount)
+        : { allowed: true, remaining: 100, limit: 100, isPro: false };
+    }
   };
 
 })();
@@ -757,6 +786,48 @@ function restoreSafetyVaultBatch() {
  */
 function dismissSafetyVaultBatch() {
   return DriveCleanerWebApp.dismissSafetyVaultBatch();
+}
+
+// ============================================
+// COMMERCIAL LICENSING & QUOTAS API
+// ============================================
+
+/**
+ * Retrieves active license status and monthly cleanup quota metrics
+ * Called from React app via google.script.run
+ * @returns {Object} License state and usage metrics
+ */
+function getLicenseState() {
+  return DriveCleanerWebApp.getLicenseState();
+}
+
+/**
+ * Activates a Pro license key
+ * Called from React app via google.script.run
+ * @param {string} key - License key
+ * @returns {Object} Activation result
+ */
+function activateLicenseKey(key) {
+  return DriveCleanerWebApp.activateLicenseKey(key);
+}
+
+/**
+ * Deactivates active license and reverts to Free plan
+ * Called from React app via google.script.run
+ * @returns {Object} Deactivation result
+ */
+function deactivateLicenseKey() {
+  return DriveCleanerWebApp.deactivateLicenseKey();
+}
+
+/**
+ * Checks if a batch cleanup is allowed under the current monthly quota
+ * Called from React app via google.script.run
+ * @param {number} fileCount - Number of files to clean
+ * @returns {Object} Quota check result
+ */
+function checkCleanupQuota(fileCount) {
+  return DriveCleanerWebApp.checkCleanupQuota(fileCount);
 }
 
 // ============================================

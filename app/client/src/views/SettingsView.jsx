@@ -41,6 +41,8 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Hero from '@/components/Hero'
 import { useSettings } from '@/hooks/useSettings'
+import { useLicense } from '@/hooks/useLicense'
+import { UpgradeModal } from '@/components/licensing/UpgradeModal'
 import { WaSwitch, WaCallout, WaButton, WaBadge } from '@/components/ui/webawesome'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -103,11 +105,43 @@ export default function SettingsView() {
     }
   }
 
+  const { license, isPro, monthlyUsage, activateKey, deactivateKey } = useLicense()
+  const [settingsUpgradeModalOpen, setSettingsUpgradeModalOpen] = useState(false)
+  const [keyInput, setKeyInput] = useState('')
+  const [isActivatingKey, setIsActivatingKey] = useState(false)
+  const [keyFeedback, setKeyFeedback] = useState(null)
+
+  const handleKeySubmit = async (e) => {
+    e?.preventDefault()
+    if (!keyInput.trim()) return
+
+    setIsActivatingKey(true)
+    setKeyFeedback(null)
+    const res = await activateKey(keyInput.trim())
+    setIsActivatingKey(false)
+
+    if (res.success) {
+      setKeyFeedback({ type: 'success', text: res.message || 'Pro license activated!' })
+      setKeyInput('')
+      triggerSaveToast('Drive Cleaner Pro activated!')
+    } else {
+      setKeyFeedback({ type: 'error', text: res.error || 'Failed to activate key' })
+    }
+  }
+
+  const handleDeactivate = async () => {
+    if (confirm('Are you sure you want to deactivate your license and revert to the Free tier?')) {
+      await deactivateKey()
+      triggerSaveToast('License deactivated. Reverted to Free plan.')
+    }
+  }
+
   const tabs = [
     { id: 'thresholds', label: 'Thresholds & Rules', faIcon: faSliders },
     { id: 'scanning', label: 'Scan & Scope', faIcon: faHardDrive },
     { id: 'appearance', label: 'Appearance', faIcon: faPalette },
     { id: 'safety', label: 'Safety & Trash', faIcon: faShieldCheck },
+    { id: 'plan', label: 'Plan & Licensing', faIcon: faSparkles },
     { id: 'data', label: 'Data & Privacy', faIcon: faDatabase },
   ]
 
@@ -596,6 +630,175 @@ export default function SettingsView() {
           </motion.div>
         )}
 
+        {/* TAB: PLAN & LICENSING */}
+        {activeTab === 'plan' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
+            className="space-y-6"
+          >
+            <div>
+              <h2 className="text-xl font-semibold text-white flex items-center gap-2.5">
+                <FontAwesomeIcon icon={faSparkles} className="w-5 h-5 text-amber-400" />
+                Plan, Usage Quotas & Licensing
+              </h2>
+              <p className="text-sm text-slate-400 mt-1">
+                Monitor your monthly cleanup volume, view license details, or activate Drive Cleaner Professional.
+              </p>
+            </div>
+
+            {/* Current Plan Overview Card */}
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900/90 to-slate-950 border border-slate-800 shadow-xl space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className={`p-3 rounded-2xl ${isPro ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30 shadow-md shadow-amber-500/10' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'}`}>
+                    <Sparkles className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg font-bold text-white">
+                        {isPro ? 'Drive Cleaner Professional' : 'Free Community Plan'}
+                      </h3>
+                      <WaBadge variant={isPro ? 'warning' : 'neutral'} appearance="filled" pill>
+                        {isPro ? 'Pro Active' : 'Free Tier'}
+                      </WaBadge>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      {isPro
+                        ? 'Full commercial license with unlimited bulk actions and automated background triggers.'
+                        : 'Includes all scan engines, analytics, and 100 free cleanup actions per month.'}
+                    </p>
+                  </div>
+                </div>
+
+                {!isPro && (
+                  <WaButton
+                    variant="brand"
+                    appearance="filled"
+                    onClick={() => setSettingsUpgradeModalOpen(true)}
+                    className="shrink-0"
+                  >
+                    Upgrade to Pro ($4.99)
+                  </WaButton>
+                )}
+              </div>
+
+              {/* Monthly Quota Meter (For Free Users) */}
+              {!isPro && monthlyUsage && (
+                <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-semibold text-slate-300 flex items-center gap-2">
+                      <HardDrive className="w-4 h-4 text-blue-400" />
+                      Monthly Free File Cleanup Allowance
+                    </span>
+                    <span className="font-mono text-slate-200 font-bold">
+                      {monthlyUsage.cleaned} / {monthlyUsage.limit} items ({monthlyUsage.remaining} remaining)
+                    </span>
+                  </div>
+                  <div className="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-300 ${
+                        monthlyUsage.percent >= 90 ? 'bg-red-500' : monthlyUsage.percent >= 70 ? 'bg-amber-500' : 'bg-blue-500'
+                      }`}
+                      style={{ width: `${Math.min(100, Math.max(5, monthlyUsage.percent))}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between items-center text-[11px] text-slate-500">
+                    <span>Cleaned this month ({monthlyUsage.month || 'Current'})</span>
+                    <span>Resets on the 1st of each month</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Pro Details (For Pro Users) */}
+              {isPro && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+                  <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
+                    <span className="text-slate-500 block text-[11px]">License Key</span>
+                    <span className="font-mono font-semibold text-slate-200 mt-0.5 block truncate">
+                      {license.licenseKey || 'Active (Domain/Marketplace)'}
+                    </span>
+                  </div>
+                  <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
+                    <span className="text-slate-500 block text-[11px]">Monthly Quota</span>
+                    <span className="font-semibold text-emerald-400 mt-0.5 block">
+                      Unlimited
+                    </span>
+                  </div>
+                  <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-center justify-between">
+                    <div>
+                      <span className="text-slate-500 block text-[11px]">Expiration</span>
+                      <span className="font-semibold text-slate-200 mt-0.5 block">
+                        {license.expiresAt || 'Lifetime'}
+                      </span>
+                    </div>
+                    <button
+                      onClick={handleDeactivate}
+                      className="text-xs text-red-400 hover:text-red-300 underline font-medium"
+                    >
+                      Deactivate
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* License Key Activation Card */}
+            {!isPro && (
+              <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-4">
+                <div>
+                  <h3 className="text-base font-semibold text-white flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-amber-400" />
+                    Activate License Key
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    If you purchased Drive Cleaner on the Google Workspace Marketplace or received an activation key, enter it below.
+                  </p>
+                </div>
+
+                <form onSubmit={handleKeySubmit} className="space-y-3">
+                  <div className="flex flex-col sm:flex-row gap-2 max-w-md">
+                    <input
+                      type="text"
+                      value={keyInput}
+                      onChange={(e) => setKeyInput(e.target.value)}
+                      placeholder="DC-PRO-XXXX-XXXX-XXXX"
+                      className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 font-mono"
+                    />
+                    <WaButton
+                      type="submit"
+                      variant="brand"
+                      appearance="filled"
+                      loading={isActivatingKey}
+                      disabled={!keyInput.trim() || isActivatingKey}
+                    >
+                      Activate
+                    </WaButton>
+                  </div>
+
+                  <p className="text-[10px] text-slate-500">
+                    Evaluation key for test mode: <code className="text-blue-400 font-mono">DC-PRO-TEST-2026</code>
+                  </p>
+
+                  {keyFeedback && (
+                    <div
+                      className={`p-3 rounded-xl text-xs flex items-center gap-2 max-w-md ${
+                        keyFeedback.type === 'success'
+                          ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
+                          : 'bg-red-500/10 text-red-300 border border-red-500/30'
+                      }`}
+                    >
+                      <ShieldCheck className="w-4 h-4 shrink-0" />
+                      <span>{keyFeedback.text}</span>
+                    </div>
+                  )}
+                </form>
+              </div>
+            )}
+          </motion.div>
+        )}
+
         {/* TAB 5: DATA & PRIVACY */}
         {activeTab === 'data' && (
           <motion.div
@@ -747,6 +950,12 @@ export default function SettingsView() {
           </motion.div>
         )}
       </div>
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={settingsUpgradeModalOpen}
+        onClose={() => setSettingsUpgradeModalOpen(false)}
+      />
     </div>
   )
 }

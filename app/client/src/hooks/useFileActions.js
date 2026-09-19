@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import fileActionsService from '@/services/fileActionsService'
+import licenseService from '@/services/licenseService'
 import { useDailyImpact } from './useDailyImpact'
 import { addHistoryEvent } from '@/lib/tracking/historyStorage'
 import { getSettings } from '@/lib/settings/settingsStorage'
@@ -62,11 +63,23 @@ export function useFileActions() {
   const executeTrash = useCallback(async (onSuccess) => {
     if (filesPendingTrash.length === 0) return
 
-    setIsTrashing(true)
     const filesToTrash = [...filesPendingTrash]
     const fileIds = filesToTrash.map((f) => f.fileId)
     const totalBytes = filesToTrash.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0)
 
+    // Verify monthly cleanup quota before initiating
+    try {
+      const quota = await licenseService.checkCleanupQuota(filesToTrash.length)
+      if (!quota.allowed && !quota.isPro) {
+        setConfirmModalOpen(false)
+        window.dispatchEvent(new CustomEvent('drive_cleaner_open_upgrade_modal'))
+        return
+      }
+    } catch (e) {
+      console.warn('Quota check error, allowing cleanup:', e)
+    }
+
+    setIsTrashing(true)
     setTrashProgress({ processed: 0, total: fileIds.length, percent: 0 })
 
     try {

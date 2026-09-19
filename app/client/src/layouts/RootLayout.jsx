@@ -5,6 +5,7 @@ import TopHeader from '@/components/navigation/TopHeader'
 import CommandPalette from '@/components/navigation/CommandPalette'
 import FilePreviewModal from '@/components/preview/FilePreviewModal'
 import SafetyVaultBanner from '@/components/actions/SafetyVaultBanner'
+import UpgradeModal from '@/components/licensing/UpgradeModal'
 
 /**
  * RootLayout - 2026 Spatial Glassmorphism Layout
@@ -12,8 +13,9 @@ import SafetyVaultBanner from '@/components/actions/SafetyVaultBanner'
  */
 export default function RootLayout() {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false)
 
-  // Global ⌘K / Ctrl+K keyboard shortcut listener
+  // Global ⌘K / Ctrl+K keyboard shortcut listener & Upgrade Modal listener
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
@@ -22,8 +24,15 @@ export default function RootLayout() {
       }
     }
 
+    const handleOpenUpgrade = () => setUpgradeModalOpen(true)
+
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    window.addEventListener('drive_cleaner_open_upgrade_modal', handleOpenUpgrade)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('drive_cleaner_open_upgrade_modal', handleOpenUpgrade)
+    }
   }, [])
 
   return (
@@ -45,7 +54,10 @@ export default function RootLayout() {
       {/* Primary Workspace Column */}
       <div className="relative z-10 flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         {/* Top Workspace Header Bar */}
-        <TopHeader onOpenCommandPalette={() => setCommandPaletteOpen(true)} />
+        <TopHeader
+          onOpenCommandPalette={() => setCommandPaletteOpen(true)}
+          onOpenUpgrade={() => setUpgradeModalOpen(true)}
+        />
 
         {/* Persistent Safety Vault Multi-Session Undo Banner */}
         <SafetyVaultBanner />
@@ -66,6 +78,12 @@ export default function RootLayout() {
 
       {/* Global File Preview & Details Modal */}
       <FilePreviewModal />
+
+      {/* Global Pro Upgrade & Licensing Modal */}
+      <UpgradeModal
+        isOpen={upgradeModalOpen}
+        onClose={() => setUpgradeModalOpen(false)}
+      />
     </div>
   )
 }
