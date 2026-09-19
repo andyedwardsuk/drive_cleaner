@@ -13,9 +13,10 @@
   "rules": {
     "no-unused-vars": ["warn", {
       "argsIgnorePattern": "^_",
-      "varsIgnorePattern": "^(doGet|doPost|onOpen|onEdit|onInstall|onFormSubmit|include|test|refresh|submit|list|get|set|delete|update|create|convert|trash|untrash).*"
+      "varsIgnorePattern": "^(doGet|doPost|onOpen|onEdit|onInstall|onFormSubmit|include|test|refresh|submit|list|get|set|delete|update|create|convert|trash|untrash|run|audit|analyze|save|apply|remove|revoke|bulk|downgrade|sync|restore|purge|empty|authorize|archive|unarchive|check|activate|deactivate|dismiss|clear|invalidate|send|execute).*"
     }],
     "no-console": "off",
+    "no-redeclare": "off",
     "quotes": ["warn", "single", { "avoidEscape": true }],
     "semi": ["warn", "always"],
     "no-prototype-builtins": "off"
@@ -30,6 +31,29 @@
     "Utilities": "readonly",
     "Session": "readonly",
     "PropertiesService": "readonly",
-    "CacheService": "readonly"
+    "CacheService": "readonly",
+    "Drive": "readonly",
+    "LabelsManager": "readonly",
+    "SharedDrivesManager": "readonly",
+    "MediaOptimizer": "readonly",
+    "SecurityAuditManager": "readonly",
+    "SyncManager": "readonly",
+    "TrashGovernanceManager": "readonly",
+    "LicenseManager": "readonly",
+    "TriggerManager": "readonly",
+    "FolderReorganizer": "readonly",
+    "MetadataParser": "readonly",
+    "ScanEngine": "readonly",
+    "CarbonAnalyzer": "readonly",
+    "RotAnalyzer": "readonly",
+    "WorkspaceAnalyzer": "readonly",
+    "Recommendations": "readonly",
+    "CacheManager": "readonly",
+    "Formatters": "readonly",
+    "getLicenseState_": "readonly",
+    "activateLicenseKey_": "readonly",
+    "deactivateLicenseKey_": "readonly",
+    "checkCleanupQuota_": "readonly",
+    "recordCleanupQuota_": "readonly"
   }
 }
