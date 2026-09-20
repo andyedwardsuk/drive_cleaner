@@ -81,7 +81,7 @@ function generateSignedLicenseKey(seed, tier = 'pro') {
   }
 
   const salt = activeTier === 'enterprise' ? LICENSE_ENT_SALT : LICENSE_PRO_SALT;
-  const payload = `${b1}-${b2}`;
+  const payload = activeTier === 'enterprise' ? `${b1}${b2}` : `${b1}-${b2}`;
   const checksum = computeLicenseChecksum(payload, salt);
 
   return activeTier === 'enterprise'
