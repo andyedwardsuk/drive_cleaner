@@ -39,8 +39,9 @@ export function useIncrementalSync() {
         await syncService.saveSyncMeta('changeToken', token)
       }
 
-      // If local cache is empty, seed with some files in dev simulation
-      if (storedCount === 0) {
+      // Only seed mock files in local development simulation if cache is completely empty
+      const isDevMode = typeof google === 'undefined' || !google.script || !google.script.run
+      if (storedCount === 0 && isDevMode) {
         const seedFiles = [
           {
             fileId: 'cached_file_01',
@@ -84,23 +85,27 @@ export function useIncrementalSync() {
       }
 
       setChangeToken(token)
-      setLastSyncedAt(lastSync || new Date().toISOString())
+      setLastSyncedAt(lastSync || (isDevMode ? new Date().toISOString() : null))
       setLocalFileCount(files.length)
       setCachedFiles(files)
 
-      // Initial history event
-      setRecentDeltas([
-        {
-          id: 'init_delta_1',
-          timestamp: lastSync || new Date().toISOString(),
-          type: 'initial_sync',
-          token: token,
-          createdCount: files.length,
-          modifiedCount: 0,
-          deletedCount: 0,
-          durationMs: 142,
-        },
-      ])
+      // Initial history event (only if previous sync exists or in dev mode)
+      if (lastSync || (isDevMode && files.length > 0)) {
+        setRecentDeltas([
+          {
+            id: 'init_delta_1',
+            timestamp: lastSync || new Date().toISOString(),
+            type: 'initial_sync',
+            token: token,
+            createdCount: files.length,
+            modifiedCount: 0,
+            deletedCount: 0,
+            durationMs: 142,
+          },
+        ])
+      } else {
+        setRecentDeltas([])
+      }
     } catch (err) {
       console.error('Initialization error in Incremental Sync:', err)
       setError(err.message || 'Failed to initialize local sync engine')
