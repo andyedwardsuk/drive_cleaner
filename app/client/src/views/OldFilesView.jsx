@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react'
-import { Clock, Filter, RefreshCw, Eye, Search, X, Download, Sparkles } from 'lucide-react'
+import { useState, useMemo, useEffect } from 'react'
+import { Clock, Filter, RefreshCw, Eye, Search, X, Download, Sparkles, Trash2 } from 'lucide-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faHourglassHalf,
@@ -17,6 +17,9 @@ import { Input } from '@/components/ui/input'
 import { useSmartScan } from '@/hooks/useSmartScan'
 import { useSettings } from '@/hooks/useSettings'
 import { useFilePreview, normalizeFileMetadata } from '@/hooks/useFilePreview'
+import { useFileActions } from '@/hooks/useFileActions'
+import { TrashConfirmationModal } from '@/components/actions/TrashConfirmationModal'
+import { UndoToast } from '@/components/actions/UndoToast'
 import {
   Table,
   TableBody,
@@ -134,9 +137,9 @@ function FileTypeTab({ label, icon, count, active, onClick }) {
 /**
  * Age summary card
  */
-function AgeSummary({ totalSize, fileCount, oldestAge }) {
+function AgeSummary({ totalSize, fileCount, oldestAge, onCleanAll, canClean }) {
   return (
-    <div className="p-6 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm shadow-lg">
+    <div className="p-6 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div className="flex items-center gap-4">
         <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
           <Clock className="w-6 h-6" />
@@ -153,6 +156,16 @@ function AgeSummary({ totalSize, fileCount, oldestAge }) {
           </p>
         </div>
       </div>
+
+      {canClean && (
+        <Button
+          onClick={onCleanAll}
+          className="h-11 px-5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs shadow-lg shadow-amber-900/30 flex items-center gap-2 self-start sm:self-auto shrink-0 transition-all active:scale-[0.98]"
+        >
+          <Trash2 className="w-4 h-4" />
+          <span>Clean Filtered ({fileCount})</span>
+        </Button>
+      )}
     </div>
   )
 }
@@ -164,6 +177,20 @@ export default function OldFilesView() {
   const { data, loading, error, runScan } = useSmartScan()
   const { thresholds } = useSettings()
   const { openPreview } = useFilePreview()
+  const {
+    isTrashing,
+    trashProgress,
+    confirmModalOpen,
+    filesPendingTrash,
+    requestTrash,
+    cancelTrash,
+    executeTrash,
+    undoToast,
+    executeRestore,
+    dismissUndo,
+    isRestoring,
+  } = useFileActions()
+
   const inactiveDays = thresholds?.oldFileInactiveDays || 365
   const inactiveYears = inactiveDays / 365
   const [ageFilter, setAgeFilter] = useState('all') // 'all', 'custom', '2yr', '5yr'
@@ -171,6 +198,35 @@ export default function OldFilesView() {
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState('age') // 'age', 'name', 'size'
   const [sortOrder, setSortOrder] = useState('desc')
+  const [trashedIds, setTrashedIds] = useState(new Set())
+
+  // Track trashed & restored files via global events
+  useEffect(() => {
+    const handleTrashed = (e) => {
+      const ids = e.detail?.fileIds || []
+      setTrashedIds((prev) => {
+        const next = new Set(prev)
+        ids.forEach((id) => next.add(id))
+        return next
+      })
+    }
+
+    const handleRestored = (e) => {
+      const files = e.detail?.files || []
+      setTrashedIds((prev) => {
+        const next = new Set(prev)
+        files.forEach((f) => next.delete(f.fileId || f.id || f.file_id))
+        return next
+      })
+    }
+
+    window.addEventListener('drive_cleaner_files_trashed', handleTrashed)
+    window.addEventListener('drive_cleaner_files_restored', handleRestored)
+    return () => {
+      window.removeEventListener('drive_cleaner_files_trashed', handleTrashed)
+      window.removeEventListener('drive_cleaner_files_restored', handleRestored)
+    }
+  }, [])
 
   // Filter and sort old files
   const filteredFiles = useMemo(() => {
@@ -223,12 +279,17 @@ export default function OldFilesView() {
     return files
   }, [data, ageFilter, typeFilter, searchQuery, sortBy, sortOrder, inactiveYears])
 
+  // Compute active untrashed files
+  const activeFiles = useMemo(() => {
+    return filteredFiles.filter((f) => !trashedIds.has(f.file_id || f.fileId))
+  }, [filteredFiles, trashedIds])
+
   // Calculate type counts
   const typeCounts = useMemo(() => {
     if (!data?.old_files?.items) return {}
 
     const counts = {
-      all: data.old_files.items.length,
+      all: 0,
       video: 0,
       image: 0,
       audio: 0,
@@ -238,19 +299,32 @@ export default function OldFilesView() {
     }
 
     data.old_files.items.forEach(file => {
-      const category = getFileTypeCategory(file.mime_type)
-      counts[category] = (counts[category] || 0) + 1
+      if (!trashedIds.has(file.file_id || file.fileId)) {
+        counts.all += 1
+        const category = getFileTypeCategory(file.mime_type)
+        counts[category] = (counts[category] || 0) + 1
+      }
     })
 
     return counts
-  }, [data])
+  }, [data, trashedIds])
 
-  // Calculate total size and oldest age of filtered files
+  // Calculate total size and oldest age of active filtered files
   const { filteredTotalSize, oldestAge } = useMemo(() => {
-    const totalSize = filteredFiles.reduce((sum, file) => sum + file.size_bytes, 0)
-    const maxAge = filteredFiles.reduce((max, file) => Math.max(max, file.age_years || 0), 0)
+    const totalSize = activeFiles.reduce((sum, file) => sum + (file.size_bytes || 0), 0)
+    const maxAge = activeFiles.reduce((max, file) => Math.max(max, file.age_years || 0), 0)
     return { filteredTotalSize: totalSize, oldestAge: maxAge }
-  }, [filteredFiles])
+  }, [activeFiles])
+
+  const handleCleanFiltered = () => {
+    if (activeFiles.length > 0) {
+      requestTrash(activeFiles)
+    }
+  }
+
+  const handleTrashFile = (file) => {
+    requestTrash([file])
+  }
 
   // Toggle sort
   const handleSort = (column) => {
@@ -321,14 +395,25 @@ export default function OldFilesView() {
         title="Old Files"
         subtitle="Find and archive files you haven't used in a long time"
         actions={
-          <Button
-            onClick={() => runScan('root', 'user')}
-            disabled={loading}
-            className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-900/40 disabled:opacity-50"
-          >
-            <RefreshCw className={cn('w-4 h-4 mr-2', loading && 'animate-spin')} />
-            {loading ? 'Scanning...' : 'Refresh Scan'}
-          </Button>
+          <div className="flex items-center gap-2">
+            {activeFiles.length > 0 && (
+              <Button
+                onClick={handleCleanFiltered}
+                className="h-11 px-5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs shadow-lg shadow-amber-900/40 flex items-center gap-2 active:scale-[0.98] transition-all"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>Clean Filtered ({activeFiles.length})</span>
+              </Button>
+            )}
+            <Button
+              onClick={() => runScan('root', 'user')}
+              disabled={loading}
+              className="h-11 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-900/40 disabled:opacity-50"
+            >
+              <RefreshCw className={cn('w-4 h-4 mr-2', loading && 'animate-spin')} />
+              {loading ? 'Scanning...' : 'Refresh Scan'}
+            </Button>
+          </div>
         }
       />
 
@@ -348,8 +433,10 @@ export default function OldFilesView() {
       {/* Age Summary */}
       <AgeSummary
         totalSize={filteredTotalSize}
-        fileCount={filteredFiles.length}
+        fileCount={activeFiles.length}
         oldestAge={oldestAge}
+        onCleanAll={handleCleanFiltered}
+        canClean={activeFiles.length > 0}
       />
 
       {/* Filters Card */}
@@ -421,19 +508,29 @@ export default function OldFilesView() {
             )}
           </div>
 
-          <Button
-            variant="outline"
-            onClick={handleExportCSV}
-            disabled={filteredFiles.length === 0}
-            className="w-full sm:w-auto h-11 px-4 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 text-xs font-semibold"
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Export CSV
-          </Button>
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            {activeFiles.length > 0 && (
+              <Button
+                onClick={handleCleanFiltered}
+                className="h-11 px-4 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold flex items-center gap-2 shadow-lg shadow-amber-900/30"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Clean ({activeFiles.length})</span>
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              onClick={handleExportCSV}
+              disabled={filteredFiles.length === 0}
+              className="h-11 px-4 rounded-xl border-slate-800 hover:bg-slate-800 text-slate-300 text-xs font-semibold shrink-0"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Files Table */}
       {/* Files Table */}
       <div className="border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm overflow-hidden shadow-xl">
         <Table>
@@ -459,12 +556,12 @@ export default function OldFilesView() {
                 Size {sortBy === 'size' && (sortOrder === 'desc' ? '↓' : '↑')}
               </TableHead>
               <TableHead className="text-slate-400">Last Modified</TableHead>
-              <TableHead className="text-slate-400 text-right w-20">Preview</TableHead>
+              <TableHead className="text-slate-400 text-right pr-6">Action</TableHead>
             </tr>
           </TableHeader>
           <TableBody className={cn('divide-y divide-slate-800/50 text-sm', loading && filteredFiles.length > 0 && 'opacity-60 transition-opacity duration-150')}>
             {loading && filteredFiles.length === 0 ? (
-              <TableSkeleton rows={8} columnWidths={['w-6', 'w-64', 'w-16', 'w-20', 'w-24', 'w-8']} />
+              <TableSkeleton rows={8} columnWidths={['w-6', 'w-64', 'w-16', 'w-20', 'w-24', 'w-24']} />
             ) : filteredFiles.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="py-14 text-center text-slate-400">
@@ -474,47 +571,88 @@ export default function OldFilesView() {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredFiles.map((file, index) => (
-                <TableRow
-                  key={file.file_id || index}
-                  className="hover:bg-slate-800/40 transition-colors group"
-                >
-                  <TableCell>
-                    <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                      <FontAwesomeIcon icon={getFileTypeIcon(file.mime_type)} className="w-4 h-4 text-amber-400" />
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-slate-200 font-medium">
-                    <span className="truncate block max-w-md">{file.file_name}</span>
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap">
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20">
-                      {formatAge(file.age_years)}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-slate-300 font-mono text-xs whitespace-nowrap">
-                    {formatBytes(file.size_bytes)}
-                  </TableCell>
-                  <TableCell className="text-slate-400 text-xs whitespace-nowrap">
-                    {formatDate(file.modified_date)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handlePreview(file)}
-                      className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg"
-                      title="Preview file"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
+              filteredFiles.map((file, index) => {
+                const isTrashed = trashedIds.has(file.file_id || file.fileId)
+
+                return (
+                  <TableRow
+                    key={file.file_id || index}
+                    className={cn(
+                      'hover:bg-slate-800/40 transition-colors group',
+                      isTrashed && 'opacity-40 line-through'
+                    )}
+                  >
+                    <TableCell>
+                      <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                        <FontAwesomeIcon icon={getFileTypeIcon(file.mime_type)} className="w-4 h-4 text-amber-400" />
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-slate-200 font-medium">
+                      <span className="truncate block max-w-md">{file.file_name}</span>
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                        {formatAge(file.age_years)}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-slate-300 font-mono text-xs whitespace-nowrap">
+                      {formatBytes(file.size_bytes)}
+                    </TableCell>
+                    <TableCell className="text-slate-400 text-xs whitespace-nowrap">
+                      {formatDate(file.modified_date)}
+                    </TableCell>
+                    <TableCell className="text-right pr-6">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handlePreview(file)}
+                          className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg"
+                          title="Preview file"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        {!isTrashed ? (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleTrashFile(file)}
+                            className="h-8 px-2.5 rounded-lg bg-red-500/10 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/20 text-xs font-medium flex items-center gap-1.5 transition-all"
+                            title="Move to trash"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Trash</span>
+                          </Button>
+                        ) : (
+                          <span className="text-[11px] text-red-400 italic pr-2">In Trash</span>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )
+              })
             )}
           </TableBody>
         </Table>
       </div>
+
+      {/* Safety Confirmation Modal */}
+      <TrashConfirmationModal
+        isOpen={confirmModalOpen}
+        files={filesPendingTrash}
+        onConfirm={executeTrash}
+        onCancel={cancelTrash}
+        isTrashing={isTrashing}
+        trashProgress={trashProgress}
+      />
+
+      {/* Undo Toast Banner */}
+      <UndoToast
+        undoToast={undoToast}
+        onUndo={executeRestore}
+        onDismiss={dismissUndo}
+        isRestoring={isRestoring}
+      />
     </div>
   )
 }

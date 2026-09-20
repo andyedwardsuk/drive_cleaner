@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Trash2, Filter, RefreshCw, Folder, FileX, Eye, Search, X, Download, Sparkles } from 'lucide-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFolderMinus, faFolderOpen, faFileSlash, faLayerGroup } from '@fortawesome/pro-duotone-svg-icons'
@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useSmartScan } from '@/hooks/useSmartScan'
 import { useFilePreview, normalizeFileMetadata } from '@/hooks/useFilePreview'
+import { useFileActions } from '@/hooks/useFileActions'
+import { TrashConfirmationModal } from '@/components/actions/TrashConfirmationModal'
+import { UndoToast } from '@/components/actions/UndoToast'
 import {
   Table,
   TableBody,
@@ -48,9 +51,9 @@ function TypeFilterChip({ label, icon, active, onClick }) {
 /**
  * Empty items summary card
  */
-function EmptyItemsSummary({ totalCount, folderCount, fileCount }) {
+function EmptyItemsSummary({ totalCount, folderCount, fileCount, onCleanAll, canClean }) {
   return (
-    <div className="p-6 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm shadow-lg">
+    <div className="p-6 border border-slate-800/80 rounded-2xl bg-slate-900/60 backdrop-blur-sm shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div className="flex items-center gap-4">
         <div className="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400">
           <Trash2 className="w-6 h-6" />
@@ -67,6 +70,16 @@ function EmptyItemsSummary({ totalCount, folderCount, fileCount }) {
           </p>
         </div>
       </div>
+
+      {canClean && (
+        <Button
+          onClick={onCleanAll}
+          className="h-11 px-5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs shadow-lg shadow-purple-900/30 flex items-center gap-2 self-start sm:self-auto shrink-0 transition-all active:scale-[0.98]"
+        >
+          <Trash2 className="w-4 h-4" />
+          <span>Clean All Empty Items ({totalCount})</span>
+        </Button>
+      )}
     </div>
   )
 }
@@ -77,9 +90,52 @@ function EmptyItemsSummary({ totalCount, folderCount, fileCount }) {
 export default function EmptyItemsView() {
   const { data, loading, error, runScan } = useSmartScan()
   const { openPreview } = useFilePreview()
+  const {
+    isTrashing,
+    trashProgress,
+    confirmModalOpen,
+    filesPendingTrash,
+    requestTrash,
+    cancelTrash,
+    executeTrash,
+    undoToast,
+    executeRestore,
+    dismissUndo,
+    isRestoring,
+  } = useFileActions()
+
   const [typeFilter, setTypeFilter] = useState('all') // 'all', 'folders', 'files'
   const [searchQuery, setSearchQuery] = useState('')
   const [sortOrder, setSortOrder] = useState('asc')
+  const [trashedIds, setTrashedIds] = useState(new Set())
+
+  // Track trashed & restored files via global events
+  useEffect(() => {
+    const handleTrashed = (e) => {
+      const ids = e.detail?.fileIds || []
+      setTrashedIds((prev) => {
+        const next = new Set(prev)
+        ids.forEach((id) => next.add(id))
+        return next
+      })
+    }
+
+    const handleRestored = (e) => {
+      const files = e.detail?.files || []
+      setTrashedIds((prev) => {
+        const next = new Set(prev)
+        files.forEach((f) => next.delete(f.fileId || f.id || f.file_id))
+        return next
+      })
+    }
+
+    window.addEventListener('drive_cleaner_files_trashed', handleTrashed)
+    window.addEventListener('drive_cleaner_files_restored', handleRestored)
+    return () => {
+      window.removeEventListener('drive_cleaner_files_trashed', handleTrashed)
+      window.removeEventListener('drive_cleaner_files_restored', handleRestored)
+    }
+  }, [])
 
   // Filter and sort empty items
   const filteredItems = useMemo(() => {
@@ -110,15 +166,31 @@ export default function EmptyItemsView() {
     return items
   }, [data, typeFilter, searchQuery, sortOrder])
 
+  // Compute active untrashed items
+  const activeItems = useMemo(() => {
+    return filteredItems.filter((item) => !trashedIds.has(item.file_id || item.fileId))
+  }, [filteredItems, trashedIds])
+
   // Calculate counts
   const { folderCount, fileCount } = useMemo(() => {
     if (!data?.empty_items?.items) return { folderCount: 0, fileCount: 0 }
 
-    const folders = data.empty_items.items.filter(item => isFolder(item.mime_type)).length
-    const files = data.empty_items.items.length - folders
+    const activeAll = data.empty_items.items.filter((item) => !trashedIds.has(item.file_id || item.fileId))
+    const folders = activeAll.filter(item => isFolder(item.mime_type)).length
+    const files = activeAll.length - folders
 
     return { folderCount: folders, fileCount: files }
-  }, [data])
+  }, [data, trashedIds])
+
+  const handleCleanAll = () => {
+    if (activeItems.length > 0) {
+      requestTrash(activeItems)
+    }
+  }
+
+  const handleTrashItem = (item) => {
+    requestTrash([item])
+  }
 
   const handleSort = () => {
     setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')
@@ -181,14 +253,25 @@ export default function EmptyItemsView() {
         title="Empty Items"
         subtitle="Find empty files and folders to clean up"
         actions={
-          <Button
-            onClick={() => runScan('root', 'user')}
-            disabled={loading}
-            className="h-11 px-5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold shadow-lg shadow-purple-900/40 disabled:opacity-50"
-          >
-            <RefreshCw className={cn('w-4 h-4 mr-2', loading && 'animate-spin')} />
-            {loading ? 'Scanning...' : 'Refresh Scan'}
-          </Button>
+          <div className="flex items-center gap-2">
+            {activeItems.length > 0 && (
+              <Button
+                onClick={handleCleanAll}
+                className="h-11 px-5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs shadow-lg shadow-purple-900/40 flex items-center gap-2 active:scale-[0.98] transition-all"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>Clean All ({activeItems.length})</span>
+              </Button>
+            )}
+            <Button
+              onClick={() => runScan('root', 'user')}
+              disabled={loading}
+              className="h-11 px-5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold shadow-lg shadow-purple-900/40 disabled:opacity-50"
+            >
+              <RefreshCw className={cn('w-4 h-4 mr-2', loading && 'animate-spin')} />
+              {loading ? 'Scanning...' : 'Refresh Scan'}
+            </Button>
+          </div>
         }
       />
 
@@ -205,11 +288,13 @@ export default function EmptyItemsView() {
         </div>
       )}
 
-      {/* Summary */}
+      {/* Summary with Clean All */}
       <EmptyItemsSummary
-        totalCount={filteredItems.length}
+        totalCount={activeItems.length}
         folderCount={folderCount}
         fileCount={fileCount}
+        onCleanAll={handleCleanAll}
+        canClean={activeItems.length > 0}
       />
 
       {/* Search & Filter Toolbar (All h-11) */}
@@ -279,12 +364,12 @@ export default function EmptyItemsView() {
               </TableHead>
               <TableHead className="text-slate-400">Criteria</TableHead>
               <TableHead className="text-slate-400">Safety</TableHead>
-              <TableHead className="text-slate-400 text-right w-20">Preview</TableHead>
+              <TableHead className="text-slate-400 text-right pr-6">Action</TableHead>
             </tr>
           </TableHeader>
           <TableBody className={cn('divide-y divide-slate-800/50 text-sm', loading && filteredItems.length > 0 && 'opacity-60 transition-opacity duration-150')}>
             {loading && filteredItems.length === 0 ? (
-              <TableSkeleton rows={8} columnWidths={['w-6', 'w-64', 'w-24', 'w-16', 'w-8']} />
+              <TableSkeleton rows={8} columnWidths={['w-6', 'w-64', 'w-24', 'w-16', 'w-24']} />
             ) : filteredItems.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="py-14 text-center text-slate-400">
@@ -294,66 +379,107 @@ export default function EmptyItemsView() {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredItems.map((item, index) => (
-                <TableRow
-                  key={item.file_id || index}
-                  className="hover:bg-slate-800/40 transition-colors group"
-                >
-                  <TableCell>
-                    {isFolder(item.mime_type) ? (
-                      <Folder className="w-5 h-5 text-purple-400" />
-                    ) : (
-                      <FileX className="w-5 h-5 text-purple-300" />
+              filteredItems.map((item, index) => {
+                const isTrashed = trashedIds.has(item.file_id || item.fileId)
+
+                return (
+                  <TableRow
+                    key={item.file_id || index}
+                    className={cn(
+                      'hover:bg-slate-800/40 transition-colors group',
+                      isTrashed && 'opacity-40 line-through'
                     )}
-                  </TableCell>
-                  <TableCell className="text-slate-200 font-medium">
-                    <span className="truncate block max-w-md">{item.file_name}</span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-1.5 flex-wrap">
-                      {item.matched_criteria?.map((criteria, i) => (
-                        <span
-                          key={i}
-                          className="px-2.5 py-0.5 rounded-md text-[11px] font-medium bg-purple-500/10 text-purple-300 border border-purple-500/20"
-                        >
-                          {criteria.replace(/_/g, ' ')}
-                        </span>
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      className={cn(
-                        'px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize',
-                        item.safety_level === 'safe'
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                          : item.safety_level === 'review'
-                          ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                          : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                  >
+                    <TableCell>
+                      {isFolder(item.mime_type) ? (
+                        <Folder className="w-5 h-5 text-purple-400" />
+                      ) : (
+                        <FileX className="w-5 h-5 text-purple-300" />
                       )}
-                    >
-                      {item.safety_level || 'safe'}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {!isFolder(item.mime_type) && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handlePreview(item)}
-                        className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg"
-                        title="Preview file"
+                    </TableCell>
+                    <TableCell className="text-slate-200 font-medium">
+                      <span className="truncate block max-w-md">{item.file_name}</span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1.5 flex-wrap">
+                        {item.matched_criteria?.map((criteria, i) => (
+                          <span
+                            key={i}
+                            className="px-2.5 py-0.5 rounded-md text-[11px] font-medium bg-purple-500/10 text-purple-300 border border-purple-500/20"
+                          >
+                            {criteria.replace(/_/g, ' ')}
+                          </span>
+                        ))}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={cn(
+                          'px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize',
+                          item.safety_level === 'safe'
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                            : item.safety_level === 'review'
+                            ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                            : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                        )}
                       >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))
+                        {item.safety_level || 'safe'}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right pr-6">
+                      <div className="flex items-center justify-end gap-1.5">
+                        {!isFolder(item.mime_type) && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handlePreview(item)}
+                            className="h-8 w-8 p-0 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg"
+                            title="Preview file"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {!isTrashed ? (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleTrashItem(item)}
+                            className="h-8 px-2.5 rounded-lg bg-red-500/10 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/20 text-xs font-medium flex items-center gap-1.5 transition-all"
+                            title="Move to trash"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Trash</span>
+                          </Button>
+                        ) : (
+                          <span className="text-[11px] text-red-400 italic pr-2">In Trash</span>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )
+              })
             )}
           </TableBody>
         </Table>
       </div>
+
+      {/* Safety Confirmation Modal */}
+      <TrashConfirmationModal
+        isOpen={confirmModalOpen}
+        files={filesPendingTrash}
+        onConfirm={executeTrash}
+        onCancel={cancelTrash}
+        isTrashing={isTrashing}
+        trashProgress={trashProgress}
+      />
+
+      {/* Undo Toast Banner */}
+      <UndoToast
+        undoToast={undoToast}
+        onUndo={executeRestore}
+        onDismiss={dismissUndo}
+        isRestoring={isRestoring}
+      />
 
       {/* Help / Guidance Footer Card */}
       <div className="p-5 border border-slate-800/70 rounded-2xl bg-slate-900/40 backdrop-blur-sm">
@@ -361,7 +487,7 @@ export default function EmptyItemsView() {
           About Empty Items
         </h4>
         <p className="text-xs text-slate-400 leading-relaxed">
-          Empty items include empty directories with no child files, and 0-byte abandoned files. Deleting empty directories and 0-byte stubs keeps your folder hierarchy clean and organized without affecting actual data.
+          Empty items include empty directories with no child files, and 0-byte abandoned files. Deleting empty directories and 0-byte stubs keeps your folder hierarchy clean and organized without affecting actual data. All actions move items safely to Google Drive Trash with instant undo.
         </p>
       </div>
     </div>
