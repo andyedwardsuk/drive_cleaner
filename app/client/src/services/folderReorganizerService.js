@@ -43,6 +43,40 @@ export const folderReorganizerService = {
               { id: 'gen_2', name: 'Untitled folder', path: 'Work / Untitled folder' },
               { id: 'gen_3', name: 'Random stuff', path: 'My Drive / Random stuff' }
             ],
+            currentTree: {
+              rootId: 'root',
+              rootName: 'My Drive',
+              rootFilesCount: 34,
+              totalFoldersCount: 5,
+              folders: [
+                {
+                  id: 'f_work',
+                  name: 'Work',
+                  depth: 1,
+                  isGeneric: false,
+                  children: [
+                    { id: 'f_clients', name: 'Clients', depth: 2, isGeneric: false, children: [] },
+                    { id: 'f_projects', name: 'Projects', depth: 2, isGeneric: false, children: [] }
+                  ]
+                },
+                {
+                  id: 'f_personal',
+                  name: 'Personal',
+                  depth: 1,
+                  isGeneric: false,
+                  children: [
+                    { id: 'f_finance', name: 'Finance', depth: 2, isGeneric: false, children: [] }
+                  ]
+                },
+                {
+                  id: 'f_gen1',
+                  name: 'New Folder (2)',
+                  depth: 1,
+                  isGeneric: true,
+                  children: []
+                }
+              ]
+            },
             clusters: [
               {
                 id: 'cluster_acme_corp',

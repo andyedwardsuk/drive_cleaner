@@ -49,44 +49,54 @@ export default function SmartReorganizerView() {
   } = useFolderReorganizer()
 
   const [activeTab, setActiveTab] = useState('tree') // 'tree' | 'clusters' | 'anomalies'
-  const [selectedCluster, setSelectedCluster] = useState(null)
   const [confirmModalOpen, setConfirmModalOpen] = useState(false)
   const [pendingPlan, setPendingPlan] = useState(null)
   const [successBanner, setSuccessBanner] = useState('')
 
-  const healthScore = analysis?.healthScore || 58
-  const rating = analysis?.rating || 'Needs Tidy'
+  const healthScore = analysis?.healthScore ?? 100
+  const rating = analysis?.rating || (isLoading ? 'Analyzing...' : 'Optimal')
   const metrics = analysis?.metrics || {
-    totalFolders: 24,
-    totalFiles: 186,
-    maxDepth: 7,
-    orphanedRootFiles: 34,
-    genericFolderCount: 4
+    totalFolders: 0,
+    totalFiles: 0,
+    maxDepth: 1,
+    orphanedRootFiles: 0,
+    genericFolderCount: 0
   }
 
   const handleApplyCluster = (cluster) => {
+    const moves = (cluster.moves && cluster.moves.length > 0)
+      ? cluster.moves
+      : (cluster.sampleFiles || []).map((name, idx) => ({
+          fileId: `file_${cluster.id}_${idx}`,
+          targetPath: cluster.suggestedPath
+        }))
+
     setPendingPlan({
-      title: `Organised ${cluster.fileCount} files into ${cluster.suggestedPath}`,
+      title: `Organise ${cluster.fileCount} files into ${cluster.suggestedPath}`,
       targetPath: cluster.suggestedPath,
-      moves: (cluster.sampleFiles || []).map((name, idx) => ({
-        fileId: `file_${cluster.id}_${idx}`,
-        targetPath: cluster.suggestedPath
-      }))
+      moves: moves
     })
     setConfirmModalOpen(true)
   }
 
   const handleApplyFullStructure = () => {
+    const allMoves = []
+    ;(analysis?.clusters || []).forEach((c) => {
+      if (c.moves && Array.isArray(c.moves)) {
+        allMoves.push(...c.moves)
+      }
+    })
+
+    if (allMoves.length === 0) {
+      setSuccessBanner('No reorganisation needed — your Drive hierarchy is in good order!')
+      setTimeout(() => setSuccessBanner(''), 4000)
+      return
+    }
+
     setPendingPlan({
       title: 'Full Drive Hierarchy Reorganisation',
       targetPath: 'Work, Personal, Media & Assets, Archive',
-      moves: [
-        { fileId: 'move_1', targetPath: 'Work/Clients/Acme Corp' },
-        { fileId: 'move_2', targetPath: 'Work/Projects/Active' },
-        { fileId: 'move_3', targetPath: 'Personal/Finance' },
-        { fileId: 'move_4', targetPath: 'Media & Assets' },
-        { fileId: 'move_5', targetPath: 'Archive/2023' }
-      ]
+      moves: allMoves
     })
     setConfirmModalOpen(true)
   }
@@ -253,67 +263,103 @@ export default function SmartReorganizerView() {
       {activeTab === 'tree' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* CURRENT CHAOTIC STRUCTURE */}
+            {/* CURRENT DRIVE STRUCTURE */}
             <div className="rounded-2xl border border-border/50 bg-card/40 p-6 space-y-4 backdrop-blur-sm">
               <div className="flex items-center justify-between pb-3 border-b border-border/40">
                 <div className="flex items-center gap-2">
-                  <div className="rounded-lg bg-rose-500/10 p-2 text-rose-400">
+                  <div className={cn(
+                    "rounded-lg p-2",
+                    healthScore < 60 ? "bg-rose-500/10 text-rose-400" : (healthScore < 80 ? "bg-amber-500/10 text-amber-400" : "bg-emerald-500/10 text-emerald-400")
+                  )}>
                     <AlertCircle className="h-4 w-4" />
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-foreground">Current Drive Structure</h4>
-                    <p className="text-xs text-muted-foreground">Unorganised, mixed contexts, deep nesting</p>
+                    <p className="text-xs text-muted-foreground">
+                      {isLoading ? 'Scanning folders...' : `${metrics.totalFolders} ${metrics.totalFolders === 1 ? 'folder' : 'folders'}, max depth: ${metrics.maxDepth}`}
+                    </p>
                   </div>
                 </div>
-                <Badge variant="outline" className="border-rose-500/30 text-rose-400 text-xs">
-                  Chaotic
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "text-xs",
+                    healthScore < 60 ? "border-rose-500/30 text-rose-400" : (healthScore < 80 ? "border-amber-500/30 text-amber-400" : "border-emerald-500/30 text-emerald-400")
+                  )}
+                >
+                  {rating}
                 </Badge>
               </div>
 
-              {/* Tree Mockup: Current */}
-              <div className="font-mono text-xs text-muted-foreground space-y-2 py-2">
+              {/* Dynamic Real Tree: Current */}
+              <div className="font-mono text-xs text-muted-foreground space-y-2 py-2 max-h-[380px] overflow-y-auto pr-1">
                 <div className="flex items-center gap-2 text-foreground font-semibold">
-                  <FolderOpen className="h-4 w-4 text-amber-400" />
-                  <span>My Drive /</span>
-                  <Badge variant="outline" className="text-[10px] text-rose-400 ml-auto border-rose-500/30">
-                    34 files in root
+                  <FolderOpen className="h-4 w-4 text-amber-400 flex-shrink-0" />
+                  <span className="truncate">{analysis?.currentTree?.rootName || 'My Drive'} /</span>
+                  <Badge variant="outline" className="text-[10px] text-rose-400 ml-auto border-rose-500/30 flex-shrink-0">
+                    {metrics.orphanedRootFiles} {metrics.orphanedRootFiles === 1 ? 'file' : 'files'} in root
                   </Badge>
                 </div>
-                <div className="pl-5 space-y-1.5 border-l border-border/40 ml-2">
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <FolderOpen className="h-3.5 w-3.5 text-amber-400" />
-                    <span>Project Alpha</span>
+
+                {isLoading ? (
+                  <div className="py-8 text-center text-xs text-muted-foreground animate-pulse">
+                    Scanning Drive folder structure...
                   </div>
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <FolderOpen className="h-3.5 w-3.5 text-amber-400" />
-                    <span>CLIENT - Acme Corp</span>
+                ) : (!analysis?.currentTree?.folders || analysis.currentTree.folders.length === 0) ? (
+                  <div className="pl-5 py-4 space-y-2 border-l border-border/40 ml-2">
+                    <p className="text-xs text-slate-300">
+                      No subfolders detected in this location.
+                    </p>
+                    <p className="text-[11px] text-muted-foreground">
+                      All files are currently stored directly in the root directory. Creating a multi-level folder structure will improve your Drive health score.
+                    </p>
                   </div>
-                  <div className="flex items-center gap-2 text-amber-400/90 font-medium">
-                    <FolderOpen className="h-3.5 w-3.5 text-amber-400" />
-                    <span>New Folder (2)</span>
-                    <span className="text-[10px] text-muted-foreground">(generic name)</span>
+                ) : (
+                  <div className="pl-5 space-y-2 border-l border-border/40 ml-2">
+                    {analysis.currentTree.folders.slice(0, 20).map((folder) => (
+                      <div key={folder.id} className="space-y-1">
+                        <div className="flex items-center gap-2 text-slate-300">
+                          <FolderOpen className="h-3.5 w-3.5 text-amber-400 flex-shrink-0" />
+                          <span className="truncate">{folder.name}</span>
+                          {folder.isGeneric && (
+                            <span className="text-[10px] text-amber-400/90 font-medium flex-shrink-0">(generic name)</span>
+                          )}
+                          {folder.depth > 3 && (
+                            <span className="text-[10px] text-rose-400 flex-shrink-0">(depth: {folder.depth})</span>
+                          )}
+                        </div>
+
+                        {folder.children && folder.children.length > 0 && (
+                          <div className="pl-4 space-y-1 border-l border-border/40 ml-1.5 text-slate-400">
+                            {folder.children.slice(0, 8).map((child) => (
+                              <div key={child.id} className="flex items-center gap-2">
+                                <span className="text-muted-foreground">├─</span>
+                                <FolderOpen className="h-3 w-3 text-amber-400 flex-shrink-0" />
+                                <span className="truncate">{child.name}</span>
+                                {child.isGeneric && (
+                                  <span className="text-[10px] text-amber-400/90 flex-shrink-0">(generic)</span>
+                                )}
+                                {child.depth > 3 && (
+                                  <span className="text-[10px] text-rose-400 flex-shrink-0">(depth: {child.depth})</span>
+                                )}
+                              </div>
+                            ))}
+                            {folder.children.length > 8 && (
+                              <div className="text-[10px] text-muted-foreground pl-4">
+                                + {folder.children.length - 8} more subfolders
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    {analysis.currentTree.folders.length > 20 && (
+                      <div className="text-[11px] text-muted-foreground pt-1 pl-1">
+                        + {analysis.currentTree.folders.length - 20} more folders in Drive
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <FolderOpen className="h-3.5 w-3.5 text-amber-400" />
-                    <span>Documents /</span>
-                  </div>
-                  <div className="pl-5 space-y-1.5 border-l border-border/40 ml-2">
-                    <div className="flex items-center gap-2 text-slate-300">
-                      <FolderOpen className="h-3.5 w-3.5 text-amber-400" />
-                      <span>Acme Corp Files</span>
-                      <span className="text-[10px] text-rose-400">(duplicate concept)</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-slate-400">
-                      <FolderOpen className="h-3.5 w-3.5 text-amber-400" />
-                      <span>Random stuff</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-rose-400/90">
-                      <FolderOpen className="h-3.5 w-3.5 text-rose-400" />
-                      <span>Old / 2022 / Q1 / Jan / Week1 /</span>
-                      <span className="text-[10px]">(depth: 7)</span>
-                    </div>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
 
@@ -334,49 +380,56 @@ export default function SmartReorganizerView() {
                 </Badge>
               </div>
 
-              {/* Tree Mockup: Proposed */}
-              <div className="font-mono text-xs text-muted-foreground space-y-2 py-2">
+              {/* Dynamic Real Tree: Proposed */}
+              <div className="font-mono text-xs text-muted-foreground space-y-2 py-2 max-h-[380px] overflow-y-auto pr-1">
                 <div className="flex items-center gap-2 text-foreground font-semibold">
-                  <FolderCheck className="h-4 w-4 text-primary" />
-                  <span>My Drive /</span>
-                  <span className="text-[10px] text-emerald-400 ml-auto">0 orphans</span>
+                  <FolderCheck className="h-4 w-4 text-primary flex-shrink-0" />
+                  <span>{analysis?.currentTree?.rootName || 'My Drive'} /</span>
+                  <span className="text-[10px] text-emerald-400 ml-auto flex-shrink-0">0 orphans</span>
                 </div>
+
                 <div className="pl-5 space-y-2 border-l border-primary/30 ml-2">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-indigo-300 font-semibold">
-                      <Briefcase className="h-3.5 w-3.5 text-indigo-400" />
-                      <span className="flex items-center gap-1.5"><FontAwesomeIcon icon={faFolder} className="w-3.5 h-3.5 text-blue-400" /> Work /</span>
-                    </div>
-                    <div className="pl-5 space-y-1 border-l border-border/30 ml-2 text-slate-400">
-                      <div className="flex items-center gap-1.5"><span>├─</span> <FontAwesomeIcon icon={faFolder} className="w-3 h-3 text-blue-400" /> Clients / Acme Corp/ <span className="text-emerald-400">(consolidated)</span></div>
-                      <div className="flex items-center gap-1.5"><span>└─</span> <FontAwesomeIcon icon={faFolder} className="w-3 h-3 text-blue-400" /> Projects / Active/</div>
-                    </div>
-                  </div>
+                  {(analysis?.proposedStructure || []).map((cat, idx) => {
+                    const iconMap = {
+                      briefcase: <Briefcase className="h-3.5 w-3.5 text-indigo-400" />,
+                      user: <User className="h-3.5 w-3.5 text-emerald-400" />,
+                      image: <ImageIcon className="h-3.5 w-3.5 text-sky-400" />,
+                      archive: <Archive className="h-3.5 w-3.5 text-amber-400" />
+                    }
+                    const colorMap = {
+                      briefcase: 'text-indigo-300',
+                      user: 'text-emerald-300',
+                      image: 'text-sky-300',
+                      archive: 'text-amber-300'
+                    }
+                    const IconComp = iconMap[cat.icon] || <FolderCheck className="h-3.5 w-3.5 text-primary" />
+                    const textColor = colorMap[cat.icon] || 'text-primary'
 
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-emerald-300 font-semibold">
-                      <User className="h-3.5 w-3.5 text-emerald-400" />
-                      <span className="flex items-center gap-1.5"><FontAwesomeIcon icon={faFolder} className="w-3.5 h-3.5 text-blue-400" /> Personal /</span>
-                    </div>
-                    <div className="pl-5 space-y-1 border-l border-border/30 ml-2 text-slate-400">
-                      <div className="flex items-center gap-1.5"><span>├─</span> <FontAwesomeIcon icon={faFolder} className="w-3 h-3 text-blue-400" /> Finance /</div>
-                      <div className="flex items-center gap-1.5"><span>└─</span> <FontAwesomeIcon icon={faFolder} className="w-3 h-3 text-blue-400" /> Travel /</div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sky-300 font-semibold">
-                      <ImageIcon className="h-3.5 w-3.5 text-sky-400" />
-                      <span className="flex items-center gap-1.5"><FontAwesomeIcon icon={faFolder} className="w-3.5 h-3.5 text-blue-400" /> Media & Assets /</span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-amber-300 font-semibold">
-                      <Archive className="h-3.5 w-3.5 text-amber-400" />
-                      <span className="flex items-center gap-1.5"><FontAwesomeIcon icon={faFolder} className="w-3.5 h-3.5 text-blue-400" /> Archive / 2023 /</span>
-                    </div>
-                  </div>
+                    return (
+                      <div key={idx} className="space-y-1">
+                        <div className={cn("flex items-center gap-2 font-semibold", textColor)}>
+                          {IconComp}
+                          <span className="flex items-center gap-1.5 truncate">
+                            <FontAwesomeIcon icon={faFolder} className="w-3.5 h-3.5 text-blue-400" /> {cat.path} /
+                          </span>
+                        </div>
+                        {cat.children && cat.children.length > 0 && (
+                          <div className="pl-5 space-y-1 border-l border-border/30 ml-2 text-slate-400">
+                            {cat.children.map((child, cIdx) => (
+                              <div key={cIdx} className="flex items-center gap-1.5 truncate">
+                                <span>{cIdx === cat.children.length - 1 ? '└─' : '├─'}</span>
+                                <FontAwesomeIcon icon={faFolder} className="w-3 h-3 text-blue-400 flex-shrink-0" />
+                                <span className="truncate">{child.path.replace(cat.path + '/', '')} /</span>
+                                {child.count ? (
+                                  <span className="text-[10px] text-muted-foreground flex-shrink-0">({child.count} files)</span>
+                                ) : null}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
 
