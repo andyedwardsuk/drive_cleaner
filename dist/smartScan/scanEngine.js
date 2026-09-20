@@ -491,6 +491,16 @@ function calculateSpaceSavings_(categoryResults) {
 }
 
 /**
+ * Calculates total potential space savings from category results
+ * Compatible alias for calculateSpaceSavings_
+ * @param {Object} categoryResults - Object containing category results
+ * @returns {number} Total potential savings in bytes
+ */
+function calculateTotalSavings(categoryResults) {
+  return calculateSpaceSavings_(categoryResults);
+}
+
+/**
  * Executes a single chunk of Smart Scan directory indexing.
  * Called iteratively by the client to scan large drives without hitting GAS 6-minute limits.
  *
@@ -655,8 +665,7 @@ function finishSmartScan(filesPayload, folderId, folderName, extraMeta) {
     };
 
     // Calculate total potential savings
-    // eslint-disable-next-line no-undef
-    const totalSavings = calculateTotalSavings(categoryResults);
+    const totalSavings = calculateSpaceSavings_(categoryResults);
 
     // Run Carbon Footprint Analyzer
     // eslint-disable-next-line no-undef
@@ -715,3 +724,5 @@ globalThis.runSmartScan = runSmartScan;
 globalThis.runSmartScanChunk = runSmartScanChunk;
 globalThis.finishSmartScan = finishSmartScan;
 globalThis.testSmartScan = testSmartScan;
+globalThis.calculateSpaceSavings_ = calculateSpaceSavings_;
+globalThis.calculateTotalSavings = calculateTotalSavings;
