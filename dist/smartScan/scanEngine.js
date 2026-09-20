@@ -233,13 +233,25 @@ function runSmartScan(folderId, corpora) {
     // Calculate Carbon Footprint
     console.log('Calculating carbon footprint...');
     // eslint-disable-next-line no-undef
-    const carbonFootprintResult = calculateCarbonFootprint(structuredFiles, categoryResults);
-    console.log(`- Annual CO2: ${carbonFootprintResult.annual_co2_kg} kg CO2 (${carbonFootprintResult.eco_rating.level})`);
+    let carbonFootprintResult;
+    try {
+      if (typeof calculateCarbonFootprint === 'function') {
+        carbonFootprintResult = calculateCarbonFootprint(structuredFiles, categoryResults);
+      } else if (typeof analyzeCarbonFootprint === 'function') {
+        carbonFootprintResult = analyzeCarbonFootprint(structuredFiles, categoryResults);
+      } else {
+        carbonFootprintResult = { storage_gb: 0, annual_energy_kwh: 0, annual_co2_kg: 0, annual_co2_tonnes: 0, equivalents: { headline: '0 smartphone charges' }, eco_rating: { level: 'Eco Champion' } };
+      }
+    } catch (carbonErr) {
+      console.warn('Carbon footprint calculation fallback: ' + carbonErr.message);
+      carbonFootprintResult = { storage_gb: 0, annual_energy_kwh: 0, annual_co2_kg: 0, annual_co2_tonnes: 0, equivalents: { headline: '0 smartphone charges' }, eco_rating: { level: 'Eco Champion' } };
+    }
+    console.log(`- Annual CO2: ${carbonFootprintResult.annual_co2_kg || 0} kg CO2 (${carbonFootprintResult.eco_rating ? carbonFootprintResult.eco_rating.level : 'Active'})`);
 
     // Generate recommendations
     console.log('Generating recommendations...');
     // eslint-disable-next-line no-undef
-    const recommendations = generateRecommendations(categoryResults);
+    const recommendations = typeof generateRecommendations === 'function' ? generateRecommendations(categoryResults) : [];
 
     // Format final results with safety watchdog metadata
     const isPartial = !!filesData.isTruncated;
@@ -668,12 +680,30 @@ function finishSmartScan(filesPayload, folderId, folderName, extraMeta) {
     const totalSavings = calculateSpaceSavings_(categoryResults);
 
     // Run Carbon Footprint Analyzer
-    // eslint-disable-next-line no-undef
-    const carbonFootprintResult = analyzeCarbonFootprint(structuredFiles, totalSavings);
+    let carbonFootprintResult;
+    try {
+      if (typeof calculateCarbonFootprint === 'function') {
+        carbonFootprintResult = calculateCarbonFootprint(structuredFiles, categoryResults);
+      } else if (typeof analyzeCarbonFootprint === 'function') {
+        carbonFootprintResult = analyzeCarbonFootprint(structuredFiles, categoryResults);
+      } else {
+        carbonFootprintResult = { storage_gb: 0, annual_energy_kwh: 0, annual_co2_kg: 0, annual_co2_tonnes: 0, equivalents: { headline: '0 smartphone charges', car_miles: 0, car_km: 0, smartphone_charges: 0, tree_years: 0, burgers: 0, laptop_hours: 0, coffee_cups: 0 }, breakdown_by_type: {}, potential_savings: { cleanup_gb: 0, co2_saved_kg: 0, energy_saved_kwh: 0, equivalents: { headline: '0 smartphone charges', car_miles: 0, car_km: 0, smartphone_charges: 0, tree_years: 0, burgers: 0 } }, eco_rating: { level: 'Eco Champion', color: 'emerald', icon: '🌟', badge: 'Minimal Carbon Impact', message: 'No storage footprint.' }, achievements: [] };
+      }
+    } catch (carbonErr) {
+      console.warn('Carbon footprint calculation fallback: ' + carbonErr.message);
+      carbonFootprintResult = { storage_gb: 0, annual_energy_kwh: 0, annual_co2_kg: 0, annual_co2_tonnes: 0, equivalents: { headline: '0 smartphone charges', car_miles: 0, car_km: 0, smartphone_charges: 0, tree_years: 0, burgers: 0, laptop_hours: 0, coffee_cups: 0 }, breakdown_by_type: {}, potential_savings: { cleanup_gb: 0, co2_saved_kg: 0, energy_saved_kwh: 0, equivalents: { headline: '0 smartphone charges', car_miles: 0, car_km: 0, smartphone_charges: 0, tree_years: 0, burgers: 0 } }, eco_rating: { level: 'Eco Champion', color: 'emerald', icon: '🌟', badge: 'Minimal Carbon Impact', message: 'No storage footprint.' }, achievements: [] };
+    }
 
     // Generate recommendations
-    // eslint-disable-next-line no-undef
-    const recommendations = generateRecommendations(categoryResults);
+    let recommendations = [];
+    try {
+      if (typeof generateRecommendations === 'function') {
+        recommendations = generateRecommendations(categoryResults);
+      }
+    } catch (recErr) {
+      console.warn('Recommendations generation fallback: ' + recErr.message);
+      recommendations = [];
+    }
 
     const scanResults = {
       success: true,

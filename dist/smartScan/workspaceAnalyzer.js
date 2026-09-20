@@ -518,3 +518,10 @@ function isWorkspaceFile(file) {
 function getWorkspaceTypeInfo(mimeType) {
   return WORKSPACE_TYPES[mimeType] || null;
 }
+
+// Export public functions to global scope for GAS
+if (typeof globalThis !== 'undefined') {
+  globalThis.analyzeWorkspaceFiles = analyzeWorkspaceFiles;
+  globalThis.isWorkspaceFile = isWorkspaceFile;
+  globalThis.getWorkspaceTypeInfo = getWorkspaceTypeInfo;
+}

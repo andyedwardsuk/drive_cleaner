@@ -327,3 +327,22 @@ function calculateCarbonFootprint(structuredFiles, categoryResults = {}) {
     achievements
   };
 }
+
+/**
+ * Analyze Cloud Carbon Footprint metrics (compatibility alias)
+ * @param {Array<Object>} structuredFiles
+ * @param {Object|number} [categoryResultsOrSavings]
+ * @returns {Object}
+ */
+function analyzeCarbonFootprint(structuredFiles, categoryResultsOrSavings) {
+  const categoryResults = typeof categoryResultsOrSavings === 'object' && categoryResultsOrSavings !== null
+    ? categoryResultsOrSavings
+    : {};
+  return calculateCarbonFootprint(structuredFiles, categoryResults);
+}
+
+// Export public functions to global scope for GAS
+if (typeof globalThis !== 'undefined') {
+  globalThis.calculateCarbonFootprint = calculateCarbonFootprint;
+  globalThis.analyzeCarbonFootprint = analyzeCarbonFootprint;
+}

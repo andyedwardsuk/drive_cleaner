@@ -580,3 +580,8 @@ function analyzeROT(filesData) {
     items: unifiedItems
   };
 }
+
+// Export public function to global scope for GAS
+if (typeof globalThis !== 'undefined') {
+  globalThis.analyzeROT = analyzeROT;
+}
