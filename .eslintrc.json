@@ -54,6 +54,10 @@
     "activateLicenseKey_": "readonly",
     "deactivateLicenseKey_": "readonly",
     "checkCleanupQuota_": "readonly",
-    "recordCleanupQuota_": "readonly"
+    "recordCleanupQuota_": "readonly",
+    "computeLicenseChecksum_": "readonly",
+    "generateSignedLicenseKey_": "readonly",
+    "verifyLicenseKeyAuthenticity_": "readonly",
+    "ContentService": "readonly"
   }
 }

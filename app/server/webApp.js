@@ -685,6 +685,74 @@ function doGet(e) {
 }
 
 /**
+ * Web app doPost entry point
+ * Handles inbound commercial purchase webhooks from platforms like Gumroad, Lemon Squeezy, or Stripe.
+ * Generates and returns a signed Pro license key.
+ * @param {Object} e - Event object with post data and parameters
+ * @returns {TextOutput} JSON response
+ */
+function doPost(e) {
+  try {
+    let payload = {};
+    if (e && e.postData && e.postData.contents) {
+      if (e.postData.type && e.postData.type.includes('json')) {
+        payload = JSON.parse(e.postData.contents);
+      } else {
+        payload = e.parameter || {};
+      }
+    } else if (e && e.parameter) {
+      payload = e.parameter;
+    }
+
+    const action = payload.action || (e && e.parameter && e.parameter.action) || 'purchase_webhook';
+
+    if (action === 'verify_key') {
+      const key = payload.key || payload.license_key;
+      const verifyResult = typeof verifyLicenseKeyAuthenticity_ === 'function'
+        ? verifyLicenseKeyAuthenticity_(key)
+        : { valid: false, error: 'Verification service not loaded' };
+      return ContentService.createTextOutput(JSON.stringify(verifyResult))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    const email = payload.email || payload.buyer_email || payload.customer_email || 'anonymous';
+    const saleId = payload.sale_id || payload.order_id || payload.id || Utilities.getUuid().slice(0, 8);
+    const tier = payload.tier === 'enterprise' ? 'enterprise' : 'pro';
+
+    let licenseKey = null;
+    if (typeof generateSignedLicenseKey_ === 'function') {
+      licenseKey = generateSignedLicenseKey_(email, tier);
+    } else {
+      const b1 = (Math.random().toString(36).substring(2, 6)).toUpperCase().padEnd(4, 'X');
+      const b2 = (Math.random().toString(36).substring(2, 6)).toUpperCase().padEnd(4, 'Y');
+      const cs = typeof computeLicenseChecksum_ === 'function'
+        ? computeLicenseChecksum_(b1 + '-' + b2, 'DC_SALT_2026_STORAGE_PRO')
+        : '2026';
+      licenseKey = 'DC-PRO-' + b1 + '-' + b2 + '-' + cs;
+    }
+
+    const responseData = {
+      success: true,
+      licenseKey: licenseKey,
+      customerEmail: email,
+      saleId: saleId,
+      tier: tier,
+      timestamp: new Date().toISOString(),
+      message: 'License key generated successfully. Enter this key into Drive Cleaner > Settings > Plan & Licensing.'
+    };
+
+    return ContentService.createTextOutput(JSON.stringify(responseData))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    console.error('Error in doPost webhook:', err);
+    return ContentService.createTextOutput(JSON.stringify({
+      success: false,
+      error: err.message || 'Failed to process webhook'
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+/**
  * Legacy function name for backwards compatibility
  * @deprecated Use DriveCleanerWebApp.getOAuthToken() instead
  * @returns {string} OAuth token

@@ -6,6 +6,8 @@
     "build": "node build.js",
     "build:dev": "node build.js --dev",
     "preflight": "node scripts/preflight-check.js",
+    "license:gen": "node scripts/generate-license-key.js",
+    "license:verify": "node scripts/generate-license-key.js --verify",
     "push": "pnpm run build && clasp push",
     "push:dev": "pnpm run build:dev && clasp push",
     "push:watch": "pnpm run build && clasp push --watch",
