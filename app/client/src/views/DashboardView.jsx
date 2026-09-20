@@ -251,7 +251,7 @@ export default function DashboardView() {
         </div>
 
         {/* 3 Spotlight Interactive KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
           {/* Card 1: Reclaimable Space */}
           <div className="relative group p-4 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-blue-500/40 transition-all duration-150 glass-specular-sm flex flex-col justify-between">
             <div>
@@ -301,7 +301,7 @@ export default function DashboardView() {
           </div>
 
           {/* Card 3: Cloud Trash Lifecycle */}
-          <div className="relative group p-4 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-rose-500/40 transition-all duration-150 glass-specular-sm flex flex-col justify-between">
+          <div className="relative group p-4 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-rose-500/40 transition-all duration-150 glass-specular-sm flex flex-col justify-between sm:col-span-2 lg:col-span-1">
             <div>
               <div className="flex items-center justify-between mb-3">
                 <span className="p-2 rounded-xl bg-rose-500/15 text-rose-400 border border-rose-500/25">
@@ -326,7 +326,7 @@ export default function DashboardView() {
         </div>
       </div>
 
-      <div className="p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-xl shadow-lg shadow-black/10">
+      <div className="p-4 sm:p-6 border rounded-2xl bg-slate-900/60 border-slate-800/80 backdrop-blur-xl shadow-lg shadow-black/10">
         <form onSubmit={handleSubmit} className="space-y-3">
           <Label htmlFor="folderId" className="text-sm font-semibold text-slate-200 block">
             Folder ID or Google Drive URL
@@ -352,7 +352,7 @@ export default function DashboardView() {
             <Button
               type="submit"
               disabled={loading}
-              className="h-11 w-[140px] shrink-0 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl shadow-md shadow-blue-600/25 flex items-center justify-center gap-2 transition-colors"
+              className="h-11 w-full sm:w-[140px] shrink-0 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl shadow-md shadow-blue-600/25 flex items-center justify-center gap-2 transition-colors"
             >
               {loading ? (
                 <>

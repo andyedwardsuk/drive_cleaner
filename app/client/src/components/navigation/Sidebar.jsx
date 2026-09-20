@@ -19,7 +19,12 @@ import { APP_VERSION } from '@/version'
 import { cn } from '@/lib/utils'
 
 export default function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window !== 'undefined' && window.innerWidth) {
+      return window.innerWidth < 1100
+    }
+    return false
+  })
   const [activeFlyout, setActiveFlyout] = useState(null)
   const [hoveredTooltip, setHoveredTooltip] = useState(null)
   const flyoutTimeoutRef = useRef(null)
@@ -102,7 +107,7 @@ export default function Sidebar() {
     <>
       <motion.aside
         initial={false}
-        animate={{ width: collapsed ? 64 : 260 }}
+        animate={{ width: collapsed ? 64 : 272 }}
         transition={{ duration: 0.2, ease: 'easeInOut' }}
         className="relative flex flex-col h-screen border-r border-slate-800/80 bg-slate-950/90 backdrop-blur-2xl text-slate-200 z-40 select-none shadow-2xl shrink-0 glass-specular-sm"
       >
