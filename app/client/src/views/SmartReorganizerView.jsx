@@ -21,9 +21,11 @@ import {
   FileText,
   Clock,
   ChevronRight,
+  ChevronDown,
   TrendingUp,
   Sliders,
-  ExternalLink
+  ExternalLink,
+  Edit2
 } from 'lucide-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFolder, faXmark } from '@fortawesome/pro-duotone-svg-icons'
@@ -31,7 +33,25 @@ import Hero from '@/components/Hero'
 import { useFolderReorganizer } from '@/hooks/useFolderReorganizer'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { cn } from '@/lib/utils'
+import { cn, formatBytes } from '@/lib/utils'
+
+function getFileIcon(mimeType, title) {
+  const m = (mimeType || '').toLowerCase()
+  const t = (title || '').toLowerCase()
+  if (m.includes('spreadsheet') || t.endsWith('.xlsx') || t.endsWith('.csv') || t.endsWith('.gsheet')) {
+    return <FileText className="h-3.5 w-3.5 text-emerald-400 flex-shrink-0" />
+  }
+  if (m.includes('image/') || t.endsWith('.png') || t.endsWith('.jpg') || t.endsWith('.jpeg')) {
+    return <ImageIcon className="h-3.5 w-3.5 text-sky-400 flex-shrink-0" />
+  }
+  if (m.includes('presentation') || t.endsWith('.pptx') || t.endsWith('.gslides')) {
+    return <FileText className="h-3.5 w-3.5 text-amber-400 flex-shrink-0" />
+  }
+  if (m.includes('zip') || m.includes('archive') || t.endsWith('.zip') || t.endsWith('.tar') || t.endsWith('.gz')) {
+    return <Archive className="h-3.5 w-3.5 text-purple-400 flex-shrink-0" />
+  }
+  return <FileText className="h-3.5 w-3.5 text-slate-400 flex-shrink-0" />
+}
 
 export default function SmartReorganizerView() {
   const {
@@ -53,6 +73,13 @@ export default function SmartReorganizerView() {
   const [pendingPlan, setPendingPlan] = useState(null)
   const [successBanner, setSuccessBanner] = useState('')
 
+  // Interactive decision controls state
+  const [selectedFilesByCluster, setSelectedFilesByCluster] = useState({})
+  const [customTargets, setCustomTargets] = useState({})
+  const [editingTargetClusterId, setEditingTargetClusterId] = useState(null)
+  const [targetInputValues, setTargetInputValues] = useState({})
+  const [expandedClusters, setExpandedClusters] = useState({})
+
   const healthScore = analysis?.healthScore ?? 100
   const rating = analysis?.rating || (isLoading ? 'Analyzing...' : 'Optimal')
   const metrics = analysis?.metrics || {
@@ -63,28 +90,131 @@ export default function SmartReorganizerView() {
     genericFolderCount: 0
   }
 
-  const handleApplyCluster = (cluster) => {
-    const moves = (cluster.moves && cluster.moves.length > 0)
-      ? cluster.moves
-      : (cluster.sampleFiles || []).map((name, idx) => ({
-          fileId: `file_${cluster.id}_${idx}`,
-          targetPath: cluster.suggestedPath
-        }))
+  // Helpers for cluster files and selection
+  const getClusterFiles = (cluster) => {
+    if (cluster.files && cluster.files.length > 0) return cluster.files
+    return (cluster.sampleFiles || []).map((name, idx) => ({
+      id: `${cluster.id}_sample_${idx}`,
+      title: name,
+      mimeType: '',
+      fileSize: 0
+    }))
+  }
+
+  const getSelectedFileIds = (cluster) => {
+    if (selectedFilesByCluster[cluster.id] !== undefined) {
+      return selectedFilesByCluster[cluster.id]
+    }
+    return getClusterFiles(cluster).map((f) => f.id)
+  }
+
+  const toggleFileInCluster = (clusterId, fileId, allFiles) => {
+    setSelectedFilesByCluster((prev) => {
+      const current = prev[clusterId] !== undefined ? prev[clusterId] : allFiles.map((f) => f.id)
+      const next = current.includes(fileId)
+        ? current.filter((id) => id !== fileId)
+        : [...current, fileId]
+      return { ...prev, [clusterId]: next }
+    })
+  }
+
+  const selectAllInCluster = (clusterId, allFiles) => {
+    setSelectedFilesByCluster((prev) => ({
+      ...prev,
+      [clusterId]: allFiles.map((f) => f.id)
+    }))
+  }
+
+  const clearAllInCluster = (clusterId) => {
+    setSelectedFilesByCluster((prev) => ({
+      ...prev,
+      [clusterId]: []
+    }))
+  }
+
+  const getTargetForCluster = (cluster) => {
+    return customTargets[cluster.id] || cluster.suggestedPath
+  }
+
+  const startEditingTarget = (cluster) => {
+    setEditingTargetClusterId(cluster.id)
+    setTargetInputValues((prev) => ({
+      ...prev,
+      [cluster.id]: getTargetForCluster(cluster)
+    }))
+  }
+
+  const saveTargetForCluster = (clusterId) => {
+    const val = (targetInputValues[clusterId] || '').trim()
+    if (val) {
+      setCustomTargets((prev) => ({ ...prev, [clusterId]: val }))
+    }
+    setEditingTargetClusterId(null)
+  }
+
+  const toggleExpandCluster = (clusterId) => {
+    setExpandedClusters((prev) => ({ ...prev, [clusterId]: !prev[clusterId] }))
+  }
+
+  const handleReviewCluster = (cluster) => {
+    const targetPath = getTargetForCluster(cluster)
+    const allFiles = getClusterFiles(cluster)
+    const selectedIds = getSelectedFileIds(cluster)
+    const selectedFiles = allFiles.filter((f) => selectedIds.includes(f.id))
+
+    if (selectedFiles.length === 0) return
 
     setPendingPlan({
-      title: `Organise ${cluster.fileCount} files into ${cluster.suggestedPath}`,
-      targetPath: cluster.suggestedPath,
-      moves: moves
+      clusterId: cluster.id,
+      clusterName: cluster.name,
+      title: `Move ${selectedFiles.length} files into ${targetPath}`,
+      targetPath: targetPath,
+      selectedFiles: selectedFiles,
+      allFiles: allFiles,
+      moves: selectedFiles.map((f) => ({
+        fileId: f.id,
+        targetPath: targetPath
+      }))
     })
     setConfirmModalOpen(true)
+  }
+
+  const toggleModalFile = (fileId) => {
+    if (!pendingPlan) return
+    const currentMoves = pendingPlan.moves || []
+    const isChecked = currentMoves.some((m) => m.fileId === fileId)
+    let nextMoves
+    if (isChecked) {
+      nextMoves = currentMoves.filter((m) => m.fileId !== fileId)
+    } else {
+      nextMoves = [...currentMoves, { fileId: fileId, targetPath: pendingPlan.targetPath }]
+    }
+    setPendingPlan({
+      ...pendingPlan,
+      moves: nextMoves
+    })
+  }
+
+  const updateModalTargetPath = (newPath) => {
+    if (!pendingPlan) return
+    setPendingPlan({
+      ...pendingPlan,
+      targetPath: newPath,
+      moves: (pendingPlan.moves || []).map((m) => ({ ...m, targetPath: newPath }))
+    })
   }
 
   const handleApplyFullStructure = () => {
     const allMoves = []
     ;(analysis?.clusters || []).forEach((c) => {
-      if (c.moves && Array.isArray(c.moves)) {
-        allMoves.push(...c.moves)
-      }
+      const allFiles = getClusterFiles(c)
+      const selectedIds = getSelectedFileIds(c)
+      const target = getTargetForCluster(c)
+      allFiles
+        .filter((f) => selectedIds.includes(f.id))
+        .forEach((f) => {
+          allMoves.push({ fileId: f.id, targetPath: target })
+        })
     })
 
     if (allMoves.length === 0) {
@@ -94,9 +224,13 @@ export default function SmartReorganizerView() {
     }
 
     setPendingPlan({
+      clusterId: 'full_structure',
+      clusterName: 'Full Drive Hierarchy Reorganisation',
       title: 'Full Drive Hierarchy Reorganisation',
-      targetPath: 'Work, Personal, Media & Assets, Archive',
-      moves: allMoves
+      targetPath: 'Optimal Drive Architecture',
+      moves: allMoves,
+      selectedFiles: allMoves.map((m, idx) => ({ id: m.fileId, title: `File ${idx + 1}` })),
+      allFiles: allMoves.map((m, idx) => ({ id: m.fileId, title: `File ${idx + 1}` }))
     })
     setConfirmModalOpen(true)
   }
@@ -454,71 +588,195 @@ export default function SmartReorganizerView() {
           <div className="rounded-xl border border-border/50 bg-card/30 p-4">
             <h3 className="text-base font-semibold">Detected Natural File Clusters</h3>
             <p className="mt-1 text-xs text-muted-foreground">
-              Drive Cleaner automatically groups files scattered across random folders based on client keywords, projects, file types, and date ranges.
+              Drive Cleaner automatically groups files scattered across random folders into meaningful topics. You have full control: review every candidate file, uncheck any items that should stay, and customize the target destination.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {(analysis?.clusters || []).map((cluster) => (
-              <motion.div
-                key={cluster.id}
-                whileHover={{ y: -2 }}
-                className="rounded-xl border border-border/50 bg-card/40 p-5 space-y-4 shadow-sm backdrop-blur-sm flex flex-col justify-between"
-              >
-                <div className="space-y-2.5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h4 className="font-bold text-sm text-foreground">{cluster.name}</h4>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {cluster.fileCount} files • {cluster.confidence}% AI confidence
-                      </p>
-                    </div>
-                    <Badge variant="outline" className="border-indigo-500/30 text-indigo-400 bg-indigo-500/5 text-xs">
-                      Target: {cluster.suggestedPath}
-                    </Badge>
-                  </div>
+            {(analysis?.clusters || []).map((cluster) => {
+              const allFiles = getClusterFiles(cluster)
+              const selectedIds = getSelectedFileIds(cluster)
+              const targetPath = getTargetForCluster(cluster)
+              const isExpanded = !!expandedClusters[cluster.id]
+              const isEditingTarget = editingTargetClusterId === cluster.id
+              const displayFiles = isExpanded ? allFiles : allFiles.slice(0, 5)
 
-                  {/* Keyword Pills */}
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {(cluster.keywords || []).map((kw) => (
-                      <span
-                        key={kw}
-                        className="rounded-md bg-muted/60 px-2 py-0.5 text-[11px] text-muted-foreground"
-                      >
-                        #{kw}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Sample Files List */}
-                  <div className="rounded-lg border border-border/40 bg-muted/20 p-3 space-y-1.5 text-xs">
-                    <span className="text-[10px] font-semibold uppercase text-muted-foreground tracking-wider block">
-                      Sample Candidate Files:
-                    </span>
-                    {(cluster.sampleFiles || []).map((file, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-slate-300 truncate">
-                        <FileText className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-                        <span className="truncate">{file}</span>
+              return (
+                <motion.div
+                  key={cluster.id}
+                  whileHover={{ y: -2 }}
+                  className="rounded-xl border border-border/50 bg-card/40 p-5 space-y-4 shadow-sm backdrop-blur-sm flex flex-col justify-between"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h4 className="font-bold text-sm text-foreground">{cluster.name}</h4>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {allFiles.length} files • {cluster.confidence}% AI confidence
+                        </p>
                       </div>
-                    ))}
-                  </div>
-                </div>
 
-                <div className="pt-3 border-t border-border/40 flex items-center justify-between">
-                  <span className="text-[11px] text-muted-foreground truncate max-w-[200px]">
-                    From: {(cluster.currentLocations || []).join(', ')}
-                  </span>
-                  <Button
-                    size="sm"
-                    onClick={() => handleApplyCluster(cluster)}
-                    className="gap-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 text-white"
-                  >
-                    <ArrowRight className="h-3.5 w-3.5" />
-                    Move Cluster
-                  </Button>
-                </div>
-              </motion.div>
-            ))}
+                      {/* Target Folder Badge / Inline Editor */}
+                      {!isEditingTarget ? (
+                        <button
+                          type="button"
+                          onClick={() => startEditingTarget(cluster)}
+                          title="Click to edit destination folder"
+                          className="group flex items-center gap-1.5 rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-2.5 py-1 text-xs text-indigo-300 hover:border-indigo-500/60 hover:bg-indigo-500/20 transition-colors"
+                        >
+                          <span className="font-mono text-[11px] truncate max-w-[150px]">
+                            {targetPath}
+                          </span>
+                          <Edit2 className="h-3 w-3 text-indigo-400 group-hover:text-indigo-200 flex-shrink-0" />
+                        </button>
+                      ) : (
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="text"
+                            value={targetInputValues[cluster.id] || ''}
+                            onChange={(e) =>
+                              setTargetInputValues((prev) => ({ ...prev, [cluster.id]: e.target.value }))
+                            }
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') saveTargetForCluster(cluster.id)
+                              if (e.key === 'Escape') setEditingTargetClusterId(null)
+                            }}
+                            className="h-7 w-36 rounded border border-primary/50 bg-background/90 px-2 text-xs font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                            autoFocus
+                          />
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => saveTargetForCluster(cluster.id)}
+                            className="h-7 px-2 text-[11px]"
+                          >
+                            Save
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Quick Preset Paths (shown when editing target) */}
+                    {isEditingTarget && (
+                      <div className="flex flex-wrap gap-1 p-2 rounded-lg bg-muted/30 border border-border/40">
+                        <span className="text-[10px] text-muted-foreground block w-full">Quick suggestions:</span>
+                        {['Personal/Travel', 'Work/Projects', 'Personal/Finance', 'Media & Assets', 'Archive'].map((preset) => (
+                          <button
+                            key={preset}
+                            type="button"
+                            onClick={() => {
+                              setTargetForCluster(cluster.id, preset)
+                              setEditingTargetClusterId(null)
+                            }}
+                            className="text-[10px] rounded bg-muted/60 px-1.5 py-0.5 text-muted-foreground hover:text-foreground hover:bg-muted"
+                          >
+                            {preset}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Keyword Pills */}
+                    <div className="flex flex-wrap gap-1.5">
+                      {(cluster.keywords || []).map((kw) => (
+                        <span
+                          key={kw}
+                          className="rounded-md bg-muted/60 px-2 py-0.5 text-[11px] text-muted-foreground"
+                        >
+                          #{kw}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Interactive Candidate Files Checklist */}
+                    <div className="rounded-lg border border-border/40 bg-muted/20 p-3 space-y-2 text-xs">
+                      <div className="flex items-center justify-between pb-1.5 border-b border-border/30">
+                        <span className="text-[10px] font-semibold uppercase text-muted-foreground tracking-wider">
+                          Files to Move ({selectedIds.length} of {allFiles.length})
+                        </span>
+                        <div className="flex items-center gap-2 text-[11px]">
+                          <button
+                            type="button"
+                            onClick={() => selectAllInCluster(cluster.id, allFiles)}
+                            className="text-primary hover:underline"
+                          >
+                            Select All
+                          </button>
+                          <span className="text-muted-foreground">•</span>
+                          <button
+                            type="button"
+                            onClick={() => clearAllInCluster(cluster.id)}
+                            className="text-muted-foreground hover:text-foreground"
+                          >
+                            Clear
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5 max-h-[160px] overflow-y-auto pr-1">
+                        {displayFiles.map((file) => {
+                          const isChecked = selectedIds.includes(file.id)
+                          return (
+                            <label
+                              key={file.id}
+                              className={cn(
+                                "flex items-center gap-2.5 p-1.5 rounded-md hover:bg-muted/40 cursor-pointer select-none transition-colors",
+                                isChecked ? "text-slate-200" : "text-muted-foreground/60 line-through"
+                              )}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={() => toggleFileInCluster(cluster.id, file.id, allFiles)}
+                                className="h-3.5 w-3.5 rounded border-border text-primary focus:ring-primary/20 cursor-pointer"
+                              />
+                              {getFileIcon(file.mimeType, file.title)}
+                              <span className="truncate flex-1 text-xs">{file.title}</span>
+                              {file.fileSize > 0 && (
+                                <span className="text-[10px] text-muted-foreground flex-shrink-0">
+                                  {formatBytes(file.fileSize)}
+                                </span>
+                              )}
+                            </label>
+                          )
+                        })}
+                      </div>
+
+                      {allFiles.length > 5 && (
+                        <div className="pt-1 text-center">
+                          <button
+                            type="button"
+                            onClick={() => toggleExpandCluster(cluster.id)}
+                            className="text-[11px] text-indigo-400 hover:text-indigo-300 inline-flex items-center gap-1 font-medium"
+                          >
+                            {isExpanded ? (
+                              <>Show fewer files</>
+                            ) : (
+                              <>Show all {allFiles.length} files ({allFiles.length - 5} more) <ChevronDown className="h-3 w-3" /></>
+                            )}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-border/40 flex items-center justify-between">
+                    <span className="text-[11px] text-muted-foreground truncate max-w-[160px]">
+                      From: {(cluster.currentLocations || []).join(', ')}
+                    </span>
+                    <Button
+                      size="sm"
+                      disabled={selectedIds.length === 0}
+                      onClick={() => handleReviewCluster(cluster)}
+                      className="gap-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50"
+                    >
+                      <ArrowRight className="h-3.5 w-3.5" />
+                      Review & Move ({selectedIds.length})
+                    </Button>
+                  </div>
+                </motion.div>
+              )
+            })}
           </div>
         </div>
       )}
@@ -630,7 +888,7 @@ export default function SmartReorganizerView() {
         </div>
       )}
 
-      {/* Confirmation Modal */}
+      {/* Interactive Review & Confirmation Modal */}
       <AnimatePresence>
         {confirmModalOpen && pendingPlan && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
@@ -638,46 +896,111 @@ export default function SmartReorganizerView() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl space-y-4"
+              className="w-full max-w-xl rounded-2xl border border-border bg-card p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col justify-between"
             >
-              <div className="flex items-center gap-3">
-                <div className="rounded-xl bg-primary/10 p-3 text-primary">
-                  <FolderCheck className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold">Confirm Reorganization</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Target destination: <strong className="text-foreground">{pendingPlan.targetPath}</strong>
-                  </p>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-border/40 bg-muted/20 p-4 text-xs space-y-2">
-                <div className="flex items-center gap-2 text-emerald-400 font-semibold">
-                  <ShieldCheck className="h-4 w-4" />
-                  <span>100% Safe & Reversible</span>
-                </div>
-                <p className="text-muted-foreground leading-relaxed">
-                  Moving files in Google Drive preserves file links, share permissions, document revisions, and comment history. Original locations are saved for 1-click restore.
-                </p>
-              </div>
-
-              {isReorganizing && (
-                <div className="space-y-1 pt-2">
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Moving files...</span>
-                    <span>{reorgProgress}%</span>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 pb-3 border-b border-border/40">
+                  <div className="rounded-xl bg-primary/10 p-3 text-primary">
+                    <FolderCheck className="h-6 w-6" />
                   </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full bg-primary transition-all duration-300"
-                      style={{ width: `${reorgProgress}%` }}
-                    />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-bold truncate">Review & Move Files</h3>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {pendingPlan.clusterName || 'Custom Reorganization Plan'}
+                    </p>
                   </div>
                 </div>
-              )}
 
-              <div className="pt-4 flex justify-end gap-3">
+                {/* Target Destination Control */}
+                <div className="rounded-xl border border-border/50 bg-muted/20 p-3.5 space-y-2">
+                  <div className="flex items-center justify-between text-xs font-semibold">
+                    <span className="text-muted-foreground">Destination Folder:</span>
+                    <span className="text-[11px] text-primary font-mono">{pendingPlan.targetPath}</span>
+                  </div>
+                  <input
+                    type="text"
+                    value={pendingPlan.targetPath || ''}
+                    onChange={(e) => updateModalTargetPath(e.target.value)}
+                    placeholder="e.g. Personal/Travel or Work/Projects/Active"
+                    className="w-full h-8 rounded border border-border bg-background px-2.5 text-xs font-mono text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                    <span className="text-[10px] text-muted-foreground">Presets:</span>
+                    {['Personal/Travel', 'Work/Projects/Active', 'Personal/Finance', 'Media & Assets', 'Archive'].map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => updateModalTargetPath(preset)}
+                        className="text-[10px] rounded bg-muted/60 px-2 py-0.5 text-muted-foreground hover:text-foreground hover:bg-muted font-mono"
+                      >
+                        {preset}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* File List with Checkboxes */}
+                <div className="rounded-xl border border-border/40 bg-muted/10 p-3 space-y-2 text-xs">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-border/30">
+                    <span className="text-[11px] font-semibold text-foreground">
+                      Files Included in Move ({pendingPlan.moves?.length || 0} of {pendingPlan.allFiles?.length || pendingPlan.moves?.length || 0})
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">Uncheck any file to exclude</span>
+                  </div>
+
+                  <div className="space-y-1 max-h-44 overflow-y-auto pr-1">
+                    {(pendingPlan.allFiles || pendingPlan.selectedFiles || []).map((file) => {
+                      const isIncluded = (pendingPlan.moves || []).some((m) => m.fileId === file.id)
+                      return (
+                        <label
+                          key={file.id}
+                          className={cn(
+                            "flex items-center gap-2.5 p-1.5 rounded-md hover:bg-muted/40 cursor-pointer select-none transition-colors",
+                            isIncluded ? "text-slate-200" : "text-muted-foreground/50 line-through"
+                          )}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isIncluded}
+                            onChange={() => toggleModalFile(file.id)}
+                            className="h-3.5 w-3.5 rounded border-border text-primary focus:ring-primary/20 cursor-pointer"
+                          />
+                          {getFileIcon(file.mimeType, file.title)}
+                          <span className="truncate flex-1 text-xs">{file.title}</span>
+                          {file.fileSize > 0 && (
+                            <span className="text-[10px] text-muted-foreground flex-shrink-0">
+                              {formatBytes(file.fileSize)}
+                            </span>
+                          )}
+                        </label>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Reversible guarantee notice */}
+                <div className="flex items-center gap-2 rounded-lg bg-emerald-500/10 p-2.5 text-xs text-emerald-400 border border-emerald-500/20">
+                  <ShieldCheck className="h-4 w-4 flex-shrink-0" />
+                  <span>100% Reversible — Drive Cleaner saves original locations for instant 1-click restore.</span>
+                </div>
+
+                {isReorganizing && (
+                  <div className="space-y-1 pt-1">
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>Moving files...</span>
+                      <span>{reorgProgress}%</span>
+                    </div>
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full bg-primary transition-all duration-300"
+                        style={{ width: `${reorgProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-4 border-t border-border/40 flex justify-end gap-3">
                 <Button
                   variant="outline"
                   size="sm"
@@ -688,19 +1011,19 @@ export default function SmartReorganizerView() {
                 </Button>
                 <Button
                   size="sm"
-                  disabled={isReorganizing}
+                  disabled={isReorganizing || (pendingPlan.moves?.length || 0) === 0}
                   onClick={handleConfirmReorganization}
                   className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
                 >
                   {isReorganizing ? (
                     <>
                       <RotateCcw className="h-4 w-4 animate-spin" />
-                      Reorganizing...
+                      Moving {pendingPlan.moves?.length || 0} Files...
                     </>
                   ) : (
                     <>
                       <Check className="h-4 w-4" />
-                      Execute Move
+                      Execute Move ({pendingPlan.moves?.length || 0} Files)
                     </>
                   )}
                 </Button>

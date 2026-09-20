@@ -213,72 +213,162 @@ var FolderReorganizer = (function () {
       if (totalFolders === 0 && orphanedCount > 0) score = Math.max(35, 80 - Math.min(40, orphanedCount * 2));
       score = Math.max(20, Math.min(95, score));
 
-      // 4. Detected Clusters based on REAL files
+      // 4. Detected Clusters based on SEMANTIC TOPIC ANALYSIS (No duplicates, full file payloads)
       const clusters = [];
+      const assignedFileIds = {};
 
-      // Cluster: Root Orphaned Files
-      if (rawRootFiles.length > 0) {
+      // Build unified deduplicated pool of files
+      const filePoolMap = {};
+      for (let r = 0; r < rawRootFiles.length; r++) {
+        const rf = rawRootFiles[r];
+        filePoolMap[rf.id] = {
+          id: rf.id,
+          title: rf.title || 'Untitled',
+          mimeType: rf.mimeType || '',
+          fileSize: rf.fileSize || 0,
+          modifiedDate: rf.modifiedDate || '',
+          isRoot: true
+        };
+      }
+      for (let s = 0; s < rawSampleFiles.length; s++) {
+        const sf = rawSampleFiles[s];
+        if (!filePoolMap[sf.id]) {
+          filePoolMap[sf.id] = {
+            id: sf.id,
+            title: sf.title || 'Untitled',
+            mimeType: sf.mimeType || '',
+            fileSize: sf.fileSize || 0,
+            modifiedDate: sf.modifiedDate || '',
+            isRoot: false
+          };
+        }
+      }
+      const allCandidateFiles = Object.keys(filePoolMap).map(function (k) { return filePoolMap[k]; });
+
+      // Topic definitions with match patterns and recommended destinations
+      const topicDefinitions = [
+        {
+          id: 'travel_roadtrip',
+          name: 'Travel & Road Trip Planning',
+          target: 'Personal/Travel',
+          keywords: ['roadtrip', 'road trip', 'travel', 'vacation', 'itinerary', 'holiday', 'stops', 'trip'],
+          pattern: /(road\s*trip|travel|vacation|itinerary|holiday|places\s+to\s+visit)/i,
+          confidence: 96
+        },
+        {
+          id: 'project_ingot',
+          name: 'Ingot Project & Team Materials',
+          target: 'Work/Projects/Ingot',
+          keywords: ['ingot', 'team', 'relay', 'rehearsal', 'exchange'],
+          pattern: /\bingot\b/i,
+          confidence: 95
+        },
+        {
+          id: 'finance_tax',
+          name: 'Finance, Invoices & Tax Documents',
+          target: 'Personal/Finance',
+          keywords: ['tax', 'invoice', 'receipt', 'statement', 'billing', 'expense', 'w2', '1099'],
+          pattern: /(tax|invoice|receipt|statement|billing|expense|financial)/i,
+          confidence: 94
+        },
+        {
+          id: 'media_assets',
+          name: 'Media Assets & Visuals',
+          target: 'Media & Assets',
+          keywords: ['images', 'photos', 'videos', 'branding', 'png', 'jpg', 'banner'],
+          pattern: /(\.png|\.jpe?g|\.svg|\.gif|\.mp4|\.mov|favicon|logo|banner|photoshoot)/i,
+          mimePattern: /(image\/|video\/)/i,
+          confidence: 93
+        },
+        {
+          id: 'data_sheets',
+          name: 'Data Reports & Spreadsheets',
+          target: 'Work/Data & Reports',
+          keywords: ['data', 'sheets', 'reports', 'metrics', 'analytics'],
+          pattern: /(report|metrics|analytics|dataset|\.csv|\.xlsx)/i,
+          mimePattern: /spreadsheet/i,
+          confidence: 88
+        }
+      ];
+
+      // Extract dynamic topic clusters from candidate files
+      for (let t = 0; t < topicDefinitions.length; t++) {
+        const topic = topicDefinitions[t];
+        const matched = [];
+
+        for (let f = 0; f < allCandidateFiles.length; f++) {
+          const file = allCandidateFiles[f];
+          if (assignedFileIds[file.id]) continue; // Prevent overlapping across clusters
+
+          const title = file.title || '';
+          const mime = file.mimeType || '';
+
+          const titleMatch = topic.pattern && topic.pattern.test(title);
+          const mimeMatch = topic.mimePattern && topic.mimePattern.test(mime);
+
+          if (titleMatch || mimeMatch) {
+            matched.push(file);
+            assignedFileIds[file.id] = true;
+          }
+        }
+
+        if (matched.length > 0) {
+          clusters.push({
+            id: 'cluster_' + topic.id,
+            name: topic.name,
+            confidence: topic.confidence,
+            fileCount: matched.length,
+            suggestedPath: topic.target,
+            keywords: topic.keywords,
+            currentLocations: [rootFolderName],
+            files: matched.map(function (f) {
+              return {
+                id: f.id,
+                title: f.title,
+                mimeType: f.mimeType,
+                fileSize: f.fileSize,
+                modifiedDate: f.modifiedDate
+              };
+            }),
+            sampleFiles: matched.slice(0, 5).map(function (f) { return f.title; }),
+            moves: matched.map(function (f) {
+              return { fileId: f.id, targetPath: topic.target };
+            })
+          });
+        }
+      }
+
+      // Remaining unclustered root files
+      const remainingRootFiles = allCandidateFiles.filter(function (f) {
+        return f.isRoot && !assignedFileIds[f.id];
+      });
+
+      if (remainingRootFiles.length > 0) {
         clusters.push({
-          id: 'cluster_root_orphans',
-          name: 'Root Orphaned Working Docs',
-          confidence: 90,
-          fileCount: rawRootFiles.length,
+          id: 'cluster_root_unsorted',
+          name: 'Unsorted Root Files',
+          confidence: 85,
+          fileCount: remainingRootFiles.length,
           suggestedPath: 'Work/Projects/Active',
           keywords: ['root', 'unsorted', 'inbox'],
           currentLocations: [rootFolderName],
-          sampleFiles: rawRootFiles.slice(0, 5).map(function (f) { return f.title; }),
-          moves: rawRootFiles.slice(0, 25).map(function (f) {
+          files: remainingRootFiles.map(function (f) {
+            return {
+              id: f.id,
+              title: f.title,
+              mimeType: f.mimeType,
+              fileSize: f.fileSize,
+              modifiedDate: f.modifiedDate
+            };
+          }),
+          sampleFiles: remainingRootFiles.slice(0, 5).map(function (f) { return f.title; }),
+          moves: remainingRootFiles.map(function (f) {
             return { fileId: f.id, targetPath: 'Work/Projects/Active' };
           })
         });
       }
 
-      // Cluster: Spreadsheets & Data
-      const sheetFiles = rawSampleFiles.filter(function (f) {
-        const m = (f.mimeType || '').toLowerCase();
-        const t = (f.title || '').toLowerCase();
-        return m.indexOf('spreadsheet') !== -1 || t.endsWith('.xlsx') || t.endsWith('.csv') || t.endsWith('.gsheet');
-      });
-      if (sheetFiles.length > 0) {
-        clusters.push({
-          id: 'cluster_sheets_data',
-          name: 'Financial & Data Spreadsheets',
-          confidence: 92,
-          fileCount: sheetFiles.length,
-          suggestedPath: 'Work/Finance & Data',
-          keywords: ['finance', 'sheets', 'reports', 'csv'],
-          currentLocations: [rootFolderName],
-          sampleFiles: sheetFiles.slice(0, 5).map(function (f) { return f.title; }),
-          moves: sheetFiles.slice(0, 20).map(function (f) {
-            return { fileId: f.id, targetPath: 'Work/Finance & Data' };
-          })
-        });
-      }
-
-      // Cluster: Media & Visual Assets
-      const mediaFiles = rawSampleFiles.filter(function (f) {
-        const m = (f.mimeType || '').toLowerCase();
-        const t = (f.title || '').toLowerCase();
-        return m.indexOf('image/') !== -1 || m.indexOf('video/') !== -1 ||
-          t.endsWith('.png') || t.endsWith('.jpg') || t.endsWith('.jpeg') || t.endsWith('.mp4') || t.endsWith('.mov');
-      });
-      if (mediaFiles.length > 0) {
-        clusters.push({
-          id: 'cluster_media_assets',
-          name: 'Media Assets & Visuals',
-          confidence: 95,
-          fileCount: mediaFiles.length,
-          suggestedPath: 'Media & Assets',
-          keywords: ['images', 'photos', 'videos', 'branding'],
-          currentLocations: [rootFolderName],
-          sampleFiles: mediaFiles.slice(0, 5).map(function (f) { return f.title; }),
-          moves: mediaFiles.slice(0, 20).map(function (f) {
-            return { fileId: f.id, targetPath: 'Media & Assets' };
-          })
-        });
-      }
-
-      // Cluster: Generic Folders to Consolidate
+      // Generic Folders to Consolidate
       for (let g = 0; g < Math.min(2, genericFolders.length); g++) {
         const gf = genericFolders[g];
         clusters.push({
@@ -289,6 +379,7 @@ var FolderReorganizer = (function () {
           suggestedPath: 'Work/Archive',
           keywords: [gf.name.toLowerCase(), 'generic-folder', 'tidy'],
           currentLocations: [gf.path],
+          files: [{ id: gf.id, title: gf.name + ' (Folder)', mimeType: 'application/vnd.google-apps.folder', fileSize: 0 }],
           sampleFiles: ['Folder contents of ' + gf.name],
           moves: []
         });

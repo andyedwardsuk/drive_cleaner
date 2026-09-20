@@ -79,44 +79,48 @@ export const folderReorganizerService = {
             },
             clusters: [
               {
-                id: 'cluster_acme_corp',
-                name: 'Acme Corp Client Deliverables',
-                confidence: 94,
-                fileCount: 42,
-                suggestedPath: 'Work/Clients/Acme Corp',
-                keywords: ['acme', 'contract', 'proposal', 'brief'],
-                currentLocations: ['My Drive root', 'Documents/Acme', 'New Folder (2)'],
-                sampleFiles: ['Acme Master Contract 2024.pdf', 'Q3 Deliverables Brief.docx', 'Pricing Proposal.xlsx']
-              },
-              {
-                id: 'cluster_root_orphans',
-                name: 'Root Orphaned Drafts & Notes',
-                confidence: 88,
-                fileCount: 34,
-                suggestedPath: 'Work/Projects/Active',
-                keywords: ['notes', 'draft', 'scratchpad', 'meeting'],
+                id: 'cluster_travel_roadtrip',
+                name: 'Travel & Road Trip Planning',
+                confidence: 96,
+                fileCount: 5,
+                suggestedPath: 'Personal/Travel',
+                keywords: ['roadtrip', 'travel', 'vacation', 'itinerary'],
                 currentLocations: ['My Drive root'],
-                sampleFiles: ['Meeting Notes - Strategy.gdoc', 'Q4 Roadmap Brainstorm.gdoc', 'Design Ideas.png']
+                sampleFiles: ['Road Trip - Places to Visit', '3 Week Roadtrip Plan', '2027 RoadTrip Planning', '4 Week RoadTrip Plan'],
+                files: [
+                  { id: 'dev_rt_1', title: 'Road Trip - Places to Visit', mimeType: 'application/vnd.google-apps.spreadsheet', fileSize: 15420 },
+                  { id: 'dev_rt_2', title: '3 Week Roadtrip Plan', mimeType: 'application/vnd.google-apps.document', fileSize: 32410 },
+                  { id: 'dev_rt_3', title: '2027 RoadTrip Planning', mimeType: 'application/vnd.google-apps.document', fileSize: 21100 },
+                  { id: 'dev_rt_4', title: '4 Week RoadTrip Plan', mimeType: 'application/vnd.google-apps.document', fileSize: 28400 }
+                ],
+                moves: [
+                  { fileId: 'dev_rt_1', targetPath: 'Personal/Travel' },
+                  { fileId: 'dev_rt_2', targetPath: 'Personal/Travel' },
+                  { fileId: 'dev_rt_3', targetPath: 'Personal/Travel' },
+                  { fileId: 'dev_rt_4', targetPath: 'Personal/Travel' }
+                ]
               },
               {
-                id: 'cluster_personal_finances',
-                name: 'Personal Finance & Tax Docs',
-                confidence: 91,
-                fileCount: 26,
-                suggestedPath: 'Personal/Finance',
-                keywords: ['tax', 'receipt', 'invoice', 'statement'],
-                currentLocations: ['Downloads folder', 'Documents/Old'],
-                sampleFiles: ['2023 Tax Return.pdf', 'Mortgage Statement.pdf', 'Medical Insurance Receipt.pdf']
-              },
-              {
-                id: 'cluster_media_assets',
-                name: 'High-Res Assets & Screen Recordings',
-                confidence: 92,
-                fileCount: 38,
-                suggestedPath: 'Media & Assets',
-                keywords: ['banner', 'hero', 'recording', 'screenshot'],
-                currentLocations: ['My Drive root', 'Random stuff'],
-                sampleFiles: ['Product Demo v2.mp4', 'Hero Banner 4k.png', 'Logo Pack Vector.svg']
+                id: 'cluster_project_ingot',
+                name: 'Ingot Project & Team Materials',
+                confidence: 95,
+                fileCount: 4,
+                suggestedPath: 'Work/Projects/Ingot',
+                keywords: ['ingot', 'team', 'relay', 'rehearsal'],
+                currentLocations: ['My Drive root'],
+                sampleFiles: ['ingot relay', 'Ingot Archive', 'ingot Team - rehearsal', 'ingot-favicon-v3.png'],
+                files: [
+                  { id: 'dev_ing_1', title: 'ingot relay', mimeType: 'application/vnd.google-apps.document', fileSize: 42100 },
+                  { id: 'dev_ing_2', title: 'Ingot Archive', mimeType: 'application/zip', fileSize: 1450000 },
+                  { id: 'dev_ing_3', title: 'ingot Team - rehearsal', mimeType: 'application/vnd.google-apps.presentation', fileSize: 852000 },
+                  { id: 'dev_ing_4', title: 'ingot-favicon-v3.png', mimeType: 'image/png', fileSize: 32000 }
+                ],
+                moves: [
+                  { fileId: 'dev_ing_1', targetPath: 'Work/Projects/Ingot' },
+                  { fileId: 'dev_ing_2', targetPath: 'Work/Projects/Ingot' },
+                  { fileId: 'dev_ing_3', targetPath: 'Work/Projects/Ingot' },
+                  { fileId: 'dev_ing_4', targetPath: 'Work/Projects/Ingot' }
+                ]
               }
             ],
             proposedStructure: [
