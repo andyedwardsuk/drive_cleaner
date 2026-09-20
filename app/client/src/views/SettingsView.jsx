@@ -20,6 +20,13 @@ import {
   Zap,
   CheckCircle2,
   FolderOpen,
+  Activity,
+  RefreshCw,
+  Gauge,
+  Cpu,
+  CheckCircle,
+  AlertCircle,
+  XCircle,
 } from 'lucide-react'
 import {
   faSliders,
@@ -36,12 +43,14 @@ import {
   faClock,
   faBoltLightning,
   faFolderOpen,
-  faGear
+  faGear,
+  faGaugeHigh
 } from '@fortawesome/pro-duotone-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Hero from '@/components/Hero'
 import { useSettings } from '@/hooks/useSettings'
 import { useLicense } from '@/hooks/useLicense'
+import { useDiagnostics } from '@/hooks/useDiagnostics'
 import { UpgradeModal } from '@/components/licensing/UpgradeModal'
 import { WaSwitch, WaCallout, WaButton, WaBadge } from '@/components/ui/webawesome'
 import { Button } from '@/components/ui/button'
@@ -106,6 +115,13 @@ export default function SettingsView() {
   }
 
   const { license, isPro, monthlyUsage, activateKey, deactivateKey } = useLicense()
+  const {
+    isRunning: isRunningDiag,
+    report: diagReport,
+    lastRunAt: diagLastRun,
+    runDiagnostics,
+    downloadReportJson,
+  } = useDiagnostics()
   const [settingsUpgradeModalOpen, setSettingsUpgradeModalOpen] = useState(false)
   const [keyInput, setKeyInput] = useState('')
   const [isActivatingKey, setIsActivatingKey] = useState(false)
@@ -143,6 +159,7 @@ export default function SettingsView() {
     { id: 'safety', label: 'Safety & Trash', faIcon: faShieldCheck },
     { id: 'plan', label: 'Plan & Licensing', faIcon: faSparkles },
     { id: 'data', label: 'Data & Privacy', faIcon: faDatabase },
+    { id: 'diagnostics', label: 'System Diagnostics', faIcon: faGaugeHigh },
   ]
 
   const largeSizeOptions = [
@@ -947,6 +964,190 @@ export default function SettingsView() {
                 </div>
               </div>
             </WaCallout>
+          </motion.div>
+        )}
+
+        {/* TAB 7: SYSTEM DIAGNOSTICS & TELEMETRY */}
+        {activeTab === 'diagnostics' && (
+          <motion.div
+            key="diagnostics"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="space-y-6"
+          >
+            {/* System Status Summary Header */}
+            <div className="p-6 border border-slate-800/80 rounded-2xl bg-gradient-to-br from-slate-900/80 via-slate-900/50 to-slate-950/70 backdrop-blur-xl shadow-xl space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className={cn(
+                    'w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border shadow-lg',
+                    diagReport?.overallStatus === 'HEALTHY'
+                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-emerald-500/10'
+                      : diagReport?.overallStatus === 'DEGRADED'
+                      ? 'bg-amber-500/10 text-amber-400 border-amber-500/30 shadow-amber-500/10'
+                      : 'bg-rose-500/10 text-rose-400 border-rose-500/30 shadow-rose-500/10'
+                  )}>
+                    <Activity className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-base font-bold text-white">System Diagnostics & Telemetry</h3>
+                      <Badge className={cn(
+                        'text-[10px] font-bold uppercase tracking-wider',
+                        diagReport?.overallStatus === 'HEALTHY'
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                          : diagReport?.overallStatus === 'DEGRADED'
+                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                          : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                      )}>
+                        {diagReport?.overallStatus || 'Auditing'}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Live connectivity, API latency benchmarks, and storage vault health
+                    </p>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={downloadReportJson}
+                    disabled={!diagReport}
+                    className="border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs gap-1.5"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    Export Report
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={runDiagnostics}
+                    disabled={isRunningDiag}
+                    className="bg-blue-600 hover:bg-blue-500 text-white text-xs gap-1.5 font-medium shadow-md shadow-blue-600/20"
+                  >
+                    <RefreshCw className={cn('w-3.5 h-3.5', isRunningDiag && 'animate-spin')} />
+                    {isRunningDiag ? 'Benchmarking...' : 'Run Self-Test'}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Metric Highlights Strip */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-slate-800/70">
+                <div className="p-3 rounded-xl bg-slate-950/50 border border-slate-800/60">
+                  <span className="text-[11px] text-slate-400 font-medium">Drive API Latency</span>
+                  <div className="text-lg font-bold text-white font-mono mt-0.5">
+                    {diagReport?.checks?.find((c) => c.id === 'drive_api')?.latencyMs || 0} ms
+                  </div>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-950/50 border border-slate-800/60">
+                  <span className="text-[11px] text-slate-400 font-medium">Properties Vault</span>
+                  <div className="text-lg font-bold text-white font-mono mt-0.5">
+                    {diagReport?.storageQuota?.usedKb || '0'} KB
+                    <span className="text-xs font-normal text-slate-500 ml-1">/ 500 KB</span>
+                  </div>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-950/50 border border-slate-800/60">
+                  <span className="text-[11px] text-slate-400 font-medium">Vault Quota Used</span>
+                  <div className="text-lg font-bold text-emerald-400 font-mono mt-0.5">
+                    {diagReport?.storageQuota?.percentUsed || '0.0'}%
+                  </div>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-950/50 border border-slate-800/60">
+                  <span className="text-[11px] text-slate-400 font-medium">Total Test Duration</span>
+                  <div className="text-lg font-bold text-white font-mono mt-0.5">
+                    {diagReport?.totalDurationMs || 0} ms
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Diagnostics Checks Cards Grid */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider px-1">
+                Subsystem Verification Breakdown ({diagReport?.checks?.length || 0} Tests)
+              </h4>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {diagReport?.checks?.map((check) => {
+                  const isPass = check.status === 'PASS'
+                  const isWarn = check.status === 'WARN'
+
+                  return (
+                    <div
+                      key={check.id}
+                      className="p-4 rounded-xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-sm space-y-2 group hover:border-slate-700 transition-colors"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          {isPass ? (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                          ) : isWarn ? (
+                            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                          ) : (
+                            <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                          )}
+                          <span className="text-sm font-semibold text-white truncate">
+                            {check.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="text-[11px] font-mono text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded">
+                            {check.latencyMs} ms
+                          </span>
+                          <span
+                            className={cn(
+                              'text-[10px] font-bold px-2 py-0.5 rounded-full uppercase',
+                              isPass
+                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                                : isWarn
+                                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                                : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+                            )}
+                          >
+                            {check.status}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-slate-400 leading-relaxed pl-6">
+                        {check.details}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Runtime & Host Environment Specifications */}
+            <div className="p-5 border border-slate-800/80 rounded-2xl bg-slate-900/40 space-y-3">
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-300 uppercase tracking-wider">
+                <Cpu className="w-4 h-4 text-blue-400" />
+                Runtime & Security Isolation Environment
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div>
+                  <span className="text-slate-500 block text-[11px]">Execution Engine</span>
+                  <span className="text-slate-200 font-medium">{diagReport?.environment?.runtime || 'Google Apps Script V8'}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[11px]">App Version</span>
+                  <span className="text-slate-200 font-medium">v{APP_VERSION}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[11px]">Security Isolation</span>
+                  <span className="text-emerald-400 font-medium">USER_ACCESSING (Multi-tenant)</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[11px]">Last Diagnostics Run</span>
+                  <span className="text-slate-200 font-medium font-mono text-[11px]">
+                    {diagLastRun ? new Date(diagLastRun).toLocaleTimeString() : 'Just now'}
+                  </span>
+                </div>
+              </div>
+            </div>
           </motion.div>
         )}
       </div>

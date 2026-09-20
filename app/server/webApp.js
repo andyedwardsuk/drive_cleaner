@@ -630,6 +630,160 @@ var DriveCleanerWebApp = (function () {
       return typeof checkCleanupQuota_ === 'function'
         ? checkCleanupQuota_(fileCount)
         : { allowed: true, remaining: 100, limit: 100, isPro: false };
+    },
+    runSystemDiagnostics: function () {
+      const startTime = new Date().getTime();
+      const checks = [];
+
+      // 1. Google Drive API v2 Connectivity & Latency
+      const t0 = new Date().getTime();
+      let driveLatency = 0;
+      let driveStatus = 'PASS';
+      let driveDetails = '';
+      try {
+        if (typeof Drive !== 'undefined' && Drive.About && typeof Drive.About.get === 'function') {
+          const about = Drive.About.get({ fields: 'user(displayName,emailAddress),quotaBytesTotal,quotaBytesUsed' });
+          driveLatency = new Date().getTime() - t0;
+          driveDetails = 'Drive API v2 responsive (' + driveLatency + 'ms). User: ' + (about.user ? (about.user.displayName || 'Authorized') : 'Connected');
+        } else {
+          const used = DriveApp.getStorageUsed();
+          driveLatency = new Date().getTime() - t0;
+          driveDetails = 'DriveApp responsive (' + driveLatency + 'ms). Storage: ' + Math.round(used / (1024 * 1024)) + ' MB used.';
+        }
+      } catch (driveErr) {
+        driveStatus = 'FAIL';
+        driveLatency = new Date().getTime() - t0;
+        driveDetails = 'Drive API error: ' + driveErr.message;
+      }
+      checks.push({
+        id: 'drive_api',
+        name: 'Google Drive API v2',
+        status: driveStatus,
+        latencyMs: driveLatency,
+        details: driveDetails
+      });
+
+      // 2. PropertiesService Vault Quota & Latency
+      const t1 = new Date().getTime();
+      let propLatency = 0;
+      let propStatus = 'PASS';
+      let propDetails = '';
+      let usedKb = '0';
+      let percentUsed = '0';
+      try {
+        const userProps = PropertiesService.getUserProperties();
+        const props = userProps.getProperties();
+        const keys = Object.keys(props);
+        let totalBytes = 0;
+        keys.forEach(function (k) {
+          totalBytes += k.length + (props[k] ? props[k].length : 0);
+        });
+        propLatency = new Date().getTime() - t1;
+        const maxBytes = 500 * 1024;
+        usedKb = (totalBytes / 1024).toFixed(2);
+        percentUsed = ((totalBytes / maxBytes) * 100).toFixed(1);
+
+        if (totalBytes > maxBytes * 0.8) {
+          propStatus = 'WARN';
+          propDetails = keys.length + ' keys stored (' + usedKb + ' KB / 500 KB, ' + percentUsed + '% used). Approaching limit.';
+        } else {
+          propDetails = keys.length + ' keys stored (' + usedKb + ' KB / 500 KB, ' + percentUsed + '% used). Vault healthy.';
+        }
+      } catch (propErr) {
+        propStatus = 'FAIL';
+        propLatency = new Date().getTime() - t1;
+        propDetails = 'PropertiesService error: ' + propErr.message;
+      }
+      checks.push({
+        id: 'properties_vault',
+        name: 'User Properties Storage Vault',
+        status: propStatus,
+        latencyMs: propLatency,
+        details: propDetails
+      });
+
+      // 3. Google Identity & OAuth Scopes
+      const t2 = new Date().getTime();
+      let sessionLatency = 0;
+      let sessionStatus = 'PASS';
+      let sessionDetails = '';
+      try {
+        const user = Session.getActiveUser();
+        const email = user ? user.getEmail() : '';
+        sessionLatency = new Date().getTime() - t2;
+        if (email) {
+          const masked = email.replace(/(.{2})(.*)(@.*)/, '$1***$3');
+          sessionDetails = 'Active Google session verified: ' + masked;
+        } else {
+          sessionStatus = 'PASS';
+          sessionDetails = 'Authenticated multi-tenant session (Identity privacy protected).';
+        }
+      } catch (sessionErr) {
+        sessionStatus = 'WARN';
+        sessionLatency = new Date().getTime() - t2;
+        sessionDetails = 'Session check notice: ' + sessionErr.message;
+      }
+      checks.push({
+        id: 'identity_session',
+        name: 'OAuth 2.0 Session & Identity',
+        status: sessionStatus,
+        latencyMs: sessionLatency,
+        details: sessionDetails
+      });
+
+      // 4. Cryptographic Licensing Engine
+      const t3 = new Date().getTime();
+      let licLatency = 0;
+      let licStatus = 'PASS';
+      let licDetails = '';
+      try {
+        const evalTest = typeof verifyLicenseKeyAuthenticity_ === 'function'
+          ? verifyLicenseKeyAuthenticity_('DC-PRO-TEST-2026')
+          : { valid: false };
+        licLatency = new Date().getTime() - t3;
+        const currentState = typeof getLicenseState_ === 'function' ? getLicenseState_() : { tier: 'free', monthlyUsage: { limit: 100 } };
+
+        if (evalTest.valid) {
+          licDetails = 'Checksum engine verified. Tier: ' + currentState.tier.toUpperCase() + ' (Monthly quota limit: ' + currentState.monthlyUsage.limit + ').';
+        } else {
+          licStatus = 'WARN';
+          licDetails = 'Licensing active in basic mode.';
+        }
+      } catch (licErr) {
+        licStatus = 'FAIL';
+        licLatency = new Date().getTime() - t3;
+        licDetails = 'Licensing check error: ' + licErr.message;
+      }
+      checks.push({
+        id: 'licensing_engine',
+        name: 'Cryptographic Licensing Engine',
+        status: licStatus,
+        latencyMs: licLatency,
+        details: licDetails
+      });
+
+      const totalDurationMs = new Date().getTime() - startTime;
+      const hasFail = checks.some(function (c) { return c.status === 'FAIL'; });
+      const hasWarn = checks.some(function (c) { return c.status === 'WARN'; });
+      const overallStatus = hasFail ? 'ERROR' : (hasWarn ? 'DEGRADED' : 'HEALTHY');
+
+      return {
+        success: true,
+        overallStatus: overallStatus,
+        timestamp: new Date().toISOString(),
+        totalDurationMs: totalDurationMs,
+        checks: checks,
+        storageQuota: {
+          usedKb: usedKb,
+          maxKb: 500,
+          percentUsed: percentUsed
+        },
+        environment: {
+          appVersion: '1.0.0',
+          runtime: 'Google Apps Script V8',
+          timeZone: typeof Session !== 'undefined' && Session.getScriptTimeZone ? Session.getScriptTimeZone() : 'UTC'
+        }
+      };
     }
   };
 
@@ -671,8 +825,11 @@ function doGet(e) {
       case 'quota':
         result = getDriveQuota();
         break;
+      case 'diagnostics':
+        result = runSystemDiagnostics();
+        break;
       default:
-        result = { error: 'Unknown test. Use ?test=metadata, ?test=scan, ?test=analyzer, ?test=quota, or ?test=all' };
+        result = { error: 'Unknown test. Use ?test=metadata, ?test=scan, ?test=analyzer, ?test=quota, ?test=diagnostics, or ?test=all' };
     }
 
     return ContentService
@@ -750,6 +907,15 @@ function doPost(e) {
       error: err.message || 'Failed to process webhook'
     })).setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+/**
+ * Runs server-side system diagnostics suite
+ * Called from React app via google.script.run
+ * @returns {Object} Diagnostic report
+ */
+function runSystemDiagnostics() {
+  return DriveCleanerWebApp.runSystemDiagnostics();
 }
 
 /**
