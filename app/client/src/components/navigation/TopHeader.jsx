@@ -32,10 +32,14 @@ export default function TopHeader({ onOpenCommandPalette, onOpenUpgrade }) {
           <span>Drive Cleaner</span>
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-slate-600 shrink-0 hidden sm:inline" />
-        <span className="text-xs font-medium text-slate-400 truncate hidden lg:inline">
-          {routeInfo.categoryTitle}
-        </span>
-        <ChevronRight className="w-3.5 h-3.5 text-slate-600 shrink-0 hidden lg:inline" />
+        {routeInfo.categoryTitle ? (
+          <>
+            <span className="text-xs font-medium text-slate-400 truncate hidden lg:inline">
+              {routeInfo.categoryTitle}
+            </span>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-600 shrink-0 hidden lg:inline" />
+          </>
+        ) : null}
         <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800/50 border border-slate-700/40 text-xs font-semibold text-slate-100 whitespace-nowrap shrink-0">
           {routeInfo.faIcon ? (
             <FontAwesomeIcon icon={routeInfo.faIcon} className="w-3.5 h-3.5 text-blue-400 shrink-0" />
@@ -118,14 +122,13 @@ export default function TopHeader({ onOpenCommandPalette, onOpenUpgrade }) {
         {/* Live Google Drive API Beacon */}
         <div
           title="Google Drive API Live Connection"
-          className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-medium whitespace-nowrap"
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-medium whitespace-nowrap shrink-0"
         >
-          <span className="relative flex h-2 w-2">
+          <span className="relative flex h-2 w-2 shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
           </span>
-          <span className="hidden xl:inline text-[11px] font-semibold">Drive API Active</span>
-          <span className="xl:hidden text-[11px] font-semibold">Live</span>
+          <span className="text-[11px] font-semibold">Live</span>
         </div>
 
         {/* 1-Click Smart Scan Trigger */}

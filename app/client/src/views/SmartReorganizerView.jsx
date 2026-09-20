@@ -287,7 +287,7 @@ export default function SmartReorganizerView() {
                 <Badge
                   variant="outline"
                   className={cn(
-                    'text-xs font-medium',
+                    'text-xs font-medium shrink-0 min-w-[88px] justify-center text-center',
                     healthScore >= 80
                       ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'
                       : 'border-amber-500/30 bg-amber-500/10 text-amber-400'
@@ -386,10 +386,10 @@ export default function SmartReorganizerView() {
           variant="outline"
           disabled={isLoading}
           onClick={() => fetchAnalysis()}
-          className="gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+          className="gap-1.5 text-xs text-muted-foreground hover:text-foreground shrink-0 min-w-[145px] justify-center"
         >
           <RotateCcw className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')} />
-          Re-Analyse Drive
+          {isLoading ? 'Analysing...' : 'Re-Analyse Drive'}
         </Button>
       </div>
 
@@ -417,7 +417,7 @@ export default function SmartReorganizerView() {
                 <Badge
                   variant="outline"
                   className={cn(
-                    "text-xs",
+                    "text-xs shrink-0 min-w-[88px] justify-center text-center",
                     healthScore < 60 ? "border-rose-500/30 text-rose-400" : (healthScore < 80 ? "border-amber-500/30 text-amber-400" : "border-emerald-500/30 text-emerald-400")
                   )}
                 >
@@ -509,7 +509,7 @@ export default function SmartReorganizerView() {
                     <p className="text-xs text-muted-foreground">Optimal 3-level depth, clear separation</p>
                   </div>
                 </div>
-                <Badge variant="outline" className="border-emerald-500/30 text-emerald-400 bg-emerald-500/5 text-xs">
+                <Badge variant="outline" className="border-emerald-500/30 text-emerald-400 bg-emerald-500/5 text-xs shrink-0">
                   Optimal Structure
                 </Badge>
               </div>
