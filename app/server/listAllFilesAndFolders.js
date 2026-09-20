@@ -31,9 +31,6 @@ var DriveFileList = (function () {
   /** Spreadsheet header row labels */
   const HEADER_LABELS = ['Icon', 'File Name', 'File ID', 'Parent Name', 'Parent ID', 'File MIME type'];
 
-  /** Icon constants */
-  const ICON_FOLDER = '📂';
-  const ICON_FILE = '📃';
 
   // ============================================
   // PUBLIC API FUNCTIONS
@@ -413,11 +410,11 @@ var DriveFileList = (function () {
    *
    * @param {Object} item - Drive item from Drive API
    * @param {Object} parentFolder - Parent folder object { id, name }
-   * @param {boolean} isFolder - Whether item is a folder
+   * @param {boolean} [_isFolder] - Whether item is a folder (optional)
    * @returns {Array} Spreadsheet row with enhanced metadata
    * @private
    */
-  function createItemRow_(item, parentFolder, isFolder) {
+  function createItemRow_(item, parentFolder, _isFolder) {
     // eslint-disable-next-line no-undef
     const metadata = parseFileMetadata(item, parentFolder);
     // eslint-disable-next-line no-undef
