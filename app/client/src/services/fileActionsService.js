@@ -19,9 +19,9 @@ export const fileActionsService = {
     let folderName = 'Drive Folder'
 
     if (Array.isArray(payload)) {
-      fileIds = payload
+      fileIds = payload.map(item => (typeof item === 'string' ? item : item?.fileId || item?.file_id || item?.id)).filter((id) => Boolean(id) && typeof id === 'string')
     } else if (payload && Array.isArray(payload.fileIds)) {
-      fileIds = payload.fileIds
+      fileIds = payload.fileIds.map(item => (typeof item === 'string' ? item : item?.fileId || item?.file_id || item?.id)).filter((id) => Boolean(id) && typeof id === 'string')
       totalBytes = payload.totalBytes || 0
       folderName = payload.folderName || 'Drive Folder'
     }
@@ -114,8 +114,12 @@ export const fileActionsService = {
    * @param {Function} [onProgress] - Callback ({ processed, total, percent })
    * @returns {Promise<{success: boolean, restoredCount: number, failedCount: number, restoredIds: string[], errors: Array}>}
    */
-  untrashFiles: async (fileIds, onProgress) => {
-    if (!fileIds || fileIds.length === 0) {
+  untrashFiles: async (payload, onProgress) => {
+    const fileIds = (Array.isArray(payload) ? payload : [payload])
+      .map(item => (typeof item === 'string' ? item : item?.fileId || item?.file_id || item?.id))
+      .filter((id) => Boolean(id) && typeof id === 'string')
+
+    if (fileIds.length === 0) {
       return { success: true, restoredCount: 0, failedCount: 0, restoredIds: [], errors: [] }
     }
 

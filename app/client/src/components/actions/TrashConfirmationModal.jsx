@@ -31,7 +31,7 @@ export function TrashConfirmationModal({
 
   if (!visible || files.length === 0) return null
 
-  const totalBytes = files.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0)
+  const totalBytes = files.reduce((acc, f) => acc + (f.fileSizeBytes || f.size_bytes || f.size || 0), 0)
   const formatBytes = (bytes) => {
     if (bytes === 0) return '0 B'
     const k = 1024
@@ -42,7 +42,7 @@ export function TrashConfirmationModal({
 
   const starredFiles = files.filter((f) => f.starred)
   const sharedFiles = files.filter((f) => f.sharingStatus && f.sharingStatus !== 'Private')
-  const largeFiles = files.filter((f) => (f.fileSizeBytes || 0) > 500 * 1024 * 1024)
+  const largeFiles = files.filter((f) => (f.fileSizeBytes || f.size_bytes || f.size || 0) > 500 * 1024 * 1024)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in-0">
@@ -119,10 +119,10 @@ export function TrashConfirmationModal({
             <span className="text-xs text-slate-500">Showing up to 5 items</span>
           </div>
           <div className="max-h-36 overflow-y-auto space-y-1.5 pr-1 text-sm border rounded-2xl p-2.5 bg-slate-950/60 border-slate-800">
-            {files.slice(0, 5).map((file) => (
-              <div key={file.fileId} className="flex items-center justify-between py-1.5 px-2.5 rounded-xl hover:bg-slate-800/40 transition-colors">
+            {files.slice(0, 5).map((file, idx) => (
+              <div key={file.fileId || file.file_id || file.id || idx} className="flex items-center justify-between py-1.5 px-2.5 rounded-xl hover:bg-slate-800/40 transition-colors">
                 <span className="truncate max-w-[280px] text-slate-200 font-medium text-xs">
-                  {file.fileName}
+                  {file.fileName || file.file_name || file.name || 'Drive Item'}
                 </span>
                 <div className="flex items-center gap-2 shrink-0">
                   {file.starred && (
@@ -135,7 +135,9 @@ export function TrashConfirmationModal({
                       Shared
                     </WaBadge>
                   )}
-                  <span className="text-xs text-slate-400">{file.fileSize || formatBytes(file.fileSizeBytes || 0)}</span>
+                  <span className="text-xs text-slate-400">
+                    {file.fileSize || formatBytes(file.fileSizeBytes || file.size_bytes || file.size || 0)}
+                  </span>
                 </div>
               </div>
             ))}

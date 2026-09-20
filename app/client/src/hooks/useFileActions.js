@@ -39,10 +39,38 @@ export function useFileActions() {
     setSelectedFileIds(new Set())
   }, [])
 
-  // Modal open/close
+  // Modal open/close with normalization of input files
   const requestTrash = useCallback((files) => {
     if (!files || files.length === 0) return
-    setFilesPendingTrash(files)
+    const normalized = files
+      .map((f) => {
+        if (typeof f === 'string') {
+          return {
+            fileId: f,
+            fileName: 'Drive Item',
+            fileSizeBytes: 0,
+            parentName: 'Drive Folder',
+          }
+        }
+        const id = f.fileId || f.file_id || f.id
+        if (!id) return null
+        return {
+          ...f,
+          fileId: id,
+          fileName: f.fileName || f.file_name || f.name || 'Drive Item',
+          fileSizeBytes: f.fileSizeBytes || f.size_bytes || f.file_size_bytes || f.size || 0,
+          mimeType: f.mimeType || f.mime_type,
+          parentName: f.parentName || f.parent_name || 'Drive Folder',
+        }
+      })
+      .filter(Boolean)
+
+    if (normalized.length === 0) {
+      console.warn('requestTrash called with empty or invalid files:', files)
+      return
+    }
+
+    setFilesPendingTrash(normalized)
     setConfirmModalOpen(true)
   }, [])
 
@@ -64,8 +92,19 @@ export function useFileActions() {
     if (filesPendingTrash.length === 0) return
 
     const filesToTrash = [...filesPendingTrash]
-    const fileIds = filesToTrash.map((f) => f.fileId)
-    const totalBytes = filesToTrash.reduce((acc, f) => acc + (f.fileSizeBytes || 0), 0)
+    const fileIds = filesToTrash
+      .map((f) => f.fileId || f.file_id || f.id)
+      .filter((id) => Boolean(id) && typeof id === 'string')
+    const totalBytes = filesToTrash.reduce(
+      (acc, f) => acc + (f.fileSizeBytes || f.size_bytes || f.file_size_bytes || f.size || 0),
+      0
+    )
+
+    if (fileIds.length === 0) {
+      alert('Error: No valid file IDs selected to trash.')
+      setConfirmModalOpen(false)
+      return
+    }
 
     // Verify monthly cleanup quota before initiating
     try {
@@ -175,7 +214,9 @@ export function useFileActions() {
 
     setIsRestoring(true)
     const filesToRestore = undoToast.files
-    const fileIds = filesToRestore.map((f) => f.fileId)
+    const fileIds = filesToRestore
+      .map((f) => f.fileId || f.file_id || f.id)
+      .filter((id) => Boolean(id) && typeof id === 'string')
 
     setTrashProgress({ processed: 0, total: fileIds.length, percent: 0 })
 

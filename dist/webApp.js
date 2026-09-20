@@ -202,14 +202,36 @@ var DriveCleanerWebApp = (function () {
       return { success: false, error: 'Invalid fileIds array' };
     }
 
+    // Sanitize and filter to only valid non-empty string IDs
+    const validFileIds = fileIds
+      .map(function (item) {
+        if (typeof item === 'string') return item.trim();
+        if (item && typeof item === 'object') return String(item.fileId || item.file_id || item.id || '').trim();
+        return '';
+      })
+      .filter(function (id) {
+        return Boolean(id) && id.length > 0;
+      });
+
+    if (validFileIds.length === 0) {
+      return {
+        success: false,
+        error: 'No valid file IDs provided to trash',
+        trashedCount: 0,
+        failedCount: fileIds.length,
+        trashedIds: [],
+        errors: [{ error: 'No valid file IDs provided' }]
+      };
+    }
+
     const trashed = [];
     const failed = [];
 
-    for (let i = 0; i < fileIds.length; i++) {
-      const id = fileIds[i];
+    for (let i = 0; i < validFileIds.length; i++) {
+      const id = validFileIds[i];
       try {
         callWithBackoff_(function () {
-          if (typeof Drive !== 'undefined' && Drive.Files && Drive.Files.trash) {
+          if (typeof Drive !== 'undefined' && Drive.Files && typeof Drive.Files.trash === 'function') {
             Drive.Files.trash(id);
           } else {
             DriveApp.getFileById(id).setTrashed(true);
@@ -254,7 +276,7 @@ var DriveCleanerWebApp = (function () {
     }
 
     return {
-      success: trashed.length > 0 || (failed.length === 0 && fileIds.length === 0),
+      success: trashed.length > 0 || (failed.length === 0 && validFileIds.length === 0),
       trashedCount: trashed.length,
       failedCount: failed.length,
       trashedIds: trashed,
@@ -280,14 +302,36 @@ var DriveCleanerWebApp = (function () {
       return { success: false, error: 'Invalid fileIds array' };
     }
 
+    // Sanitize and filter to only valid non-empty string IDs
+    const validFileIds = fileIds
+      .map(function (item) {
+        if (typeof item === 'string') return item.trim();
+        if (item && typeof item === 'object') return String(item.fileId || item.file_id || item.id || '').trim();
+        return '';
+      })
+      .filter(function (id) {
+        return Boolean(id) && id.length > 0;
+      });
+
+    if (validFileIds.length === 0) {
+      return {
+        success: false,
+        error: 'No valid file IDs provided to restore',
+        restoredCount: 0,
+        failedCount: fileIds.length,
+        restoredIds: [],
+        errors: [{ error: 'No valid file IDs provided' }]
+      };
+    }
+
     const restored = [];
     const failed = [];
 
-    for (let i = 0; i < fileIds.length; i++) {
-      const id = fileIds[i];
+    for (let i = 0; i < validFileIds.length; i++) {
+      const id = validFileIds[i];
       try {
         callWithBackoff_(function () {
-          if (typeof Drive !== 'undefined' && Drive.Files && Drive.Files.untrash) {
+          if (typeof Drive !== 'undefined' && Drive.Files && typeof Drive.Files.untrash === 'function') {
             Drive.Files.untrash(id);
           } else {
             DriveApp.getFileById(id).setTrashed(false);
@@ -305,7 +349,7 @@ var DriveCleanerWebApp = (function () {
     }
 
     return {
-      success: restored.length > 0 || (failed.length === 0 && fileIds.length === 0),
+      success: restored.length > 0 || (failed.length === 0 && validFileIds.length === 0),
       restoredCount: restored.length,
       failedCount: failed.length,
       restoredIds: restored,
