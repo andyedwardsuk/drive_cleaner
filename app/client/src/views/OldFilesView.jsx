@@ -176,7 +176,12 @@ export default function OldFilesView() {
   const filteredFiles = useMemo(() => {
     if (!data?.old_files?.items) return []
 
-    let files = [...data.old_files.items]
+    let files = data.old_files.items.map((f) => {
+      if (f.age_years !== undefined && f.age_years !== null) return f
+      const modifiedDate = f.modified_date ? new Date(f.modified_date) : new Date(0)
+      const calculatedAge = Math.max(0, (Date.now() - modifiedDate) / (1000 * 60 * 60 * 24 * 365.25))
+      return { ...f, age_years: Math.round(calculatedAge * 10) / 10 }
+    })
 
     // Apply age filter
     if (ageFilter === 'custom' || ageFilter === '1yr') {

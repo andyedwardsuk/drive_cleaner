@@ -72,7 +72,8 @@ function ScanResults({ data }) {
       count: data.large_files?.count || 0,
       size: data.large_files?.total_size_bytes,
       color: 'purple',
-      path: '/large-files',
+      to: '/clean',
+      search: { tab: 'large-files' },
     },
     {
       icon: Clock,
@@ -80,18 +81,20 @@ function ScanResults({ data }) {
       count: data.old_files?.count || 0,
       size: data.old_files?.total_size_bytes,
       color: 'orange',
-      path: '/old-files',
+      to: '/clean',
+      search: { tab: 'old-files' },
     },
     {
       icon: Copy,
       title: 'Duplicates',
       count: data.duplicates?.count || 0,
-      size: data.duplicates?.groups?.reduce(
+      size: data.duplicates?.total_size_bytes || data.duplicates?.groups?.reduce(
         (acc, group) => acc + group.total_size_bytes,
         0
-      ),
+      ) || 0,
       color: 'blue',
-      path: '/duplicates',
+      to: '/clean',
+      search: { tab: 'duplicates' },
     },
     {
       icon: Trash2,
@@ -99,7 +102,8 @@ function ScanResults({ data }) {
       count: data.empty_items?.count || 0,
       size: 0,
       color: 'gray',
-      path: '/empty-items',
+      to: '/clean',
+      search: { tab: 'empty-items' },
     },
     {
       icon: AlertCircle,
@@ -107,7 +111,8 @@ function ScanResults({ data }) {
       count: data.temp_files?.count || 0,
       size: data.temp_files?.total_size_bytes,
       color: 'yellow',
-      path: '/temp-files',
+      to: '/clean',
+      search: { tab: 'temp-files' },
     },
     {
       icon: FileSpreadsheet,
@@ -115,7 +120,8 @@ function ScanResults({ data }) {
       count: data.workspace_files?.count || 0,
       size: data.workspace_files?.total_size_bytes,
       color: 'blue',
-      path: '/workspace-files',
+      to: '/organise',
+      search: { tab: 'workspace' },
     },
     {
       icon: Flame,
@@ -123,7 +129,8 @@ function ScanResults({ data }) {
       count: data.rot_analysis?.count || 0,
       size: data.rot_analysis?.total_size_bytes,
       color: 'rose',
-      path: '/rot-analysis',
+      to: '/security',
+      search: { tab: 'rot' },
     },
   ]
 
@@ -143,10 +150,8 @@ function ScanResults({ data }) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base font-semibold text-white">
-                  {data.folder_name || 'My Drive'}
-                </h3>
-                {data.folder_id && data.folder_id !== 'root' && (
+                <h3 className="font-semibold text-sm text-white">Folder Analysis Completed</h3>
+                {data.folder_id && (
                   <Badge variant="outline" className="text-xs font-mono text-slate-400 border-slate-800 bg-slate-950">
                     ID: {data.folder_id}
                   </Badge>
@@ -218,7 +223,7 @@ function ScanResults({ data }) {
 
         {data.carbon_footprint && (
           <div
-            onClick={() => navigate({ to: '/carbon-footprint' })}
+            onClick={() => navigate({ to: '/security', search: { tab: 'carbon' } })}
             className="mt-4 pt-4 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 cursor-pointer group hover:opacity-95 transition-opacity"
           >
             <div className="flex items-center gap-2 text-xs text-slate-300">
@@ -243,7 +248,7 @@ function ScanResults({ data }) {
           <CategoryCard
             key={index}
             {...category}
-            onClick={() => category.path && navigate({ to: category.path })}
+            onClick={() => category.to && navigate({ to: category.to, search: category.search })}
           />
         ))}
       </div>
@@ -268,17 +273,17 @@ function ScanResults({ data }) {
               const count = rec.affected_files_count || rec.file_count || 0
               const category = rec.category || ''
 
-              // Map category to view navigation path
-              const categoryPathMap = {
-                temp_files: '/temp-files',
-                duplicates: '/duplicates',
-                empty_items: '/empty-items',
-                old_files: '/old-files',
-                large_files: '/large-files',
-                workspace_files: '/workspace-files',
-                rot_analysis: '/rot-analysis',
+              // Map category to view navigation target
+              const categoryTargetMap = {
+                temp_files: { to: '/clean', search: { tab: 'temp-files' } },
+                duplicates: { to: '/clean', search: { tab: 'duplicates' } },
+                empty_items: { to: '/clean', search: { tab: 'empty-items' } },
+                old_files: { to: '/clean', search: { tab: 'old-files' } },
+                large_files: { to: '/clean', search: { tab: 'large-files' } },
+                workspace_files: { to: '/organise', search: { tab: 'workspace' } },
+                rot_analysis: { to: '/security', search: { tab: 'rot' } },
               }
-              const targetPath = categoryPathMap[category]
+              const target = categoryTargetMap[category]
 
               return (
                 <div
@@ -323,10 +328,10 @@ function ScanResults({ data }) {
                     </div>
                   </div>
 
-                  {targetPath && (
+                  {target && (
                     <Button
                       size="sm"
-                      onClick={() => navigate({ to: targetPath })}
+                      onClick={() => navigate({ to: target.to, search: target.search })}
                       className="h-9 px-4 rounded-lg bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white border border-blue-500/30 hover:border-blue-500 text-xs font-semibold shrink-0 transition-all group"
                     >
                       <span>Review & Clean</span>

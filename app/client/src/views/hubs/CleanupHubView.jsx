@@ -78,20 +78,33 @@ export default function CleanupHubView() {
   const router = useRouterState()
   const navigate = useNavigate()
 
-  // Extract ?tab= query parameter or default to 'smart-scan'
-  const searchTab = router.location.search?.tab || new URLSearchParams(window.location.search).get('tab')
-  const initialTab = searchTab || 'smart-scan'
-  const [activeTab, setActiveTab] = useState(
-    CLEANUP_TABS.some((t) => t.id === initialTab) ? initialTab : 'smart-scan'
-  )
-
-  // Synchronize when query string changes
-  useEffect(() => {
-    const tabParam = router.location.search?.tab || new URLSearchParams(window.location.search).get('tab')
-    if (tabParam && CLEANUP_TABS.some((t) => t.id === tabParam)) {
-      setActiveTab(tabParam)
+  const getResolvedTab = () => {
+    const searchTab = router.location.search?.tab
+    if (searchTab && CLEANUP_TABS.some((t) => t.id === searchTab)) return searchTab
+    try {
+      const hash = window.location.hash || ''
+      const qIdx = hash.indexOf('?')
+      if (qIdx !== -1) {
+        const hashTab = new URLSearchParams(hash.slice(qIdx)).get('tab')
+        if (hashTab && CLEANUP_TABS.some((t) => t.id === hashTab)) return hashTab
+      }
+    } catch (e) {
+      // ignore
     }
-  }, [router.location.search])
+    const winTab = new URLSearchParams(window.location.search).get('tab')
+    if (winTab && CLEANUP_TABS.some((t) => t.id === winTab)) return winTab
+    return 'smart-scan'
+  }
+
+  const [activeTab, setActiveTab] = useState(getResolvedTab())
+
+  // Synchronize when route search or hash changes
+  useEffect(() => {
+    const resolved = getResolvedTab()
+    if (resolved && resolved !== activeTab) {
+      setActiveTab(resolved)
+    }
+  }, [router.location.search, router.location.hash])
 
   const handleTabChange = (tabId) => {
     setActiveTab(tabId)

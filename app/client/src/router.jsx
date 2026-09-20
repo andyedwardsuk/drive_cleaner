@@ -1,4 +1,4 @@
-import { createRouter, createRoute, createRootRoute, createHashHistory, Navigate } from '@tanstack/react-router'
+import { createRouter, createRoute, createRootRoute, createHashHistory, Navigate, redirect } from '@tanstack/react-router'
 import RootLayout from './layouts/RootLayout'
 
 // Import 5 Primary Hub Views
@@ -24,8 +24,8 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  beforeLoad: ({ navigate }) => {
-    navigate({ to: '/dashboard' })
+  beforeLoad: () => {
+    throw redirect({ to: '/dashboard' })
   },
 })
 
@@ -109,172 +109,228 @@ const termsRoute = createRoute({
 const smartScanRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/smart-scan',
-  beforeLoad: ({ navigate }) => navigate({ to: '/clean', search: { tab: 'smart-scan' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/clean', search: { tab: 'smart-scan' } })
+  },
 })
 
 const duplicatesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/duplicates',
-  beforeLoad: ({ navigate }) => navigate({ to: '/clean', search: { tab: 'duplicates' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/clean', search: { tab: 'duplicates' } })
+  },
 })
 
 const largeFilesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/large-files',
-  beforeLoad: ({ navigate }) => navigate({ to: '/clean', search: { tab: 'large-files' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/clean', search: { tab: 'large-files' } })
+  },
 })
 
 const oldFilesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/old-files',
-  beforeLoad: ({ navigate }) => navigate({ to: '/clean', search: { tab: 'old-files' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/clean', search: { tab: 'old-files' } })
+  },
 })
 
 const emptyItemsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/empty-items',
-  beforeLoad: ({ navigate }) => navigate({ to: '/clean', search: { tab: 'empty-items' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/clean', search: { tab: 'empty-items' } })
+  },
 })
 
 const tempFilesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/temp-files',
-  beforeLoad: ({ navigate }) => navigate({ to: '/clean', search: { tab: 'temp-files' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/clean', search: { tab: 'temp-files' } })
+  },
 })
 
 const mediaOptimizerRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/media-optimizer',
-  beforeLoad: ({ navigate }) => navigate({ to: '/clean', search: { tab: 'media-optimizer' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/clean', search: { tab: 'media-optimizer' } })
+  },
 })
 
 const trashGovernanceRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/trash-governance',
-  beforeLoad: ({ navigate }) => navigate({ to: '/clean', search: { tab: 'trash-governance' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/clean', search: { tab: 'trash-governance' } })
+  },
 })
 
 // Organisation Aliases -> /organise?tab=...
 const myFoldersRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/my-folders',
-  beforeLoad: ({ navigate }) => navigate({ to: '/organise', search: { tab: 'folders' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/organise', search: { tab: 'folders' } })
+  },
 })
 
 const smartReorganizerRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/smart-reorganizer',
-  beforeLoad: ({ navigate }) => navigate({ to: '/organise', search: { tab: 'reorganizer' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/organise', search: { tab: 'reorganizer' } })
+  },
 })
 
 const folderReorganizerRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/folder-reorganizer',
-  beforeLoad: ({ navigate }) => navigate({ to: '/organise', search: { tab: 'reorganizer' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/organise', search: { tab: 'reorganizer' } })
+  },
 })
 
 const sharedDrivesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/shared-drives',
-  beforeLoad: ({ navigate }) => navigate({ to: '/organise', search: { tab: 'shared-drives' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/organise', search: { tab: 'shared-drives' } })
+  },
 })
 
 const workspaceFilesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/workspace-files',
-  beforeLoad: ({ navigate }) => navigate({ to: '/organise', search: { tab: 'workspace' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/organise', search: { tab: 'workspace' } })
+  },
 })
 
 const driveLabelsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/drive-labels',
-  beforeLoad: ({ navigate }) => navigate({ to: '/organise', search: { tab: 'labels' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/organise', search: { tab: 'labels' } })
+  },
 })
 
 const labelsManagementRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/labels-management',
-  beforeLoad: ({ navigate }) => navigate({ to: '/organise', search: { tab: 'labels' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/organise', search: { tab: 'labels' } })
+  },
 })
 
 // Security Aliases -> /security?tab=...
 const securityAuditRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/security-audit',
-  beforeLoad: ({ navigate }) => navigate({ to: '/security', search: { tab: 'audit' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/security', search: { tab: 'audit' } })
+  },
 })
 
 const sharedFilesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/shared-files',
-  beforeLoad: ({ navigate }) => navigate({ to: '/security', search: { tab: 'sharing' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/security', search: { tab: 'sharing' } })
+  },
 })
 
 const rotAnalysisRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/rot-analysis',
-  beforeLoad: ({ navigate }) => navigate({ to: '/security', search: { tab: 'rot' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/security', search: { tab: 'rot' } })
+  },
 })
 
 const carbonFootprintRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/carbon-footprint',
-  beforeLoad: ({ navigate }) => navigate({ to: '/security', search: { tab: 'carbon' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/security', search: { tab: 'carbon' } })
+  },
 })
 
 const storageAnalyticsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/storage-analytics',
-  beforeLoad: ({ navigate }) => navigate({ to: '/security', search: { tab: 'carbon' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/security', search: { tab: 'carbon' } })
+  },
 })
 
 const dailyImpactRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/daily-impact',
-  beforeLoad: ({ navigate }) => navigate({ to: '/security', search: { tab: 'carbon' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/security', search: { tab: 'carbon' } })
+  },
 })
 
 // Operations Aliases -> /operations?tab=...
 const bulkActionsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/bulk-actions',
-  beforeLoad: ({ navigate }) => navigate({ to: '/operations', search: { tab: 'bulk' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/operations', search: { tab: 'bulk' } })
+  },
 })
 
 const kanbanLabelsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/kanban-labels',
-  beforeLoad: ({ navigate }) => navigate({ to: '/operations', search: { tab: 'kanban' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/operations', search: { tab: 'kanban' } })
+  },
 })
 
 const autoArchiveRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/auto-archive',
-  beforeLoad: ({ navigate }) => navigate({ to: '/operations', search: { tab: 'archive' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/operations', search: { tab: 'archive' } })
+  },
 })
 
 const automationRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/automation',
-  beforeLoad: ({ navigate }) => navigate({ to: '/operations', search: { tab: 'triggers' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/operations', search: { tab: 'triggers' } })
+  },
 })
 
 const incrementalSyncRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/incremental-sync',
-  beforeLoad: ({ navigate }) => navigate({ to: '/operations', search: { tab: 'sync' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/operations', search: { tab: 'sync' } })
+  },
 })
 
 const changesStreamRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/changes-stream',
-  beforeLoad: ({ navigate }) => navigate({ to: '/operations', search: { tab: 'sync' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/operations', search: { tab: 'sync' } })
+  },
 })
 
 const historyRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/history',
-  beforeLoad: ({ navigate }) => navigate({ to: '/operations', search: { tab: 'history' } }),
+  beforeLoad: () => {
+    throw redirect({ to: '/operations', search: { tab: 'history' } })
+  },
 })
 
 // Create route tree

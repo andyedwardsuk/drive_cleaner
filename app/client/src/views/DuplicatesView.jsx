@@ -162,10 +162,37 @@ export default function DuplicatesView() {
     setExpandedGroups(newExpanded)
   }
 
+  // Resolve groups from data (either pre-grouped or derived from items)
+  const rawGroups = useMemo(() => {
+    if (data?.duplicates?.groups && data.duplicates.groups.length > 0) {
+      return data.duplicates.groups
+    }
+    if (data?.duplicates?.items && data.duplicates.items.length > 0) {
+      const map = new Map()
+      data.duplicates.items.forEach((item) => {
+        const key = `${item.file_name}_${item.size_bytes}`
+        if (!map.has(key)) {
+          map.set(key, [])
+        }
+        map.get(key).push(item)
+      })
+      return Array.from(map.values()).map((items) => {
+        const totalSize = items.reduce((s, i) => s + (i.size_bytes || 0), 0)
+        return {
+          file_name: items[0].file_name,
+          duplicate_count: items.length > 1 ? items.length : items.length + 1,
+          total_size_bytes: totalSize,
+          items: items,
+        }
+      })
+    }
+    return []
+  }, [data])
+
   // Expand all groups
   const expandAll = () => {
-    if (data?.duplicates?.groups) {
-      setExpandedGroups(new Set(data.duplicates.groups.map((g) => g.file_name)))
+    if (rawGroups.length > 0) {
+      setExpandedGroups(new Set(rawGroups.map((g) => g.file_name)))
     }
   }
 
@@ -176,9 +203,9 @@ export default function DuplicatesView() {
 
   // Filter and Sort groups
   const filteredAndSortedGroups = useMemo(() => {
-    if (!data?.duplicates?.groups) return []
+    if (rawGroups.length === 0) return []
 
-    let groups = [...data.duplicates.groups]
+    let groups = [...rawGroups]
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase()
@@ -202,23 +229,29 @@ export default function DuplicatesView() {
     })
 
     return groups
-  }, [data, searchQuery, sortBy, sortOrder])
+  }, [rawGroups, searchQuery, sortBy, sortOrder])
 
   // Calculate totals
   const { totalWastedSpace, totalFileCount, groupCount } = useMemo(() => {
-    if (!data?.duplicates?.groups) return { totalWastedSpace: 0, totalFileCount: 0, groupCount: 0 }
+    if (rawGroups.length === 0) {
+      return {
+        totalWastedSpace: data?.duplicates?.total_size_bytes || 0,
+        totalFileCount: data?.duplicates?.count || 0,
+        groupCount: 0,
+      }
+    }
 
-    const wastedSpace = data.duplicates.groups.reduce((sum, group) => {
+    const wastedSpace = rawGroups.reduce((sum, group) => {
       const wasted = group.total_size_bytes - (group.items[0]?.size_bytes || 0)
-      return sum + wasted
+      return sum + (wasted > 0 ? wasted : (group.items[0]?.size_bytes || 0))
     }, 0)
 
     return {
-      totalWastedSpace: wastedSpace,
-      totalFileCount: data.duplicates.count || 0,
-      groupCount: data.duplicates.groups.length
+      totalWastedSpace: data?.duplicates?.total_size_bytes || wastedSpace,
+      totalFileCount: data?.duplicates?.count || rawGroups.length,
+      groupCount: rawGroups.length,
     }
-  }, [data])
+  }, [rawGroups, data])
 
   const handleSort = (column) => {
     if (sortBy === column) {

@@ -62,20 +62,33 @@ export default function OperationsHubView() {
   const router = useRouterState()
   const navigate = useNavigate()
 
-  // Extract ?tab= query parameter or default to 'bulk'
-  const searchTab = router.location.search?.tab || new URLSearchParams(window.location.search).get('tab')
-  const initialTab = searchTab || 'bulk'
-  const [activeTab, setActiveTab] = useState(
-    OPERATIONS_TABS.some((t) => t.id === initialTab) ? initialTab : 'bulk'
-  )
-
-  // Synchronize when query string changes
-  useEffect(() => {
-    const tabParam = router.location.search?.tab || new URLSearchParams(window.location.search).get('tab')
-    if (tabParam && OPERATIONS_TABS.some((t) => t.id === tabParam)) {
-      setActiveTab(tabParam)
+  const getResolvedTab = () => {
+    const searchTab = router.location.search?.tab
+    if (searchTab && OPERATIONS_TABS.some((t) => t.id === searchTab)) return searchTab
+    try {
+      const hash = window.location.hash || ''
+      const qIdx = hash.indexOf('?')
+      if (qIdx !== -1) {
+        const hashTab = new URLSearchParams(hash.slice(qIdx)).get('tab')
+        if (hashTab && OPERATIONS_TABS.some((t) => t.id === hashTab)) return hashTab
+      }
+    } catch (e) {
+      // ignore
     }
-  }, [router.location.search])
+    const winTab = new URLSearchParams(window.location.search).get('tab')
+    if (winTab && OPERATIONS_TABS.some((t) => t.id === winTab)) return winTab
+    return 'bulk'
+  }
+
+  const [activeTab, setActiveTab] = useState(getResolvedTab())
+
+  // Synchronize when route search or hash changes
+  useEffect(() => {
+    const resolved = getResolvedTab()
+    if (resolved && resolved !== activeTab) {
+      setActiveTab(resolved)
+    }
+  }, [router.location.search, router.location.hash])
 
   const handleTabChange = (tabId) => {
     setActiveTab(tabId)

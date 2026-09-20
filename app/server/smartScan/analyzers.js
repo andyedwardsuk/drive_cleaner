@@ -265,6 +265,7 @@ function analyzeOldFiles(filesData, ageThresholds) {
         file_name: file.file_name,
         mime_type: file.mime_type,
         size_bytes: file.size_bytes,
+        age_years: Math.round((ageInDays / 365.25) * 10) / 10,
         created_date: file.created_date,
         modified_date: file.modified_date,
         last_viewed_date: file.last_viewed_date,
@@ -613,6 +614,7 @@ function analyzeDuplicates(filesData, method) {
 
     // Process duplicate groups
     const allDuplicates = [];
+    const formattedGroups = [];
     let totalSavings = 0;
 
     duplicateGroups.forEach(group => {
@@ -621,6 +623,14 @@ function analyzeDuplicates(filesData, method) {
         const dateA = a.modified_date ? new Date(a.modified_date) : new Date(a.created_date || 0);
         const dateB = b.modified_date ? new Date(b.modified_date) : new Date(b.created_date || 0);
         return dateB - dateA;
+      });
+
+      const groupTotalBytes = sortedGroup.reduce((sum, f) => sum + (f.size_bytes || 0), 0);
+      formattedGroups.push({
+        file_name: sortedGroup[0].file_name,
+        duplicate_count: sortedGroup.length,
+        total_size_bytes: groupTotalBytes,
+        items: sortedGroup
       });
 
       // Keep newest, mark others as duplicates
@@ -654,6 +664,7 @@ function analyzeDuplicates(filesData, method) {
     return {
       count: allDuplicates.length,
       total_size_bytes: totalSavings,
+      groups: formattedGroups,
       items: allDuplicates,
       category_name: 'Duplicate Files',
       category_type: 'duplicates'
@@ -663,6 +674,7 @@ function analyzeDuplicates(filesData, method) {
     return {
       count: 0,
       total_size_bytes: 0,
+      groups: [],
       items: [],
       category_name: 'Duplicate Files',
       category_type: 'duplicates'
