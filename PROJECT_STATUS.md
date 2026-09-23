@@ -1,9 +1,9 @@
 # Drive Cleaner - Project Status
 
-**Last Updated**: 2026-09-17
+**Last Updated**: 2026-09-20
 **Current Phase**: Phase 5 (Complete) - Production Hardening & Automation
-**Current Velocity**: 29 major releases deployed
-**Active Deployment**: v3.4.0 (@52)
+**Current Velocity**: 30 major releases deployed
+**Active Deployment**: v3.5.0 (@109 / @110)
 **Deployment URL**: https://script.google.com/a/macros/andyedwards.uk/s/AKfycbwiqWc11iCB2ht81cM7w9btfJtAN87hyZdgJi-wEnm0U8l0XLBtLkLrT_3RhszXkBh48w/exec
 
 ---
@@ -33,10 +33,11 @@
 
 ---
 
-## ✅ Completed Major Releases (v2.0.0 - v3.4.0)
+## ✅ Completed Major Releases (v2.0.0 - v3.5.0)
 
 | Version | Feature | Type | Status | Deployment | Git Commit |
 |---|---|---|---|---|---|
+| **v3.5.0** | **Live Hierarchy Reorganizer & Trash Safety** | Full Stack/UX | ✅ Complete | `@109` / `@110` | `c5b3cb1` |
 | **v3.4.0** | **Unified 5-Hub Architecture & Tabs** | Full Stack/UX | ✅ Complete | `@52` | `HEAD` |
 | **v3.3.0** | **2026 Spatial Architecture & ⌘K Engine** | Full Stack/UX | ✅ Complete | `@51` | `e92a8b9` |
 | **v3.2.3** | **Minimised Category Dock & Flyouts** | Frontend/UX | ✅ Complete | `@50` | `f0b833b` |

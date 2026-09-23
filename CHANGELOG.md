@@ -2,6 +2,26 @@
 
 All notable changes to the Drive Cleaner project will be documented in this file.
 
+## [3.5.0] - 2026-09-20
+### Added
+- **Smart Folder Reorganiser Real Hierarchy Traversal & Semantic Clustering**:
+  - **Live Drive Hierarchy**: Connected the folder reorganiser directly to Google Drive hierarchy traversal (`getCurrentDriveHierarchy` & `buildFolderHierarchy`), eliminating mock/synthetic directory structures.
+  - **Semantic Cluster Engine**: Integrated intelligent file clustering (`buildSemanticClusters`) grouping unorganised files into contextual clusters (Finance, Engineering, Assets, Operations, Legal) with confidence ratings and proposed target folder destinations.
+  - **Interactive Triage & Destination Controls**: Full per-file selection/deselection, target directory dropdown mapping to real Drive folders, on-the-fly destination folder creation, and batch move execution with dry-run safety previews.
+- **One-Click & Row-Level Trash Integration**:
+  - Embedded one-click batch cleanup and row-level trash actions across *Duplicates*, *Empty Items*, and *Old Files* views.
+
+### Fixed
+- **Drive API Trash Validation & Schema Normalization**:
+  - Normalized heterogeneous file ID schemas (`id` vs `fileId`, `title` vs `name`) across all views and modals.
+  - Added robust server-side file ID validation and error handling before executing `drive.files.trash`.
+- **Header & Component Layout Stabilization**:
+  - Stabilized dimensions and styling of the green `Live` status button in `TopHeader.jsx` to prevent 70px layout reflows during scans and scrollbar state changes.
+  - Fixed double-chevron rendering in workspace breadcrumbs (`Drive Cleaner > > Organisation Studio`).
+  - Added min-width constraints to structure health rating badges and action buttons in `SmartReorganizerView.jsx`.
+
+---
+
 ## [3.4.0] - 2026-09-17
 ### Changed
 - **Unified 5-Hub Workspace Architecture & Tab Navigation**:
